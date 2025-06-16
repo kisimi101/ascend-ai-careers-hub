@@ -1,6 +1,7 @@
 
 import { Hero } from "@/components/Hero";
 import { ResumeTemplates } from "@/components/ResumeTemplates";
+import { JobShowcase } from "@/components/JobShowcase";
 import { Features } from "@/components/Features";
 import { Testimonials } from "@/components/Testimonials";
 import { CTA } from "@/components/CTA";
@@ -12,6 +13,7 @@ const Index = () => {
       <Navigation />
       <Hero />
       <ResumeTemplates />
+      <JobShowcase />
       <Features />
       <Testimonials />
       <CTA />

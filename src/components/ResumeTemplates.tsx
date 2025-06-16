@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { FileText, Star, Download } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const resumeTemplates = [
   {
@@ -18,7 +19,8 @@ const resumeTemplates = [
     rating: 4.9,
     downloads: "12K+",
     preview: "bg-gradient-to-br from-blue-50 to-indigo-100",
-    color: "from-blue-500 to-indigo-500"
+    color: "from-blue-500 to-indigo-500",
+    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=600&fit=crop"
   },
   {
     id: 2,
@@ -27,7 +29,8 @@ const resumeTemplates = [
     rating: 4.8,
     downloads: "8K+",
     preview: "bg-gradient-to-br from-purple-50 to-pink-100",
-    color: "from-purple-500 to-pink-500"
+    color: "from-purple-500 to-pink-500",
+    image: "https://images.unsplash.com/photo-1634128221889-82ed6efebfc3?w=400&h=600&fit=crop"
   },
   {
     id: 3,
@@ -36,7 +39,8 @@ const resumeTemplates = [
     rating: 4.9,
     downloads: "15K+",
     preview: "bg-gradient-to-br from-green-50 to-teal-100",
-    color: "from-green-500 to-teal-500"
+    color: "from-green-500 to-teal-500",
+    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=600&fit=crop"
   },
   {
     id: 4,
@@ -45,7 +49,8 @@ const resumeTemplates = [
     rating: 4.7,
     downloads: "6K+",
     preview: "bg-gradient-to-br from-orange-50 to-red-100",
-    color: "from-orange-500 to-red-500"
+    color: "from-orange-500 to-red-500",
+    image: "https://images.unsplash.com/photo-1634128221889-82ed6efebfc3?w=400&h=600&fit=crop"
   },
   {
     id: 5,
@@ -54,11 +59,36 @@ const resumeTemplates = [
     rating: 4.8,
     downloads: "10K+",
     preview: "bg-gradient-to-br from-cyan-50 to-blue-100",
-    color: "from-cyan-500 to-blue-500"
+    color: "from-cyan-500 to-blue-500",
+    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=600&fit=crop"
   }
 ];
 
 export const ResumeTemplates = () => {
+  const [api, setApi] = useState<any>();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCurrent(api.selectedScrollSnap());
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap());
+    });
+
+    // Auto-scroll functionality
+    const interval = setInterval(() => {
+      if (api) {
+        api.scrollNext();
+      }
+    }, 4000); // Change slide every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [api]);
+
   return (
     <section className="py-20 px-6 bg-gray-50/50">
       <div className="container mx-auto">
@@ -76,6 +106,7 @@ export const ResumeTemplates = () => {
 
         <div className="relative max-w-5xl mx-auto">
           <Carousel
+            setApi={setApi}
             opts={{
               align: "start",
               loop: true,
@@ -88,23 +119,13 @@ export const ResumeTemplates = () => {
                   <Card className="group hover:shadow-2xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm overflow-hidden">
                     <CardContent className="p-0">
                       {/* Template Preview */}
-                      <div className={`h-64 ${template.preview} relative overflow-hidden`}>
-                        <div className="absolute inset-4 bg-white/90 rounded-lg shadow-sm p-4">
-                          <div className="space-y-2">
-                            <div className="h-3 bg-gray-300 rounded w-3/4"></div>
-                            <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                            <div className="h-2 bg-gray-200 rounded w-2/3"></div>
-                            <div className="mt-4 space-y-1">
-                              <div className="h-2 bg-gray-200 rounded"></div>
-                              <div className="h-2 bg-gray-200 rounded w-5/6"></div>
-                              <div className="h-2 bg-gray-200 rounded w-4/6"></div>
-                            </div>
-                            <div className="mt-4 space-y-1">
-                              <div className="h-2 bg-gray-200 rounded w-3/4"></div>
-                              <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                            </div>
-                          </div>
-                        </div>
+                      <div className="h-64 relative overflow-hidden bg-gray-100">
+                        <img 
+                          src={template.image} 
+                          alt={`${template.name} resume template`}
+                          className="w-full h-full object-cover opacity-90"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                         <div className={`absolute -top-2 -right-2 w-16 h-16 bg-gradient-to-r ${template.color} rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500`}></div>
                       </div>
 
