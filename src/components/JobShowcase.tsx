@@ -239,7 +239,7 @@ export const JobShowcase = () => {
       </div>
 
       {/* Custom CSS for animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes slide-left {
           0% {
             transform: translateX(0);
