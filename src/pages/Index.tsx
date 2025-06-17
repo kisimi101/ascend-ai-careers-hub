@@ -8,11 +8,15 @@ import { PricingSection } from "@/components/PricingSection";
 import { Testimonials } from "@/components/Testimonials";
 import { CTA } from "@/components/CTA";
 import { Navigation } from "@/components/Navigation";
+import { FloatingCTA } from "@/components/FloatingCTA";
+import { FloatingSideTools } from "@/components/FloatingSideTools";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
       <Navigation />
+      <FloatingCTA />
+      <FloatingSideTools />
       <Hero />
       <ResumeTemplates />
       <JobShowcase />
