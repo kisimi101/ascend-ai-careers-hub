@@ -23,41 +23,42 @@ export const FloatingSideTools = () => {
 
   const tools = [
     {
-      name: "Cover Letter Generator",
+      name: "Free Cover Letter Generator",
       icon: FileText,
       color: "from-blue-500 to-blue-600",
     },
     {
-      name: "AI Resume Builder",
+      name: "Free AI Resume Builder",
       icon: User,
       color: "from-green-500 to-green-600",
     },
     {
-      name: "Resume Checker",
+      name: "Free Resume Checker",
       icon: CheckCircle,
       color: "from-purple-500 to-purple-600",
     },
   ];
 
+  if (!isVisible) return null;
+
   return (
-    <div
-      className={`fixed right-4 top-1/2 transform -translate-y-1/2 z-40 transition-all duration-300 ${
-        isVisible ? "translate-x-0 opacity-100" : "translate-x-20 opacity-0"
-      }`}
-    >
+    <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40">
       <div className="flex items-center">
         {/* Expanded tools */}
         <div
           className={`flex flex-col space-y-2 mr-2 transition-all duration-300 ${
-            isExpanded ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0"
+            isExpanded ? "translate-x-0 opacity-100" : "translate-x-10 opacity-0 pointer-events-none"
           }`}
         >
           {tools.map((tool, index) => (
             <Button
               key={tool.name}
               size="sm"
-              className={`bg-gradient-to-r ${tool.color} hover:scale-105 transition-transform shadow-lg min-w-[180px] justify-start`}
-              style={{ animationDelay: `${index * 100}ms` }}
+              className={`bg-gradient-to-r ${tool.color} hover:scale-105 transition-transform shadow-lg min-w-[200px] justify-start text-white`}
+              style={{ 
+                animationDelay: `${index * 100}ms`,
+                transform: isExpanded ? 'translateX(0)' : 'translateX(100%)'
+              }}
             >
               <tool.icon className="mr-2 h-4 w-4" />
               {tool.name}
