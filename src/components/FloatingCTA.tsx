@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Rocket } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const FloatingCTA = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -26,6 +28,7 @@ export const FloatingCTA = () => {
       }`}
     >
       <Button
+        onClick={() => navigate('/resume-builder')}
         size="lg"
         className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-2xl px-8 py-4 rounded-full text-lg font-semibold animate-pulse"
       >

@@ -2,10 +2,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FileText, User, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const FloatingSideTools = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -26,16 +28,19 @@ export const FloatingSideTools = () => {
       name: "Free Cover Letter Generator",
       icon: FileText,
       color: "from-blue-500 to-blue-600",
+      path: "/cover-letter-generator"
     },
     {
       name: "Free AI Resume Builder",
       icon: User,
       color: "from-green-500 to-green-600",
+      path: "/resume-builder"
     },
     {
       name: "Free Resume Checker",
       icon: CheckCircle,
       color: "from-purple-500 to-purple-600",
+      path: "/resume-checker"
     },
   ];
 
@@ -53,6 +58,7 @@ export const FloatingSideTools = () => {
           {tools.map((tool, index) => (
             <Button
               key={tool.name}
+              onClick={() => navigate(tool.path)}
               size="sm"
               className={`bg-gradient-to-r ${tool.color} hover:scale-105 transition-transform shadow-lg min-w-[200px] justify-start text-white`}
               style={{ 
