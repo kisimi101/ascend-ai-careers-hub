@@ -2,228 +2,254 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Code, Users, TrendingUp, Award, Clock } from "lucide-react";
-import { useState, useEffect } from "react";
+import { CheckCircle, XCircle, Clock, Trophy, Target, Zap } from "lucide-react";
+import { useState } from "react";
 
-const skillCategories = [
+const skillsQuestions = [
   {
-    name: "Technical Skills",
-    icon: Code,
-    color: "from-blue-500 to-cyan-500",
-    skills: ["JavaScript", "Python", "React", "Data Analysis", "SQL"],
-    progress: 75
+    id: 1,
+    question: "What is your experience level with React?",
+    options: ["Beginner", "Intermediate", "Advanced", "Expert"],
+    correct: 2
   },
   {
-    name: "Soft Skills",
-    icon: Users,
-    color: "from-purple-500 to-pink-500",
-    skills: ["Communication", "Leadership", "Problem Solving", "Teamwork", "Time Management"],
-    progress: 82
+    id: 2,
+    question: "Which programming language are you most comfortable with?",
+    options: ["JavaScript", "Python", "Java", "C++"],
+    correct: 0
   },
   {
-    name: "Industry Knowledge",
-    icon: TrendingUp,
-    color: "from-green-500 to-teal-500",
-    skills: ["Market Trends", "Business Strategy", "Project Management", "Analytics", "Innovation"],
-    progress: 68
+    id: 3,
+    question: "How would you rate your problem-solving skills?",
+    options: ["Fair", "Good", "Very Good", "Excellent"],
+    correct: 3
   },
   {
-    name: "AI & Automation",
-    icon: Brain,
-    color: "from-orange-500 to-red-500",
-    skills: ["Machine Learning", "AI Tools", "Process Automation", "Data Science", "Prompt Engineering"],
-    progress: 45
+    id: 4,
+    question: "What's your preferred work environment?",
+    options: ["Remote", "Hybrid", "Office", "Flexible"],
+    correct: 3
+  },
+  {
+    id: 5,
+    question: "How do you handle tight deadlines?",
+    options: ["Stress out", "Plan carefully", "Work overtime", "Communicate early"],
+    correct: 3
   }
 ];
 
-const achievements = [
-  { name: "Quick Learner", icon: "🚀", description: "Completed 5 assessments in one day" },
-  { name: "Skill Master", icon: "🏆", description: "Scored 90%+ in Technical Skills" },
-  { name: "Well Rounded", icon: "⭐", description: "High scores across all categories" },
-  { name: "Growth Mindset", icon: "📈", description: "Improved scores by 20% this month" }
-];
-
 export const SkillsAssessment = () => {
-  const [currentSkill, setCurrentSkill] = useState(0);
-  const [isAssessing, setIsAssessing] = useState(false);
-  const [assessmentProgress, setAssessmentProgress] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [isStarted, setIsStarted] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSkill((prev) => (prev + 1) % skillCategories.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  const handleAnswer = (answerIndex: number) => {
+    const newAnswers = [...answers, answerIndex];
+    setAnswers(newAnswers);
 
-  const startAssessment = () => {
-    setIsAssessing(true);
-    setAssessmentProgress(0);
-    
-    const progressInterval = setInterval(() => {
-      setAssessmentProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          setIsAssessing(false);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
+    if (currentQuestion < skillsQuestions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      setShowResults(true);
+    }
   };
 
-  return (
-    <section className="py-20 px-6 bg-gradient-to-br from-gray-50 to-white">
-      <div className="container mx-auto">
-        <div className="text-center mb-16">
-          <div className="inline-block mb-4">
-            <span className="bg-purple-100 text-purple-600 px-4 py-2 rounded-full text-sm font-semibold">
-              🧠 Skills Assessment
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Discover Your
-            <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              {" "}Skill Strengths
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Take our AI-powered assessment to identify your strengths, discover growth opportunities, and get personalized career recommendations
-          </p>
-        </div>
+  const calculateScore = () => {
+    let correct = 0;
+    answers.forEach((answer, index) => {
+      if (answer === skillsQuestions[index].correct) {
+        correct++;
+      }
+    });
+    return Math.round((correct / skillsQuestions.length) * 100);
+  };
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Assessment Interface */}
-          <div className="space-y-6">
-            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center text-2xl">
-                  <Brain className="mr-3 text-purple-500" size={28} />
-                  Interactive Assessment
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <div className={`w-20 h-20 mx-auto rounded-2xl bg-gradient-to-r ${skillCategories[currentSkill].color} flex items-center justify-center mb-4 transition-all duration-500`}>
-                      <skillCategories[currentSkill].icon className="text-white" size={36} />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{skillCategories[currentSkill].name}</h3>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      {skillCategories[currentSkill].skills.map((skill, idx) => (
-                        <span key={idx} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+  const getScoreMessage = (score: number) => {
+    if (score >= 80) return { message: "Excellent! You're ready for senior positions.", icon: Trophy, color: "text-yellow-500" };
+    if (score >= 60) return { message: "Good job! You have solid foundation skills.", icon: Target, color: "text-green-500" };
+    if (score >= 40) return { message: "Not bad! Keep learning and improving.", icon: Zap, color: "text-blue-500" };
+    return { message: "Keep practicing! There's room for growth.", icon: Clock, color: "text-gray-500" };
+  };
 
-                  {isAssessing ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Assessment Progress</span>
-                        <span className="text-sm font-semibold">{assessmentProgress}%</span>
-                      </div>
-                      <Progress value={assessmentProgress} className="h-3" />
-                      <p className="text-center text-gray-600">Analyzing your responses...</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg">
-                        <div className="flex items-center mb-2">
-                          <Clock className="text-purple-500 mr-2" size={16} />
-                          <span className="text-sm font-semibold text-purple-700">Quick Assessment</span>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          • 15 minutes to complete<br/>
-                          • Get instant results<br/>
-                          • Personalized recommendations
-                        </p>
-                      </div>
-                      <Button 
-                        onClick={startAssessment}
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                        size="lg"
-                      >
-                        Start Free Assessment
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+  const resetAssessment = () => {
+    setCurrentQuestion(0);
+    setAnswers([]);
+    setShowResults(false);
+    setIsStarted(false);
+  };
 
-            {/* Achievements */}
-            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Award className="mr-2 text-yellow-500" size={20} />
-                  Your Achievements
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  {achievements.map((achievement, idx) => (
-                    <div key={idx} className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                      <div className="text-2xl mb-1">{achievement.icon}</div>
-                      <div className="text-sm font-semibold text-gray-900">{achievement.name}</div>
-                      <div className="text-xs text-gray-600">{achievement.description}</div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Skills Progress */}
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-center mb-8">Your Current Skill Profile</h3>
-            {skillCategories.map((category, idx) => (
-              <Card key={idx} className={`border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 ${currentSkill === idx ? 'ring-2 ring-purple-200' : ''}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mr-3`}>
-                        <category.icon className="text-white" size={20} />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{category.name}</h4>
-                        <p className="text-sm text-gray-600">{category.skills.length} skills assessed</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-gray-900">{category.progress}%</div>
-                      <div className="text-xs text-gray-500">Proficiency</div>
-                    </div>
-                  </div>
-                  <Progress value={category.progress} className="h-2" />
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {category.skills.slice(0, 3).map((skill, skillIdx) => (
-                      <span key={skillIdx} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
-                        {skill}
-                      </span>
-                    ))}
-                    {category.skills.length > 3 && (
-                      <span className="text-gray-400 text-xs px-2 py-1">
-                        +{category.skills.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8">
-            <h3 className="text-2xl font-bold mb-4">Ready to unlock your potential?</h3>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Join thousands of professionals who have discovered their strengths and accelerated their careers with our comprehensive skill assessment platform.
+  if (!isStarted) {
+    return (
+      <section className="py-20 px-6 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4">
+              <span className="bg-blue-100 text-blue-600 px-4 py-2 rounded-full text-sm font-semibold">
+                🎯 Skills Assessment
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Test Your
+              <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                {" "}Professional Skills
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+              Take our quick 5-minute assessment to discover your strengths and get personalized career recommendations
             </p>
-            <Button size="lg" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
-              Get Detailed Assessment Report
-            </Button>
           </div>
+
+          <div className="max-w-2xl mx-auto">
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-2xl">
+              <CardHeader className="text-center pb-6">
+                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mb-4">
+                  <Target className="text-white" size={40} />
+                </div>
+                <CardTitle className="text-2xl mb-4">Ready to Begin?</CardTitle>
+                <p className="text-gray-600">
+                  This assessment will help us understand your skills and match you with the perfect career opportunities.
+                </p>
+              </CardHeader>
+              <CardContent className="text-center">
+                <div className="grid grid-cols-3 gap-4 mb-8">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">5</div>
+                    <div className="text-sm text-gray-500">Questions</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">5</div>
+                    <div className="text-sm text-gray-500">Minutes</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">Free</div>
+                    <div className="text-sm text-gray-500">Always</div>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setIsStarted(true)}
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4 text-lg"
+                >
+                  Start Assessment
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (showResults) {
+    const score = calculateScore();
+    const { message, icon: Icon, color } = getScoreMessage(score);
+
+    return (
+      <section className="py-20 px-6 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto">
+          <div className="max-w-2xl mx-auto">
+            <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-2xl">
+              <CardHeader className="text-center pb-6">
+                <div className={`w-20 h-20 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center mb-4`}>
+                  <Icon className={`${color} bg-white rounded-full p-2`} size={40} />
+                </div>
+                <CardTitle className="text-3xl mb-4">Assessment Complete!</CardTitle>
+                <div className="text-6xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-2">
+                  {score}%
+                </div>
+                <p className="text-gray-600 mb-6">{message}</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between text-sm">
+                    <span>Your Score</span>
+                    <span>{score}%</span>
+                  </div>
+                  <Progress value={score} className="h-3" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <CheckCircle className="text-green-500 mx-auto mb-2" size={24} />
+                    <div className="font-semibold text-green-700">Correct Answers</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {answers.filter((answer, index) => answer === skillsQuestions[index].correct).length}
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-red-50 rounded-lg">
+                    <XCircle className="text-red-500 mx-auto mb-2" size={24} />
+                    <div className="font-semibold text-red-700">Incorrect Answers</div>
+                    <div className="text-2xl font-bold text-red-600">
+                      {answers.filter((answer, index) => answer !== skillsQuestions[index].correct).length}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    onClick={resetAssessment}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Retake Assessment
+                  </Button>
+                  <Button
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white flex-1"
+                  >
+                    View Job Matches
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-20 px-6 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm text-gray-500">
+                Question {currentQuestion + 1} of {skillsQuestions.length}
+              </span>
+              <span className="text-sm text-gray-500">
+                {Math.round(((currentQuestion + 1) / skillsQuestions.length) * 100)}% Complete
+              </span>
+            </div>
+            <Progress 
+              value={((currentQuestion + 1) / skillsQuestions.length) * 100} 
+              className="h-2 mb-6" 
+            />
+          </div>
+
+          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-2xl">
+            <CardHeader>
+              <CardTitle className="text-xl mb-4">
+                {skillsQuestions[currentQuestion].question}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {skillsQuestions[currentQuestion].options.map((option, index) => (
+                  <Button
+                    key={index}
+                    onClick={() => handleAnswer(index)}
+                    variant="outline"
+                    className="w-full text-left justify-start p-4 h-auto hover:bg-blue-50 hover:border-blue-300 transition-all"
+                  >
+                    <span className="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center mr-3 text-sm">
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    {option}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
