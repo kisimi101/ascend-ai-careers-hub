@@ -10,6 +10,7 @@ import { CTA } from "@/components/CTA";
 import { Navigation } from "@/components/Navigation";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { FloatingSideTools } from "@/components/FloatingSideTools";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -25,6 +26,7 @@ const Index = () => {
       <PricingSection />
       <Testimonials />
       <CTA />
+      <Footer />
     </div>
   );
 };

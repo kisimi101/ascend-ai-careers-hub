@@ -1,9 +1,10 @@
-
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
 import { Upload, FileText, CheckCircle, AlertTriangle, X, Target, Zap, Eye } from "lucide-react";
+import { Footer } from "@/components/Footer";
+import { useNavigate } from "react-router-dom";
 
 interface AnalysisResult {
   overallScore: number;
@@ -30,6 +31,7 @@ const ResumeChecker = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [jobDescription, setJobDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -103,15 +105,36 @@ const ResumeChecker = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      <Navigation />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">AI Resume Checker</h1>
-            <p className="text-xl text-gray-600">Get instant feedback and ATS compatibility score</p>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">AI</span>
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                CareerHub
+              </span>
+            </div>
+            <Button onClick={() => navigate('/')} variant="outline">
+              Back to Home
+            </Button>
           </div>
+        </div>
+      </nav>
 
+      {/* Main Content */}
+      <div className="container mx-auto px-6 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">AI Resume Checker & Grader</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Get instant feedback on your resume's ATS compatibility and professional quality
+          </p>
+        </div>
+
+        <div className="max-w-4xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Upload Section */}
             <div className="lg:col-span-1">
@@ -315,6 +338,8 @@ const ResumeChecker = () => {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };
