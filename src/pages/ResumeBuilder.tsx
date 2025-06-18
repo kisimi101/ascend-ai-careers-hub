@@ -8,7 +8,7 @@ import { Navigation } from "@/components/Navigation";
 import { useForm } from "react-hook-form";
 import { Download, FileText, User, Briefcase, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/Footer";
 
 interface ResumeData {
   personalInfo: {

@@ -1,9 +1,10 @@
+
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
 import { Upload, FileText, CheckCircle, AlertTriangle, X, Target, Zap, Eye } from "lucide-react";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 
 interface AnalysisResult {
