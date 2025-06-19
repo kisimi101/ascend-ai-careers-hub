@@ -1,8 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { FileText, User, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const CTA = () => {
+  const navigate = useNavigate();
+
   const freeTools = [
     {
       name: "Free Cover Letter Generator",
@@ -38,7 +41,12 @@ export const CTA = () => {
               Start your free trial today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" className="px-8 py-4 text-lg bg-white text-orange-600 hover:bg-gray-100">
+              <Button 
+                size="lg" 
+                variant="secondary" 
+                className="px-8 py-4 text-lg bg-white text-orange-600 hover:bg-gray-100"
+                onClick={() => navigate('/tools')}
+              >
                 Start Free Trial
               </Button>
               <Button size="lg" variant="outline" className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-orange-600">
@@ -72,7 +80,10 @@ export const CTA = () => {
               </div>
               <h4 className="text-xl font-bold text-gray-900 mb-3">{tool.name}</h4>
               <p className="text-gray-600 mb-6">{tool.description}</p>
-              <Button className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90`}>
+              <Button 
+                className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90`}
+                onClick={() => navigate('/tools')}
+              >
                 Try Now - Free
               </Button>
             </div>
