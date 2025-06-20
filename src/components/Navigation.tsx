@@ -62,6 +62,7 @@ export const Navigation = () => {
               </MenuItem>
               <MenuItem setActive={setActive} active={active} item="Community">
                 <div className="flex flex-col space-y-4 text-sm">
+                  <HoveredLink to="/community">Community Home</HoveredLink>
                   <HoveredLink to="/community/forums">Discussion Forums</HoveredLink>
                   <HoveredLink to="/community/success-stories">Success Stories</HoveredLink>
                   <HoveredLink to="/community/career-advice">Career Advice</HoveredLink>
