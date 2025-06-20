@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import ResumeBuilder from "./pages/ResumeBuilder";
 import CoverLetterGenerator from "./pages/CoverLetterGenerator";
 import ResumeChecker from "./pages/ResumeChecker";
 import ResumeSummaryGenerator from "./pages/ResumeSummaryGenerator";
+import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,7 @@ const App = () => (
           <Route path="/cover-letter-generator" element={<CoverLetterGenerator />} />
           <Route path="/resume-checker" element={<ResumeChecker />} />
           <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
+          <Route path="/community" element={<Community />} />
           <Route path="/resume-bullet-generator" element={<NotFound />} />
           <Route path="/resume-skills-generator" element={<NotFound />} />
           <Route path="/resume-keyword-scanner" element={<NotFound />} />
