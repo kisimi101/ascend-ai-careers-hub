@@ -11,6 +11,7 @@ import CoverLetterGenerator from "./pages/CoverLetterGenerator";
 import ResumeChecker from "./pages/ResumeChecker";
 import ResumeSummaryGenerator from "./pages/ResumeSummaryGenerator";
 import Community from "./pages/Community";
+import JobSearch from "./pages/JobSearch";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/resume-checker" element={<ResumeChecker />} />
           <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/job-search" element={<JobSearch />} />
           <Route path="/resume-bullet-generator" element={<NotFound />} />
           <Route path="/resume-skills-generator" element={<NotFound />} />
           <Route path="/resume-keyword-scanner" element={<NotFound />} />

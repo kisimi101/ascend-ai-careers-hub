@@ -34,6 +34,9 @@ export const Navigation = () => {
               </MenuItem>
               <MenuItem setActive={setActive} active={active} item="Job Search">
                 <div className="text-sm grid grid-cols-2 gap-10 p-4">
+                  <div className="flex flex-col space-y-4">
+                    <HoveredLink to="/job-search">Job Search</HoveredLink>
+                  </div>
                   <ProductItem
                     title="Cover Letter Generator"
                     href="/cover-letter-generator"
