@@ -12,6 +12,10 @@ import ResumeChecker from "./pages/ResumeChecker";
 import ResumeSummaryGenerator from "./pages/ResumeSummaryGenerator";
 import Community from "./pages/Community";
 import JobSearch from "./pages/JobSearch";
+import ResumeBulletGenerator from "./pages/ResumeBulletGenerator";
+import InterviewPractice from "./pages/InterviewPractice";
+import SalaryEstimator from "./pages/SalaryEstimator";
+import JobTracker from "./pages/JobTracker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,13 +35,13 @@ const App = () => (
           <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
           <Route path="/community" element={<Community />} />
           <Route path="/job-search" element={<JobSearch />} />
-          <Route path="/resume-bullet-generator" element={<NotFound />} />
+          <Route path="/resume-bullet-generator" element={<ResumeBulletGenerator />} />
           <Route path="/resume-skills-generator" element={<NotFound />} />
           <Route path="/resume-keyword-scanner" element={<NotFound />} />
           <Route path="/resignation-letter-generator" element={<NotFound />} />
-          <Route path="/interview-practice" element={<NotFound />} />
-          <Route path="/salary-estimator" element={<NotFound />} />
-          <Route path="/job-tracker" element={<NotFound />} />
+          <Route path="/interview-practice" element={<InterviewPractice />} />
+          <Route path="/salary-estimator" element={<SalaryEstimator />} />
+          <Route path="/job-tracker" element={<JobTracker />} />
           <Route path="/resume-enhancer" element={<NotFound />} />
           <Route path="/resume-translator" element={<NotFound />} />
           <Route path="/resume-examples" element={<NotFound />} />
