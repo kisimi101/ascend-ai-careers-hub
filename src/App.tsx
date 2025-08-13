@@ -16,6 +16,14 @@ import ResumeBulletGenerator from "./pages/ResumeBulletGenerator";
 import InterviewPractice from "./pages/InterviewPractice";
 import SalaryEstimator from "./pages/SalaryEstimator";
 import JobTracker from "./pages/JobTracker";
+import ResumeSkillsGenerator from "./pages/ResumeSkillsGenerator";
+import ResumeKeywordScanner from "./pages/ResumeKeywordScanner";
+import ResignationLetterGenerator from "./pages/ResignationLetterGenerator";
+import ResumeEnhancer from "./pages/ResumeEnhancer";
+import ResumeTranslator from "./pages/ResumeTranslator";
+import ResumeExamples from "./pages/ResumeExamples";
+import SocialPreview from "./pages/SocialPreview";
+import VideoResume from "./pages/VideoResume";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,17 +44,17 @@ const App = () => (
           <Route path="/community" element={<Community />} />
           <Route path="/job-search" element={<JobSearch />} />
           <Route path="/resume-bullet-generator" element={<ResumeBulletGenerator />} />
-          <Route path="/resume-skills-generator" element={<NotFound />} />
-          <Route path="/resume-keyword-scanner" element={<NotFound />} />
-          <Route path="/resignation-letter-generator" element={<NotFound />} />
+          <Route path="/resume-skills-generator" element={<ResumeSkillsGenerator />} />
+          <Route path="/resume-keyword-scanner" element={<ResumeKeywordScanner />} />
+          <Route path="/resignation-letter-generator" element={<ResignationLetterGenerator />} />
           <Route path="/interview-practice" element={<InterviewPractice />} />
           <Route path="/salary-estimator" element={<SalaryEstimator />} />
           <Route path="/job-tracker" element={<JobTracker />} />
-          <Route path="/resume-enhancer" element={<NotFound />} />
-          <Route path="/resume-translator" element={<NotFound />} />
-          <Route path="/resume-examples" element={<NotFound />} />
-          <Route path="/social-preview" element={<NotFound />} />
-          <Route path="/video-resume" element={<NotFound />} />
+          <Route path="/resume-enhancer" element={<ResumeEnhancer />} />
+          <Route path="/resume-translator" element={<ResumeTranslator />} />
+          <Route path="/resume-examples" element={<ResumeExamples />} />
+          <Route path="/social-preview" element={<SocialPreview />} />
+          <Route path="/video-resume" element={<VideoResume />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
