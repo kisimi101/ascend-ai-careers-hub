@@ -41,7 +41,7 @@ export const ResumePreview = ({ resumeData, onDownloadPDF }: ResumePreviewProps)
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="bg-white p-6 border rounded-lg min-h-[600px] text-sm">
+        <div id="resume-preview" className="bg-white p-6 border rounded-lg min-h-[600px] text-sm">
           <div className="text-center border-b pb-4 mb-4">
             <h2 className="text-xl font-bold">{resumeData.personalInfo.fullName || "Your Name"}</h2>
             <p className="text-gray-600">{resumeData.personalInfo.email} | {resumeData.personalInfo.phone}</p>

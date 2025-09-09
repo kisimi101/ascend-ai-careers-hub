@@ -11,6 +11,9 @@ import { ExperienceForm } from "@/components/resume-builder/ExperienceForm";
 import { EducationForm } from "@/components/resume-builder/EducationForm";
 import { SkillsForm } from "@/components/resume-builder/SkillsForm";
 import { ResumePreview } from "@/components/resume-builder/ResumePreview";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { useToast } from "@/hooks/use-toast";
 
 interface ResumeData {
   personalInfo: {
@@ -88,12 +91,75 @@ const ResumeBuilder = () => {
     setResumeData(prev => ({ ...prev, skills }));
   };
 
+  const { toast } = useToast();
+
   const generateResume = async () => {
     console.log("Generating enhanced resume with AI...", resumeData);
   };
 
-  const downloadPDF = () => {
-    console.log("Downloading PDF...");
+  const downloadPDF = async () => {
+    try {
+      toast({
+        title: "Generating PDF...",
+        description: "Please wait while we create your resume PDF.",
+      });
+
+      const resumeElement = document.getElementById('resume-preview');
+      if (!resumeElement) {
+        toast({
+          title: "Error",
+          description: "Resume preview not found. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const canvas = await html2canvas(resumeElement, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const fileName = `${resumeData.personalInfo.fullName || 'Resume'}_Resume.pdf`;
+      pdf.save(fileName);
+
+      toast({
+        title: "Success!",
+        description: "Your resume has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderCurrentStep = () => {
