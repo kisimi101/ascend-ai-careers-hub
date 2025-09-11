@@ -142,30 +142,39 @@ const ResumeBuilder = () => {
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
+        onclone: (clonedDoc) => {
+          const el = clonedDoc.getElementById('resume-preview') as HTMLElement | null;
+          if (el) {
+            el.style.boxShadow = 'none';
+            el.style.minHeight = 'auto';
+            el.style.borderRadius = '0';
+          }
+        },
       });
 
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-      });
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-      const imgWidth = 210;
-      const pageHeight = 295;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10; // mm
+      const maxW = pageWidth - margin * 2;
+      const maxH = pageHeight - margin * 2;
 
-      let position = 0;
+      // Start by fitting to width
+      const widthFitH = (canvas.height * maxW) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      if (widthFitH <= maxH) {
+        // Fits on one page when using full width
+        const x = (pageWidth - maxW) / 2;
+        pdf.addImage(imgData, 'PNG', x, margin, maxW, widthFitH);
+      } else {
+        // Scale down uniformly to fit height as well (force single page)
+        const scale = maxH / widthFitH; // < 1
+        const finalW = maxW * scale;
+        const finalH = maxH; // by definition
+        const x = (pageWidth - finalW) / 2;
+        pdf.addImage(imgData, 'PNG', x, margin, finalW, finalH);
       }
 
       const fileName = `${resumeData.personalInfo.fullName || 'Resume'}_Resume.pdf`;

@@ -50,14 +50,14 @@ export const ResumePreview = ({ resumeData, onDownloadPDF }: ResumePreviewProps)
 
           {resumeData.personalInfo.summary && (
             <div className="mb-4">
-              <h3 className="font-semibold text-orange-600 border-b border-orange-600 pb-1 mb-2">PROFESSIONAL SUMMARY</h3>
+              <h3 className="font-semibold text-orange-600 border-b-2 border-orange-600 pb-2 mb-2">PROFESSIONAL SUMMARY</h3>
               <p>{resumeData.personalInfo.summary}</p>
             </div>
           )}
 
           {resumeData.experience.some(exp => exp.company) && (
             <div className="mb-4">
-              <h3 className="font-semibold text-orange-600 border-b border-orange-600 pb-1 mb-2">EXPERIENCE</h3>
+              <h3 className="font-semibold text-orange-600 border-b-2 border-orange-600 pb-2 mb-2">EXPERIENCE</h3>
               {resumeData.experience.map((exp, index) => (
                 <div key={index} className="mb-3">
                   <div className="flex justify-between">
@@ -73,7 +73,7 @@ export const ResumePreview = ({ resumeData, onDownloadPDF }: ResumePreviewProps)
 
           {resumeData.education.some(edu => edu.institution) && (
             <div className="mb-4">
-              <h3 className="font-semibold text-orange-600 border-b border-orange-600 pb-1 mb-2">EDUCATION</h3>
+              <h3 className="font-semibold text-orange-600 border-b-2 border-orange-600 pb-2 mb-2">EDUCATION</h3>
               {resumeData.education.map((edu, index) => (
                 <div key={index} className="mb-2">
                   <div className="flex justify-between">
@@ -88,7 +88,7 @@ export const ResumePreview = ({ resumeData, onDownloadPDF }: ResumePreviewProps)
 
           {resumeData.skills.length > 0 && resumeData.skills[0] && (
             <div>
-              <h3 className="font-semibold text-orange-600 border-b border-orange-600 pb-1 mb-2">SKILLS</h3>
+              <h3 className="font-semibold text-orange-600 border-b-2 border-orange-600 pb-2 mb-2">SKILLS</h3>
               <div className="flex flex-wrap gap-2">
                 {resumeData.skills.map((skill, index) => (
                   <span key={index} className="bg-gray-100 px-2 py-1 rounded text-xs">
