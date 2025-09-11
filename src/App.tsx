@@ -25,42 +25,45 @@ import ResumeExamples from "./pages/ResumeExamples";
 import SocialPreview from "./pages/SocialPreview";
 import VideoResume from "./pages/VideoResume";
 import NotFound from "./pages/NotFound";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/tools" element={<ToolsDashboard />} />
-          <Route path="/resume-builder" element={<ResumeBuilder />} />
-          <Route path="/cover-letter-generator" element={<CoverLetterGenerator />} />
-          <Route path="/resume-checker" element={<ResumeChecker />} />
-          <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/job-search" element={<JobSearch />} />
-          <Route path="/resume-bullet-generator" element={<ResumeBulletGenerator />} />
-          <Route path="/resume-skills-generator" element={<ResumeSkillsGenerator />} />
-          <Route path="/resume-keyword-scanner" element={<ResumeKeywordScanner />} />
-          <Route path="/resignation-letter-generator" element={<ResignationLetterGenerator />} />
-          <Route path="/interview-practice" element={<InterviewPractice />} />
-          <Route path="/salary-estimator" element={<SalaryEstimator />} />
-          <Route path="/job-tracker" element={<JobTracker />} />
-          <Route path="/resume-enhancer" element={<ResumeEnhancer />} />
-          <Route path="/resume-translator" element={<ResumeTranslator />} />
-          <Route path="/resume-examples" element={<ResumeExamples />} />
-          <Route path="/social-preview" element={<SocialPreview />} />
-          <Route path="/video-resume" element={<VideoResume />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/tools" element={<ToolsDashboard />} />
+            <Route path="/resume-builder" element={<ResumeBuilder />} />
+            <Route path="/cover-letter-generator" element={<CoverLetterGenerator />} />
+            <Route path="/resume-checker" element={<ResumeChecker />} />
+            <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/job-search" element={<JobSearch />} />
+            <Route path="/resume-bullet-generator" element={<ResumeBulletGenerator />} />
+            <Route path="/resume-skills-generator" element={<ResumeSkillsGenerator />} />
+            <Route path="/resume-keyword-scanner" element={<ResumeKeywordScanner />} />
+            <Route path="/resignation-letter-generator" element={<ResignationLetterGenerator />} />
+            <Route path="/interview-practice" element={<InterviewPractice />} />
+            <Route path="/salary-estimator" element={<SalaryEstimator />} />
+            <Route path="/job-tracker" element={<JobTracker />} />
+            <Route path="/resume-enhancer" element={<ResumeEnhancer />} />
+            <Route path="/resume-translator" element={<ResumeTranslator />} />
+            <Route path="/resume-examples" element={<ResumeExamples />} />
+            <Route path="/social-preview" element={<SocialPreview />} />
+            <Route path="/video-resume" element={<VideoResume />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
