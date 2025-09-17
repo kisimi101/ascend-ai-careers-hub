@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Briefcase, GraduationCap, FileText } from "lucide-react";
+import { User, Briefcase, GraduationCap, FileText, Settings, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
 import { ProgressSteps } from "@/components/resume-builder/ProgressSteps";
@@ -10,35 +10,18 @@ import { PersonalInfoForm } from "@/components/resume-builder/PersonalInfoForm";
 import { ExperienceForm } from "@/components/resume-builder/ExperienceForm";
 import { EducationForm } from "@/components/resume-builder/EducationForm";
 import { SkillsForm } from "@/components/resume-builder/SkillsForm";
-import { ResumePreview } from "@/components/resume-builder/ResumePreview";
+import { TemplateSelector } from "@/components/resume-builder/TemplateSelector";
+import { ATSScoreCard } from "@/components/resume-builder/ATSScoreCard";
+import { EnhancedResumePreview } from "@/components/resume-builder/EnhancedResumePreview";
+import { ResumeData } from "@/components/resume-builder/types";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useToast } from "@/hooks/use-toast";
 
-interface ResumeData {
-  personalInfo: {
-    fullName: string;
-    email: string;
-    phone: string;
-    location: string;
-    summary: string;
-  };
-  experience: Array<{
-    company: string;
-    position: string;
-    duration: string;
-    description: string;
-  }>;
-  education: Array<{
-    institution: string;
-    degree: string;
-    year: string;
-  }>;
-  skills: string[];
-}
 
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [selectedTemplate, setSelectedTemplate] = useState("modern-professional");
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
       fullName: "",
@@ -55,10 +38,12 @@ const ResumeBuilder = () => {
   const navigate = useNavigate();
 
   const steps = [
+    { title: "Template", icon: Settings },
     { title: "Personal Info", icon: User },
     { title: "Experience", icon: Briefcase },
     { title: "Education", icon: GraduationCap },
-    { title: "Skills", icon: FileText }
+    { title: "Skills", icon: FileText },
+    { title: "Optimize", icon: Sparkles }
   ];
 
   const addExperience = () => {
@@ -198,12 +183,19 @@ const ResumeBuilder = () => {
     switch (currentStep) {
       case 0:
         return (
+          <TemplateSelector
+            selectedTemplate={selectedTemplate}
+            onSelectTemplate={setSelectedTemplate}
+          />
+        );
+      case 1:
+        return (
           <PersonalInfoForm
             personalInfo={resumeData.personalInfo}
             onUpdate={updatePersonalInfo}
           />
         );
-      case 1:
+      case 2:
         return (
           <ExperienceForm
             experience={resumeData.experience}
@@ -211,7 +203,7 @@ const ResumeBuilder = () => {
             onAdd={addExperience}
           />
         );
-      case 2:
+      case 3:
         return (
           <EducationForm
             education={resumeData.education}
@@ -219,11 +211,18 @@ const ResumeBuilder = () => {
             onAdd={addEducation}
           />
         );
-      case 3:
+      case 4:
         return (
           <SkillsForm
             skills={resumeData.skills}
             onUpdate={updateSkills}
+          />
+        );
+      case 5:
+        return (
+          <ATSScoreCard
+            resumeData={resumeData}
+            selectedTemplate={selectedTemplate}
           />
         );
       default:
@@ -298,8 +297,9 @@ const ResumeBuilder = () => {
 
           {/* Preview Section */}
           <div>
-            <ResumePreview
+            <EnhancedResumePreview
               resumeData={resumeData}
+              selectedTemplate={selectedTemplate}
               onDownloadPDF={downloadPDF}
             />
           </div>
