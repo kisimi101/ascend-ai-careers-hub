@@ -1,0 +1,7 @@
+project_id = "jpsixrrcftxctghpzuhj"
+
+[functions.optimize-resume]
+verify_jwt = false
+
+[functions.scan-keywords]
+verify_jwt = false
