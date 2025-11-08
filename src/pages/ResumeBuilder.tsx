@@ -79,30 +79,13 @@ const ResumeBuilder = () => {
   const { toast } = useToast();
 
   const generateResume = async () => {
-    try {
-      toast({
-        title: "Enhancing Resume with AI...",
-        description: "Optimizing your resume content for ATS compatibility.",
-      });
-
-      // Simulate AI enhancement - you can integrate with actual AI service later
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Auto-advance to the last step to show the enhanced preview
-      setCurrentStep(steps.length - 1);
-
-      toast({
-        title: "Resume Enhanced!",
-        description: "Your resume has been optimized with AI suggestions.",
-      });
-    } catch (error) {
-      console.error('Error generating resume:', error);
-      toast({
-        title: "Error",
-        description: "Failed to enhance resume. Please try again.",
-        variant: "destructive",
-      });
-    }
+    // Just advance to the optimize step to show ATS score
+    setCurrentStep(steps.length - 1);
+    
+    toast({
+      title: "Resume Ready!",
+      description: "View your ATS optimization score and suggestions below.",
+    });
   };
 
   const downloadPDF = async () => {

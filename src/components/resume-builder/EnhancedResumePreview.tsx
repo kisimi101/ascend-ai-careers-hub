@@ -63,7 +63,7 @@ export const EnhancedResumePreview = ({
       <CardContent>
         <div 
           id="resume-preview" 
-          className="border rounded-lg min-h-[700px] shadow-sm overflow-hidden"
+          className="border rounded-lg min-h-[700px] max-h-[800px] shadow-sm overflow-y-auto"
           style={{ aspectRatio: '8.5/11' }}
         >
           {renderTemplate()}
