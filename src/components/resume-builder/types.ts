@@ -18,6 +18,7 @@ export interface ResumeData {
     year: string;
   }>;
   skills: string[];
+  sectionOrder?: Array<"experience" | "education" | "skills" | "summary">;
 }
 
 export interface ResumeTemplate {

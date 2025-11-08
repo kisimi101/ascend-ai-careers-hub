@@ -11,8 +11,8 @@ interface EnhancedResumePreviewProps {
   resumeData: ResumeData;
   selectedTemplate: string;
   onDownloadPDF: () => void;
-  onDownloadDOCX?: () => void;
-  onDownloadPNG?: () => void;
+  onDownloadDOCX: () => void;
+  onDownloadPNG: () => void;
 }
 
 export const EnhancedResumePreview = ({ 
@@ -45,18 +45,14 @@ export const EnhancedResumePreview = ({
               <Download className="h-4 w-4 mr-1" />
               PDF
             </Button>
-            {onDownloadDOCX && (
-              <Button onClick={onDownloadDOCX} size="sm" variant="outline">
-                <FileText className="h-4 w-4 mr-1" />
-                DOCX
-              </Button>
-            )}
-            {onDownloadPNG && (
-              <Button onClick={onDownloadPNG} size="sm" variant="outline">
-                <Image className="h-4 w-4 mr-1" />
-                PNG
-              </Button>
-            )}
+            <Button onClick={onDownloadDOCX} size="sm" variant="outline">
+              <FileText className="h-4 w-4 mr-1" />
+              DOCX
+            </Button>
+            <Button onClick={onDownloadPNG} size="sm" variant="outline">
+              <Image className="h-4 w-4 mr-1" />
+              PNG
+            </Button>
           </div>
         </div>
       </CardHeader>

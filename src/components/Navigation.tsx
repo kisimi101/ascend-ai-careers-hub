@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 export const Navigation = () => {
   const [active, setActive] = useState<string | null>(null);
@@ -12,9 +13,7 @@ export const Navigation = () => {
     <div className="fixed top-0 w-full z-50 glass border-b border-border/50">
       <div className="container mx-auto container-padding py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-r from-primary to-primary-variant rounded-lg flex items-center justify-center shadow-sm">
-            <span className="text-primary-foreground font-bold text-sm">AI</span>
-          </div>
+          <img src={logo} alt="CareerHub AI Logo" className="w-10 h-10 rounded-lg" />
           <span className="text-xl font-bold text-gradient-primary">
             CareerHub
           </span>
@@ -28,6 +27,7 @@ export const Navigation = () => {
                 <div className="flex flex-col space-y-4 text-sm">
                   <HoveredLink to="/resume-builder">AI Resume Builder</HoveredLink>
                   <HoveredLink to="/resume-checker">Resume Checker</HoveredLink>
+                  <HoveredLink to="/resume-keyword-scanner">Keyword Scanner</HoveredLink>
                   <HoveredLink to="/resume-summary-generator">Resume Summary</HoveredLink>
                   <HoveredLink to="/resume-examples">Resume Examples</HoveredLink>
                 </div>
