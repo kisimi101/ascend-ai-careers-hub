@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.scan-keywords]
 verify_jwt = false
+
+[functions.compare-resumes]
+verify_jwt = false
+
+[functions.search-contacts]
+verify_jwt = false
+
+[functions.search-jobs]
+verify_jwt = false

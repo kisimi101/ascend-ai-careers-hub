@@ -28,6 +28,7 @@ export const Navigation = () => {
                   <HoveredLink to="/resume-builder">AI Resume Builder</HoveredLink>
                   <HoveredLink to="/resume-checker">Resume Checker</HoveredLink>
                   <HoveredLink to="/resume-keyword-scanner">Keyword Scanner</HoveredLink>
+                  <HoveredLink to="/resume-comparison">Resume Comparison</HoveredLink>
                   <HoveredLink to="/resume-summary-generator">Resume Summary</HoveredLink>
                   <HoveredLink to="/resume-examples">Resume Examples</HoveredLink>
                 </div>
@@ -36,6 +37,7 @@ export const Navigation = () => {
                 <div className="text-sm grid grid-cols-2 gap-10 p-4">
                   <div className="flex flex-col space-y-4">
                     <HoveredLink to="/job-search">Job Search</HoveredLink>
+                    <HoveredLink to="/resume-job-search">Jobs for Your Resume</HoveredLink>
                   </div>
                   <ProductItem
                     title="Cover Letter Generator"
@@ -61,6 +63,14 @@ export const Navigation = () => {
                     src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=140&h=70&fit=crop"
                     description="Get accurate salary estimates for your role"
                   />
+                </div>
+              </MenuItem>
+              <MenuItem setActive={setActive} active={active} item="Network">
+                <div className="flex flex-col space-y-4 text-sm">
+                  <HoveredLink to="/network">Find Recruiters & Contacts</HoveredLink>
+                  <HoveredLink to="/community">Community Home</HoveredLink>
+                  <HoveredLink to="/community/forums">Discussion Forums</HoveredLink>
+                  <HoveredLink to="/community/success-stories">Success Stories</HoveredLink>
                 </div>
               </MenuItem>
               <MenuItem setActive={setActive} active={active} item="Community">
