@@ -24,6 +24,9 @@ import ResumeTranslator from "./pages/ResumeTranslator";
 import ResumeExamples from "./pages/ResumeExamples";
 import SocialPreview from "./pages/SocialPreview";
 import VideoResume from "./pages/VideoResume";
+import ResumeComparison from "./pages/ResumeComparison";
+import Network from "./pages/Network";
+import ResumeJobSearch from "./pages/ResumeJobSearch";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -57,6 +60,9 @@ const App = () => (
             <Route path="/resume-examples" element={<ResumeExamples />} />
             <Route path="/social-preview" element={<SocialPreview />} />
             <Route path="/video-resume" element={<VideoResume />} />
+            <Route path="/resume-comparison" element={<ResumeComparison />} />
+            <Route path="/network" element={<Network />} />
+            <Route path="/resume-job-search" element={<ResumeJobSearch />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
