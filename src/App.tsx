@@ -27,6 +27,9 @@ import VideoResume from "./pages/VideoResume";
 import ResumeComparison from "./pages/ResumeComparison";
 import Network from "./pages/Network";
 import ResumeJobSearch from "./pages/ResumeJobSearch";
+import LinkedInOptimizer from "./pages/LinkedInOptimizer";
+import SkillsGapAnalyzer from "./pages/SkillsGapAnalyzer";
+import ReferenceManager from "./pages/ReferenceManager";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -63,6 +66,9 @@ const App = () => (
             <Route path="/resume-comparison" element={<ResumeComparison />} />
             <Route path="/network" element={<Network />} />
             <Route path="/resume-job-search" element={<ResumeJobSearch />} />
+            <Route path="/linkedin-optimizer" element={<LinkedInOptimizer />} />
+            <Route path="/skills-gap-analyzer" element={<SkillsGapAnalyzer />} />
+            <Route path="/reference-manager" element={<ReferenceManager />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
