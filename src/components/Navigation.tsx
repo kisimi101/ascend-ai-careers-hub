@@ -71,7 +71,9 @@ export const Navigation = () => {
                   <HoveredLink to="/linkedin-optimizer">LinkedIn Optimizer</HoveredLink>
                   <HoveredLink to="/skills-gap-analyzer">Skills Gap Analyzer</HoveredLink>
                   <HoveredLink to="/reference-manager">Reference Manager</HoveredLink>
-                  <HoveredLink to="/community">Community Home</HoveredLink>
+                  <HoveredLink to="/career-path-planner">Career Path Planner</HoveredLink>
+                  <HoveredLink to="/industry-insights">Industry Insights</HoveredLink>
+                  <HoveredLink to="/portfolio-builder">Portfolio Builder</HoveredLink>
                 </div>
               </MenuItem>
               <MenuItem setActive={setActive} active={active} item="Community">
