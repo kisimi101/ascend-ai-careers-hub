@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import ToolsDashboard from "./pages/ToolsDashboard";
 import ResumeBuilder from "./pages/ResumeBuilder";
@@ -30,6 +31,9 @@ import ResumeJobSearch from "./pages/ResumeJobSearch";
 import LinkedInOptimizer from "./pages/LinkedInOptimizer";
 import SkillsGapAnalyzer from "./pages/SkillsGapAnalyzer";
 import ReferenceManager from "./pages/ReferenceManager";
+import CareerPathPlanner from "./pages/CareerPathPlanner";
+import IndustryInsights from "./pages/IndustryInsights";
+import PortfolioBuilder from "./pages/PortfolioBuilder";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -42,6 +46,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tools" element={<ToolsDashboard />} />
@@ -69,6 +74,9 @@ const App = () => (
             <Route path="/linkedin-optimizer" element={<LinkedInOptimizer />} />
             <Route path="/skills-gap-analyzer" element={<SkillsGapAnalyzer />} />
             <Route path="/reference-manager" element={<ReferenceManager />} />
+            <Route path="/career-path-planner" element={<CareerPathPlanner />} />
+            <Route path="/industry-insights" element={<IndustryInsights />} />
+            <Route path="/portfolio-builder" element={<PortfolioBuilder />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
