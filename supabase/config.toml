@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.search-jobs]
 verify_jwt = false
+
+[functions.optimize-linkedin]
+verify_jwt = false
+
+[functions.analyze-skills-gap]
+verify_jwt = false

@@ -68,9 +68,10 @@ export const Navigation = () => {
               <MenuItem setActive={setActive} active={active} item="Network">
                 <div className="flex flex-col space-y-4 text-sm">
                   <HoveredLink to="/network">Find Recruiters & Contacts</HoveredLink>
+                  <HoveredLink to="/linkedin-optimizer">LinkedIn Optimizer</HoveredLink>
+                  <HoveredLink to="/skills-gap-analyzer">Skills Gap Analyzer</HoveredLink>
+                  <HoveredLink to="/reference-manager">Reference Manager</HoveredLink>
                   <HoveredLink to="/community">Community Home</HoveredLink>
-                  <HoveredLink to="/community/forums">Discussion Forums</HoveredLink>
-                  <HoveredLink to="/community/success-stories">Success Stories</HoveredLink>
                 </div>
               </MenuItem>
               <MenuItem setActive={setActive} active={active} item="Community">
