@@ -1,19 +1,22 @@
 
 "use client";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthDialog } from "@/components/auth/AuthDialog";
+import LanguageSelector from "@/components/LanguageSelector";
+import { User } from "lucide-react";
 
 export const Navigation = () => {
   const [active, setActive] = useState<string | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   const handleSignIn = () => {
     setAuthMode('signin');
@@ -97,12 +100,19 @@ export const Navigation = () => {
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <LanguageSelector />
             {isAuthenticated ? (
               <>
-                <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {user?.email}
-                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate('/profile')}
+                  className="hidden sm:flex items-center gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="hidden md:inline">Profile</span>
+                </Button>
                 <Button variant="outline" onClick={logout} className="focus-ring">
                   Sign Out
                 </Button>
