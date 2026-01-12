@@ -160,6 +160,7 @@ export const ResumeTemplates = () => {
 
                         <Button 
                           className={`w-full bg-gradient-to-r ${template.color} hover:opacity-90 transition-opacity`}
+                          onClick={() => window.location.href = '/resume-builder'}
                         >
                           Use This Template
                         </Button>
@@ -175,7 +176,7 @@ export const ResumeTemplates = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button variant="outline" size="lg" className="px-8">
+          <Button variant="outline" size="lg" className="px-8" onClick={() => window.location.href = '/resume-examples'}>
             View All Templates
           </Button>
         </div>

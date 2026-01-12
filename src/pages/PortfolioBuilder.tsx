@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -10,11 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Palette, Layout, Plus, Trash2, ExternalLink, Copy, Eye, 
-  Image, Link2, Github, Globe, Share2, Check, Sparkles, Download, RefreshCw
+  Image, Link2, Github, Globe, Share2, Check, Sparkles, Download, RefreshCw, Save, Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Project {
   id: string;
@@ -62,8 +64,113 @@ const PortfolioBuilder = () => {
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedPortfolioId, setSavedPortfolioId] = useState<string | null>(null);
   const portfolioPreviewRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+
+  // Load saved portfolio on mount
+  useEffect(() => {
+    const loadSavedPortfolio = async () => {
+      if (!isAuthenticated || !user) return;
+      
+      const { data, error } = await supabase
+        .from('portfolios')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (data && !error) {
+        setPortfolioData({
+          name: data.name,
+          title: data.title || '',
+          bio: data.bio || '',
+          email: data.email || '',
+          linkedin: data.linkedin || '',
+          github: data.github || '',
+          website: data.website || '',
+          projects: (data.projects as unknown as Project[]) || [],
+          template: (data.template as 'modern' | 'minimal' | 'creative') || 'modern'
+        });
+        if (data.share_url) setShareUrl(data.share_url);
+        setSavedPortfolioId(data.id);
+      }
+    };
+    
+    loadSavedPortfolio();
+  }, [isAuthenticated, user]);
+
+  const savePortfolio = async () => {
+    if (!isAuthenticated || !user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to save your portfolio.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!portfolioData.name) {
+      toast({
+        title: "Name required",
+        description: "Please enter your name to save the portfolio.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const portfolioPayload = {
+        user_id: user.id,
+        name: portfolioData.name,
+        title: portfolioData.title || null,
+        bio: portfolioData.bio || null,
+        email: portfolioData.email || null,
+        linkedin: portfolioData.linkedin || null,
+        github: portfolioData.github || null,
+        website: portfolioData.website || null,
+        projects: JSON.parse(JSON.stringify(portfolioData.projects)),
+        template: portfolioData.template,
+        share_url: shareUrl || null,
+        updated_at: new Date().toISOString()
+      };
+
+      if (savedPortfolioId) {
+        const { error } = await supabase
+          .from('portfolios')
+          .update(portfolioPayload)
+          .eq('id', savedPortfolioId);
+        
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from('portfolios')
+          .insert(portfolioPayload)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        setSavedPortfolioId(data.id);
+      }
+
+      toast({
+        title: "Portfolio saved!",
+        description: "Your portfolio has been saved to your profile."
+      });
+    } catch (error) {
+      toast({
+        title: "Save failed",
+        description: "Failed to save portfolio. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const templates = [
     { id: 'modern', name: 'Modern', description: 'Clean and professional with smooth animations' },

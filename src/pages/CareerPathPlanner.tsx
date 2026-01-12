@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Map, TrendingUp, Clock, DollarSign, BookOpen, Briefcase, 
-  ChevronRight, Star, Target, Sparkles, RefreshCw, ArrowRight, Download
+  ChevronRight, Star, Target, Sparkles, RefreshCw, ArrowRight, Download, Save, Loader2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CareerPath {
   title: string;
@@ -46,8 +48,92 @@ const CareerPathPlanner = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [plan, setPlan] = useState<CareerPlan | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedPlanId, setSavedPlanId] = useState<string | null>(null);
   const planRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+
+  // Load saved career plan on mount
+  useEffect(() => {
+    const loadSavedPlan = async () => {
+      if (!isAuthenticated || !user) return;
+      
+      const { data, error } = await supabase
+        .from('career_plans')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (data && !error) {
+        setCurrentRole(data.role_title);
+        setIndustry(data.industry);
+        setYearsExperience(data.years_experience);
+        setCareerGoal(data.career_goal || '');
+        setPlan(data.plan_data as unknown as CareerPlan);
+        setSavedPlanId(data.id);
+      }
+    };
+    
+    loadSavedPlan();
+  }, [isAuthenticated, user]);
+
+  const saveCareerPlan = async () => {
+    if (!isAuthenticated || !user || !plan) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to save your career plan.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const planData = {
+        user_id: user.id,
+        role_title: currentRole,
+        industry,
+        years_experience: yearsExperience,
+        career_goal: careerGoal || null,
+        plan_data: JSON.parse(JSON.stringify(plan)),
+        updated_at: new Date().toISOString()
+      };
+
+      if (savedPlanId) {
+        const { error } = await supabase
+          .from('career_plans')
+          .update(planData)
+          .eq('id', savedPlanId);
+        
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from('career_plans')
+          .insert(planData)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        setSavedPlanId(data.id);
+      }
+
+      toast({
+        title: "Career plan saved!",
+        description: "Your career plan has been saved to your profile."
+      });
+    } catch (error) {
+      toast({
+        title: "Save failed",
+        description: "Failed to save career plan. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const exportToPDF = async () => {
     if (!plan || !planRef.current) return;
@@ -368,8 +454,16 @@ const CareerPathPlanner = () => {
           {/* Results */}
           {plan && (
             <div className="space-y-8" ref={planRef}>
-              {/* Export Button */}
-              <div className="flex justify-end">
+              {/* Export and Save Buttons */}
+              <div className="flex justify-end gap-2">
+                <Button onClick={saveCareerPlan} disabled={isSaving} variant="default">
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-2" />
+                  )}
+                  Save Plan
+                </Button>
                 <Button onClick={exportToPDF} disabled={isExporting} variant="outline">
                   {isExporting ? (
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
