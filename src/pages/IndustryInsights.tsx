@@ -50,6 +50,7 @@ const IndustryInsights = () => {
   const [selectedIndustry, setSelectedIndustry] = useState('technology');
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<IndustryData | null>(null);
+  const [isLiveData, setIsLiveData] = useState(false);
   const { toast } = useToast();
 
   const industries = [
@@ -61,60 +62,93 @@ const IndustryInsights = () => {
     { value: 'retail', label: 'Retail & E-commerce' },
   ];
 
-  const loadIndustryData = (industry: string) => {
+  const loadIndustryData = async (industry: string) => {
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      const mockData: IndustryData = {
-        industry: industry,
-        salaryTrends: [
-          { role: 'Software Engineer', averageSalary: 125000, change: 8.5, demandLevel: 'high', openings: 45000 },
-          { role: 'Product Manager', averageSalary: 140000, change: 6.2, demandLevel: 'high', openings: 28000 },
-          { role: 'Data Scientist', averageSalary: 135000, change: 12.3, demandLevel: 'high', openings: 32000 },
-          { role: 'UX Designer', averageSalary: 105000, change: 5.8, demandLevel: 'medium', openings: 18000 },
-          { role: 'DevOps Engineer', averageSalary: 130000, change: 10.1, demandLevel: 'high', openings: 22000 },
-          { role: 'Marketing Manager', averageSalary: 95000, change: 3.2, demandLevel: 'medium', openings: 15000 },
-        ],
-        inDemandSkills: [
-          { name: 'AI/Machine Learning', growthRate: 45, averageSalaryBoost: 25000, demandScore: 95 },
-          { name: 'Cloud Computing (AWS/GCP)', growthRate: 35, averageSalaryBoost: 20000, demandScore: 92 },
-          { name: 'React/TypeScript', growthRate: 28, averageSalaryBoost: 15000, demandScore: 88 },
-          { name: 'Kubernetes/Docker', growthRate: 32, averageSalaryBoost: 18000, demandScore: 85 },
-          { name: 'Python', growthRate: 25, averageSalaryBoost: 12000, demandScore: 90 },
-          { name: 'Data Analytics', growthRate: 30, averageSalaryBoost: 14000, demandScore: 82 },
-          { name: 'Cybersecurity', growthRate: 38, averageSalaryBoost: 22000, demandScore: 88 },
-          { name: 'Product Strategy', growthRate: 20, averageSalaryBoost: 18000, demandScore: 75 },
-        ],
-        marketAnalysis: {
-          totalJobs: 2500000,
-          jobGrowth: 15.3,
-          averageSalary: 118000,
-          salaryGrowth: 7.8,
-          topCompanies: ['Google', 'Microsoft', 'Amazon', 'Apple', 'Meta', 'Netflix', 'Salesforce', 'Adobe'],
-          topLocations: [
-            { city: 'San Francisco, CA', jobs: 185000, avgSalary: 165000 },
-            { city: 'Seattle, WA', jobs: 120000, avgSalary: 155000 },
-            { city: 'New York, NY', jobs: 145000, avgSalary: 145000 },
-            { city: 'Austin, TX', jobs: 85000, avgSalary: 130000 },
-            { city: 'Boston, MA', jobs: 72000, avgSalary: 140000 },
-            { city: 'Remote', jobs: 350000, avgSalary: 125000 },
-          ]
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/fetch-job-market`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        outlook: 'Strong growth expected with continued digital transformation across all sectors. AI and automation will create new roles while transforming existing ones.',
-        predictions: [
-          'AI/ML roles will see 40%+ growth in the next 2 years',
-          'Remote work opportunities will stabilize at 35-40% of all tech jobs',
-          'Entry-level salaries expected to increase 5-8% annually',
-          'Cybersecurity demand will outpace supply for the next 5+ years',
-          'Full-stack developers with cloud experience will be most sought after'
-        ]
-      };
+        body: JSON.stringify({ industry }),
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to fetch job market data');
+      }
+
+      const result = await response.json();
+      setData(result);
+      setIsLiveData(result.isLiveData || false);
+      
+      if (result.isLiveData) {
+        toast({
+          title: "Live data loaded!",
+          description: "Showing real-time job market insights.",
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching industry data:', error);
+      // Fall back to mock data
+      const mockData = generateMockData(industry);
       setData(mockData);
+      setIsLiveData(false);
+      toast({
+        title: "Using cached data",
+        description: "Live data unavailable, showing sample insights.",
+        variant: "default",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
+
+  const generateMockData = (industry: string): IndustryData => ({
+    industry,
+    salaryTrends: [
+      { role: 'Software Engineer', averageSalary: 125000, change: 8.5, demandLevel: 'high', openings: 45000 },
+      { role: 'Product Manager', averageSalary: 140000, change: 6.2, demandLevel: 'high', openings: 28000 },
+      { role: 'Data Scientist', averageSalary: 135000, change: 12.3, demandLevel: 'high', openings: 32000 },
+      { role: 'UX Designer', averageSalary: 105000, change: 5.8, demandLevel: 'medium', openings: 18000 },
+      { role: 'DevOps Engineer', averageSalary: 130000, change: 10.1, demandLevel: 'high', openings: 22000 },
+      { role: 'Marketing Manager', averageSalary: 95000, change: 3.2, demandLevel: 'medium', openings: 15000 },
+    ],
+    inDemandSkills: [
+      { name: 'AI/Machine Learning', growthRate: 45, averageSalaryBoost: 25000, demandScore: 95 },
+      { name: 'Cloud Computing (AWS/GCP)', growthRate: 35, averageSalaryBoost: 20000, demandScore: 92 },
+      { name: 'React/TypeScript', growthRate: 28, averageSalaryBoost: 15000, demandScore: 88 },
+      { name: 'Kubernetes/Docker', growthRate: 32, averageSalaryBoost: 18000, demandScore: 85 },
+      { name: 'Python', growthRate: 25, averageSalaryBoost: 12000, demandScore: 90 },
+      { name: 'Data Analytics', growthRate: 30, averageSalaryBoost: 14000, demandScore: 82 },
+      { name: 'Cybersecurity', growthRate: 38, averageSalaryBoost: 22000, demandScore: 88 },
+      { name: 'Product Strategy', growthRate: 20, averageSalaryBoost: 18000, demandScore: 75 },
+    ],
+    marketAnalysis: {
+      totalJobs: 2500000,
+      jobGrowth: 15.3,
+      averageSalary: 118000,
+      salaryGrowth: 7.8,
+      topCompanies: ['Google', 'Microsoft', 'Amazon', 'Apple', 'Meta', 'Netflix', 'Salesforce', 'Adobe'],
+      topLocations: [
+        { city: 'San Francisco, CA', jobs: 185000, avgSalary: 165000 },
+        { city: 'Seattle, WA', jobs: 120000, avgSalary: 155000 },
+        { city: 'New York, NY', jobs: 145000, avgSalary: 145000 },
+        { city: 'Austin, TX', jobs: 85000, avgSalary: 130000 },
+        { city: 'Boston, MA', jobs: 72000, avgSalary: 140000 },
+        { city: 'Remote', jobs: 350000, avgSalary: 125000 },
+      ]
+    },
+    outlook: 'Strong growth expected with continued digital transformation across all sectors. AI and automation will create new roles while transforming existing ones.',
+    predictions: [
+      'AI/ML roles will see 40%+ growth in the next 2 years',
+      'Remote work opportunities will stabilize at 35-40% of all tech jobs',
+      'Entry-level salaries expected to increase 5-8% annually',
+      'Cybersecurity demand will outpace supply for the next 5+ years',
+      'Full-stack developers with cloud experience will be most sought after'
+    ]
+  });
 
   useEffect(() => {
     loadIndustryData(selectedIndustry);
@@ -166,8 +200,11 @@ const IndustryInsights = () => {
             </div>
             <h1 className="text-4xl font-bold mb-4">Job Market Intelligence</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Real-time salary trends, in-demand skills, and job market analysis by industry
+              {isLiveData ? 'Live' : 'Sample'} salary trends, in-demand skills, and job market analysis by industry
             </p>
+            {isLiveData && (
+              <Badge className="mt-2 bg-green-500">Live Data from Apify</Badge>
+            )}
           </div>
 
           {/* Industry Selector */}

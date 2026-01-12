@@ -1,17 +1,16 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
+import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import ToolsDashboard from "./pages/ToolsDashboard";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import CoverLetterGenerator from "./pages/CoverLetterGenerator";
 import ResumeChecker from "./pages/ResumeChecker";
 import ResumeSummaryGenerator from "./pages/ResumeSummaryGenerator";
-import Community from "./pages/Community";
 import JobSearch from "./pages/JobSearch";
 import ResumeBulletGenerator from "./pages/ResumeBulletGenerator";
 import InterviewPractice from "./pages/InterviewPractice";
@@ -42,46 +41,47 @@ const queryClient = new QueryClient();
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/tools" element={<ToolsDashboard />} />
-            <Route path="/resume-builder" element={<ResumeBuilder />} />
-            <Route path="/cover-letter-generator" element={<CoverLetterGenerator />} />
-            <Route path="/resume-checker" element={<ResumeChecker />} />
-            <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/job-search" element={<JobSearch />} />
-            <Route path="/resume-bullet-generator" element={<ResumeBulletGenerator />} />
-            <Route path="/resume-skills-generator" element={<ResumeSkillsGenerator />} />
-            <Route path="/resume-keyword-scanner" element={<ResumeKeywordScanner />} />
-            <Route path="/resignation-letter-generator" element={<ResignationLetterGenerator />} />
-            <Route path="/interview-practice" element={<InterviewPractice />} />
-            <Route path="/salary-estimator" element={<SalaryEstimator />} />
-            <Route path="/job-tracker" element={<JobTracker />} />
-            <Route path="/resume-enhancer" element={<ResumeEnhancer />} />
-            <Route path="/resume-translator" element={<ResumeTranslator />} />
-            <Route path="/resume-examples" element={<ResumeExamples />} />
-            <Route path="/social-preview" element={<SocialPreview />} />
-            <Route path="/video-resume" element={<VideoResume />} />
-            <Route path="/resume-comparison" element={<ResumeComparison />} />
-            <Route path="/network" element={<Network />} />
-            <Route path="/resume-job-search" element={<ResumeJobSearch />} />
-            <Route path="/linkedin-optimizer" element={<LinkedInOptimizer />} />
-            <Route path="/skills-gap-analyzer" element={<SkillsGapAnalyzer />} />
-            <Route path="/reference-manager" element={<ReferenceManager />} />
-            <Route path="/career-path-planner" element={<CareerPathPlanner />} />
-            <Route path="/industry-insights" element={<IndustryInsights />} />
-            <Route path="/portfolio-builder" element={<PortfolioBuilder />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/tools" element={<ToolsDashboard />} />
+              <Route path="/resume-builder" element={<ResumeBuilder />} />
+              <Route path="/cover-letter-generator" element={<CoverLetterGenerator />} />
+              <Route path="/resume-checker" element={<ResumeChecker />} />
+              <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
+              <Route path="/job-search" element={<JobSearch />} />
+              <Route path="/resume-bullet-generator" element={<ResumeBulletGenerator />} />
+              <Route path="/resume-skills-generator" element={<ResumeSkillsGenerator />} />
+              <Route path="/resume-keyword-scanner" element={<ResumeKeywordScanner />} />
+              <Route path="/resignation-letter-generator" element={<ResignationLetterGenerator />} />
+              <Route path="/interview-practice" element={<InterviewPractice />} />
+              <Route path="/salary-estimator" element={<SalaryEstimator />} />
+              <Route path="/job-tracker" element={<JobTracker />} />
+              <Route path="/resume-enhancer" element={<ResumeEnhancer />} />
+              <Route path="/resume-translator" element={<ResumeTranslator />} />
+              <Route path="/resume-examples" element={<ResumeExamples />} />
+              <Route path="/social-preview" element={<SocialPreview />} />
+              <Route path="/video-resume" element={<VideoResume />} />
+              <Route path="/resume-comparison" element={<ResumeComparison />} />
+              <Route path="/network" element={<Network />} />
+              <Route path="/resume-job-search" element={<ResumeJobSearch />} />
+              <Route path="/linkedin-optimizer" element={<LinkedInOptimizer />} />
+              <Route path="/skills-gap-analyzer" element={<SkillsGapAnalyzer />} />
+              <Route path="/reference-manager" element={<ReferenceManager />} />
+              <Route path="/career-path-planner" element={<CareerPathPlanner />} />
+              <Route path="/industry-insights" element={<IndustryInsights />} />
+              <Route path="/portfolio-builder" element={<PortfolioBuilder />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );
