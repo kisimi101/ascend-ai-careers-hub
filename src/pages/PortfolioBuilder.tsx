@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -10,9 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Palette, Layout, Plus, Trash2, ExternalLink, Copy, Eye, 
-  Image, Link2, Github, Globe, Share2, Check, Sparkles
+  Image, Link2, Github, Globe, Share2, Check, Sparkles, Download, RefreshCw
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface Project {
   id: string;
@@ -59,6 +61,8 @@ const PortfolioBuilder = () => {
   const [tagInput, setTagInput] = useState('');
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const portfolioPreviewRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const templates = [
@@ -149,6 +153,57 @@ const PortfolioBuilder = () => {
       title: "Copied!",
       description: "Link copied to clipboard."
     });
+  };
+
+  const exportToPDF = async () => {
+    if (!portfolioPreviewRef.current) return;
+    
+    setIsExporting(true);
+    try {
+      const canvas = await html2canvas(portfolioPreviewRef.current, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`portfolio-${portfolioData.name.replace(/\s+/g, '-').toLowerCase() || 'preview'}.pdf`);
+      
+      toast({
+        title: "PDF Downloaded!",
+        description: "Your portfolio has been exported successfully."
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export PDF. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const getTemplateStyles = () => {
@@ -448,10 +503,20 @@ const PortfolioBuilder = () => {
                   <Eye className="w-5 h-5" />
                   Live Preview
                 </h3>
-                <Badge variant="outline">{portfolioData.template} template</Badge>
+                <div className="flex items-center gap-2">
+                  <Button onClick={exportToPDF} disabled={isExporting} variant="outline" size="sm">
+                    {isExporting ? (
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4 mr-2" />
+                    )}
+                    Export PDF
+                  </Button>
+                  <Badge variant="outline">{portfolioData.template} template</Badge>
+                </div>
               </div>
               
-              <Card className={`overflow-hidden ${getTemplateStyles()}`}>
+              <Card ref={portfolioPreviewRef} className={`overflow-hidden ${getTemplateStyles()}`}>
                 <CardContent className="p-0">
                   {/* Portfolio Header */}
                   <div className="p-8 text-center">

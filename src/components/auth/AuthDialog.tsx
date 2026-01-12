@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,10 +11,15 @@ import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultTab?: 'signin' | 'signup';
 }
 
-export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
-  const [activeTab, setActiveTab] = useState('login');
+export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defaultTab = 'signin' }) => {
+  const [activeTab, setActiveTab] = useState(defaultTab === 'signup' ? 'signup' : 'login');
+  
+  useEffect(() => {
+    setActiveTab(defaultTab === 'signup' ? 'signup' : 'login');
+  }, [defaultTab]);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -28,14 +33,14 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    let success = false;
+    let result;
     if (activeTab === 'login') {
-      success = await login(formData.email, formData.password);
+      result = await login(formData.email, formData.password);
     } else {
-      success = await signup(formData.email, formData.password, formData.name);
+      result = await signup(formData.email, formData.password, formData.name);
     }
 
-    if (success) {
+    if (result.success) {
       toast({
         title: "Success!",
         description: `Welcome ${activeTab === 'login' ? 'back' : 'to CareerHub'}!`,
@@ -45,7 +50,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) =>
     } else {
       toast({
         title: "Error",
-        description: "Authentication failed. Please try again.",
+        description: result.error || "Authentication failed. Please try again.",
         variant: "destructive",
       });
     }

@@ -1,20 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import useLocalStorage from '@/hooks/useLocalStorage';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  subscription: 'free' | 'premium' | 'enterprise';
-  joinedDate: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string, name: string) => Promise<boolean>;
-  logout: () => void;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -34,67 +27,85 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useLocalStorage<User | null>('user', null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock successful login
-      const mockUser: User = {
-        id: '1',
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        name: email.split('@')[0],
-        subscription: 'free',
-        joinedDate: new Date().toISOString(),
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`
-      };
+        password,
+      });
       
-      setUser(mockUser);
-      return true;
+      if (error) {
+        setIsLoading(false);
+        return { success: false, error: error.message };
+      }
+      
+      return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    } finally {
       setIsLoading(false);
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
 
-  const signup = async (email: string, password: string, name: string): Promise<boolean> => {
+  const signup = async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const redirectUrl = `${window.location.origin}/`;
       
-      // Mock successful signup
-      const mockUser: User = {
-        id: Date.now().toString(),
+      const { error } = await supabase.auth.signUp({
         email,
-        name,
-        subscription: 'free',
-        joinedDate: new Date().toISOString(),
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${email}`
-      };
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: name,
+          }
+        }
+      });
       
-      setUser(mockUser);
-      return true;
+      if (error) {
+        setIsLoading(false);
+        return { success: false, error: error.message };
+      }
+      
+      return { success: true };
     } catch (error) {
-      console.error('Signup error:', error);
-      return false;
-    } finally {
       setIsLoading(false);
+      return { success: false, error: 'An unexpected error occurred' };
     }
   };
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
 
   const value: AuthContextType = {
     user,
+    session,
     login,
     signup,
     logout,

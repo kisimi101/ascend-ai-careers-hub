@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Navigation } from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,9 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Map, TrendingUp, Clock, DollarSign, BookOpen, Briefcase, 
-  ChevronRight, Star, Target, Sparkles, RefreshCw, ArrowRight
+  ChevronRight, Star, Target, Sparkles, RefreshCw, ArrowRight, Download
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface CareerPath {
   title: string;
@@ -43,7 +45,60 @@ const CareerPathPlanner = () => {
   const [careerGoal, setCareerGoal] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [plan, setPlan] = useState<CareerPlan | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const planRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  const exportToPDF = async () => {
+    if (!plan || !planRef.current) return;
+    
+    setIsExporting(true);
+    try {
+      const canvas = await html2canvas(planRef.current, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`career-plan-${currentRole.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+      
+      toast({
+        title: "PDF Downloaded!",
+        description: "Your career plan has been exported successfully."
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to export PDF. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const generateCareerPlan = async () => {
     if (!currentRole || !industry || !yearsExperience) {
@@ -312,7 +367,19 @@ const CareerPathPlanner = () => {
 
           {/* Results */}
           {plan && (
-            <div className="space-y-8">
+            <div className="space-y-8" ref={planRef}>
+              {/* Export Button */}
+              <div className="flex justify-end">
+                <Button onClick={exportToPDF} disabled={isExporting} variant="outline">
+                  {isExporting ? (
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-2" />
+                  )}
+                  Export to PDF
+                </Button>
+              </div>
+
               {/* Current Role Card */}
               <Card className="border-primary border-2">
                 <CardHeader>
