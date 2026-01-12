@@ -14,6 +14,171 @@ export type Database = {
   }
   public: {
     Tables: {
+      career_plans: {
+        Row: {
+          career_goal: string | null
+          created_at: string
+          id: string
+          industry: string
+          plan_data: Json
+          role_title: string
+          updated_at: string
+          user_id: string
+          years_experience: string
+        }
+        Insert: {
+          career_goal?: string | null
+          created_at?: string
+          id?: string
+          industry: string
+          plan_data: Json
+          role_title: string
+          updated_at?: string
+          user_id: string
+          years_experience: string
+        }
+        Update: {
+          career_goal?: string | null
+          created_at?: string
+          id?: string
+          industry?: string
+          plan_data?: Json
+          role_title?: string
+          updated_at?: string
+          user_id?: string
+          years_experience?: string
+        }
+        Relationships: []
+      }
+      job_alerts: {
+        Row: {
+          created_at: string
+          email_frequency: string | null
+          id: string
+          industry: string | null
+          is_active: boolean | null
+          job_title: string
+          keywords: string[] | null
+          last_sent_at: string | null
+          location: string | null
+          salary_max: number | null
+          salary_min: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_frequency?: string | null
+          id?: string
+          industry?: string | null
+          is_active?: boolean | null
+          job_title: string
+          keywords?: string[] | null
+          last_sent_at?: string | null
+          location?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_frequency?: string | null
+          id?: string
+          industry?: string | null
+          is_active?: boolean | null
+          job_title?: string
+          keywords?: string[] | null
+          last_sent_at?: string | null
+          location?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      portfolios: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string | null
+          github: string | null
+          id: string
+          is_public: boolean | null
+          linkedin: string | null
+          name: string
+          projects: Json | null
+          share_url: string | null
+          template: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          github?: string | null
+          id?: string
+          is_public?: boolean | null
+          linkedin?: string | null
+          name: string
+          projects?: Json | null
+          share_url?: string | null
+          template?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          github?: string | null
+          id?: string
+          is_public?: boolean | null
+          linkedin?: string | null
+          name?: string
+          projects?: Json | null
+          share_url?: string | null
+          template?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          preferred_language: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          preferred_language?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          preferred_language?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       references: {
         Row: {
           company: string | null
@@ -52,6 +217,33 @@ export type Database = {
           relationship?: string | null
           title?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          tool_name: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          tool_name: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          tool_name?: string
           user_id?: string
         }
         Relationships: []
