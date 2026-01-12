@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,24 +8,45 @@ import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 import LanguageSelector from "@/components/LanguageSelector";
-import { User } from "lucide-react";
+import { User, Menu as MenuIcon, X } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 
 export const Navigation = () => {
   const [active, setActive] = useState<string | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
   const handleSignIn = () => {
     setAuthMode('signin');
     setAuthOpen(true);
+    setMobileMenuOpen(false);
   };
 
   const handleGetStarted = () => {
     setAuthMode('signup');
     setAuthOpen(true);
+    setMobileMenuOpen(false);
   };
+
+  const mobileNavLinks = [
+    { label: "AI Resume Builder", path: "/resume-builder" },
+    { label: "Resume Checker", path: "/resume-checker" },
+    { label: "Keyword Scanner", path: "/resume-keyword-scanner" },
+    { label: "Resume Comparison", path: "/resume-comparison" },
+    { label: "Job Search", path: "/job-search" },
+    { label: "Cover Letter Generator", path: "/cover-letter-generator" },
+    { label: "Interview Practice", path: "/interview-practice" },
+    { label: "Job Tracker", path: "/job-tracker" },
+    { label: "Salary Estimator", path: "/salary-estimator" },
+    { label: "LinkedIn Optimizer", path: "/linkedin-optimizer" },
+    { label: "Skills Gap Analyzer", path: "/skills-gap-analyzer" },
+    { label: "Career Path Planner", path: "/career-path-planner" },
+    { label: "Portfolio Builder", path: "/portfolio-builder" },
+    { label: "Network", path: "/network" },
+  ];
   
   return (
     <>
@@ -39,7 +59,7 @@ export const Navigation = () => {
             </span>
           </Link>
           
-          {/* Animated Menu */}
+          {/* Desktop Menu */}
           <div className="hidden md:block">
             <div className={cn("max-w-2xl mx-auto")}>
               <Menu setActive={setActive}>
@@ -102,6 +122,66 @@ export const Navigation = () => {
           
           <div className="flex items-center space-x-2 sm:space-x-4">
             <LanguageSelector />
+            
+            {/* Mobile Menu Button */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <MenuIcon className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[350px] overflow-y-auto">
+                <div className="flex flex-col gap-4 mt-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-lg font-bold">Menu</span>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    {mobileNavLinks.map((link) => (
+                      <SheetClose asChild key={link.path}>
+                        <Link
+                          to={link.path}
+                          className="px-4 py-3 rounded-lg hover:bg-accent transition-colors text-sm font-medium"
+                        >
+                          {link.label}
+                        </Link>
+                      </SheetClose>
+                    ))}
+                  </div>
+                  
+                  <div className="border-t pt-4 mt-4 flex flex-col gap-2">
+                    {isAuthenticated ? (
+                      <>
+                        <SheetClose asChild>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => navigate('/profile')}
+                            className="w-full justify-start"
+                          >
+                            <User className="w-4 h-4 mr-2" />
+                            Profile
+                          </Button>
+                        </SheetClose>
+                        <Button variant="outline" onClick={() => { logout(); setMobileMenuOpen(false); }} className="w-full">
+                          Sign Out
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button variant="outline" onClick={handleSignIn} className="w-full">
+                          Sign In
+                        </Button>
+                        <Button className="btn-gradient w-full" onClick={handleGetStarted}>
+                          Get Started
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+            
+            {/* Desktop Auth Buttons */}
             {isAuthenticated ? (
               <>
                 <Button 
@@ -113,7 +193,7 @@ export const Navigation = () => {
                   <User className="w-4 h-4" />
                   <span className="hidden md:inline">Profile</span>
                 </Button>
-                <Button variant="outline" onClick={logout} className="focus-ring">
+                <Button variant="outline" onClick={logout} className="hidden sm:inline-flex focus-ring">
                   Sign Out
                 </Button>
               </>
@@ -122,7 +202,7 @@ export const Navigation = () => {
                 <Button variant="outline" onClick={handleSignIn} className="hidden sm:inline-flex focus-ring">
                   Sign In
                 </Button>
-                <Button className="btn-gradient focus-ring" onClick={handleGetStarted}>
+                <Button className="hidden sm:inline-flex btn-gradient focus-ring" onClick={handleGetStarted}>
                   Get Started
                 </Button>
               </>

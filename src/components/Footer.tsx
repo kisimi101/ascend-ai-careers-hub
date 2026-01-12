@@ -146,7 +146,7 @@ const Footer = () => {
             
             <div className="text-center md:text-right">
               <p className="text-gray-400 text-sm">
-                &copy; 2024 CareerHub. All rights reserved.
+                &copy; 2026 CareerHub. All rights reserved.
               </p>
               <p className="text-gray-500 text-xs mt-1">
                 Powered by AI • Built with ❤️ for job seekers
