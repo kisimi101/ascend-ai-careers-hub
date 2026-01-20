@@ -18,12 +18,14 @@ import {
   Building2,
   MapPin,
   ChevronRight,
-  Plus
+  Plus,
+  CalendarDays
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { DashboardCalendar } from "@/components/dashboard/DashboardCalendar";
 
 interface JobApplication {
   id: string;
@@ -368,6 +370,26 @@ const Dashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </div>
+
+          {/* Calendar View */}
+          <div className="mt-6">
+            <DashboardCalendar
+              interviews={upcomingInterviews.map((interview) => ({
+                id: interview.id,
+                company: interview.company,
+                position: interview.position,
+                interviewDate: interview.interviewDate!,
+                status: interview.status,
+              }))}
+              milestones={allMilestones.map((m) => ({
+                id: m.id,
+                title: m.title,
+                targetDate: m.targetDate,
+                planTitle: m.planTitle,
+                completed: m.completed,
+              }))}
+            />
           </div>
 
           {/* Career Milestones */}
