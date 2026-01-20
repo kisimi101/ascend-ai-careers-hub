@@ -8,7 +8,8 @@ import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 import LanguageSelector from "@/components/LanguageSelector";
-import { User, Menu as MenuIcon, X } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { User, Menu as MenuIcon, X, LayoutDashboard } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 
 export const Navigation = () => {
@@ -32,6 +33,7 @@ export const Navigation = () => {
   };
 
   const mobileNavLinks = [
+    { label: "Dashboard", path: "/dashboard" },
     { label: "AI Resume Builder", path: "/resume-builder" },
     { label: "Resume Checker", path: "/resume-checker" },
     { label: "Keyword Scanner", path: "/resume-keyword-scanner" },
@@ -42,6 +44,7 @@ export const Navigation = () => {
     { label: "Job Tracker", path: "/job-tracker" },
     { label: "Salary Estimator", path: "/salary-estimator" },
     { label: "LinkedIn Optimizer", path: "/linkedin-optimizer" },
+    { label: "LinkedIn Import", path: "/linkedin-import" },
     { label: "Skills Gap Analyzer", path: "/skills-gap-analyzer" },
     { label: "Career Path Planner", path: "/career-path-planner" },
     { label: "Portfolio Builder", path: "/portfolio-builder" },
@@ -120,7 +123,8 @@ export const Navigation = () => {
             </div>
           </div>
           
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex items-center space-x-1 sm:space-x-3">
+            <ThemeToggle />
             <LanguageSelector />
             
             {/* Mobile Menu Button */}
