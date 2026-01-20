@@ -9,70 +9,41 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Clipboard, Plus, Calendar, Building2, MapPin, DollarSign, Trash2, Edit } from "lucide-react";
+import { Clipboard, Plus, Calendar, Building2, MapPin, DollarSign, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface JobApplication {
-  id: string;
-  company: string;
-  position: string;
-  location: string;
-  salary: string;
-  status: 'applied' | 'phone-screen' | 'technical' | 'onsite' | 'offer' | 'rejected';
-  appliedDate: string;
-  notes: string;
-  jobUrl?: string;
-}
+import { useJobApplicationsDB, JobApplicationInsert } from "@/hooks/useJobApplicationsDB";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const JobTracker = () => {
-  const [applications, setApplications] = useState<JobApplication[]>([
-    {
-      id: '1',
-      company: 'Google',
-      position: 'Software Engineer',
-      location: 'Mountain View, CA',
-      salary: '$150,000 - $200,000',
-      status: 'technical',
-      appliedDate: '2024-01-15',
-      notes: 'Great team, interesting projects. Technical interview scheduled for next week.',
-      jobUrl: 'https://careers.google.com'
-    },
-    {
-      id: '2',
-      company: 'Meta',
-      position: 'Product Manager',
-      location: 'Menlo Park, CA',
-      salary: '$180,000 - $220,000',
-      status: 'phone-screen',
-      appliedDate: '2024-01-10',
-      notes: 'Recruiter was very friendly. Focus on growth metrics and user experience.',
-    }
-  ]);
+  const { user } = useAuth();
+  const { applications, isLoading, addApplication, updateApplication, deleteApplication, getStatusCounts } = useJobApplicationsDB();
+  const { toast } = useToast();
 
-  const [newApplication, setNewApplication] = useState<Partial<JobApplication>>({
+  const [newApplication, setNewApplication] = useState<Partial<JobApplicationInsert>>({
     company: '',
     position: '',
     location: '',
     salary: '',
     status: 'applied',
-    appliedDate: new Date().toISOString().split('T')[0],
+    applied_date: new Date().toISOString().split('T')[0],
     notes: '',
-    jobUrl: ''
+    job_url: ''
   });
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const statusColors: Record<JobApplication['status'], string> = {
-    applied: 'bg-blue-100 text-blue-800',
-    'phone-screen': 'bg-yellow-100 text-yellow-800',
-    technical: 'bg-purple-100 text-purple-800',
-    onsite: 'bg-orange-100 text-orange-800',
-    offer: 'bg-green-100 text-green-800',
-    rejected: 'bg-red-100 text-red-800'
+  const statusColors: Record<string, string> = {
+    applied: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    'phone-screen': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+    technical: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+    onsite: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+    offer: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
   };
 
-  const statusLabels: Record<JobApplication['status'], string> = {
+  const statusLabels: Record<string, string> = {
     applied: 'Applied',
     'phone-screen': 'Phone Screen',
     technical: 'Technical Interview',
@@ -81,7 +52,29 @@ const JobTracker = () => {
     rejected: 'Rejected'
   };
 
-  const addApplication = () => {
+  const sendNotificationEmail = async (oldStatus: string | undefined, newStatus: string, company: string, position: string) => {
+    if (!user?.email) return;
+    
+    try {
+      await supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'status_change',
+          user_email: user.email,
+          user_name: user.user_metadata?.full_name,
+          application_data: {
+            company,
+            position,
+            old_status: oldStatus,
+            new_status: newStatus,
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Failed to send notification email:', error);
+    }
+  };
+
+  const handleAddApplication = async () => {
     if (!newApplication.company || !newApplication.position) {
       toast({
         title: "Missing Information",
@@ -91,86 +84,80 @@ const JobTracker = () => {
       return;
     }
 
-    const application: JobApplication = {
-      id: Date.now().toString(),
+    setIsSubmitting(true);
+    const result = await addApplication({
       company: newApplication.company!,
       position: newApplication.position!,
-      location: newApplication.location || '',
-      salary: newApplication.salary || '',
-      status: newApplication.status as JobApplication['status'] || 'applied',
-      appliedDate: newApplication.appliedDate || new Date().toISOString().split('T')[0],
-      notes: newApplication.notes || '',
-      jobUrl: newApplication.jobUrl || ''
-    };
+      location: newApplication.location || null,
+      salary: newApplication.salary || null,
+      status: (newApplication.status as 'applied' | 'phone-screen' | 'technical' | 'onsite' | 'offer' | 'rejected') || 'applied',
+      applied_date: newApplication.applied_date || new Date().toISOString().split('T')[0],
+      interview_date: null,
+      notes: newApplication.notes || null,
+      job_url: newApplication.job_url || null,
+    });
 
-    setApplications([...applications, application]);
-    setNewApplication({
-      company: '',
-      position: '',
-      location: '',
-      salary: '',
-      status: 'applied',
-      appliedDate: new Date().toISOString().split('T')[0],
-      notes: '',
-      jobUrl: ''
-    });
-    setIsDialogOpen(false);
-    
-    toast({
-      title: "Application Added!",
-      description: "Your job application has been tracked successfully",
-    });
+    if (result) {
+      // Send notification email for new application
+      await sendNotificationEmail(undefined, result.status, result.company, result.position);
+      
+      setNewApplication({
+        company: '',
+        position: '',
+        location: '',
+        salary: '',
+        status: 'applied',
+        applied_date: new Date().toISOString().split('T')[0],
+        notes: '',
+        job_url: ''
+      });
+      setIsDialogOpen(false);
+    }
+    setIsSubmitting(false);
   };
 
-  const updateStatus = (id: string, newStatus: JobApplication['status']) => {
-    setApplications(apps => 
-      apps.map(app => 
-        app.id === id ? { ...app, status: newStatus } : app
-      )
-    );
-    
-    toast({
-      title: "Status Updated",
-      description: `Application status changed to ${statusLabels[newStatus]}`,
-    });
+  const handleUpdateStatus = async (id: string, newStatus: string, company: string, position: string, oldStatus: string) => {
+    const success = await updateApplication(id, { status: newStatus as 'applied' | 'phone-screen' | 'technical' | 'onsite' | 'offer' | 'rejected' });
+    if (success) {
+      await sendNotificationEmail(oldStatus, newStatus, company, position);
+    }
   };
 
-  const deleteApplication = (id: string) => {
-    setApplications(apps => apps.filter(app => app.id !== id));
-    toast({
-      title: "Application Deleted",
-      description: "Application removed from tracker",
-    });
-  };
-
-  const getStatusCounts = () => {
-    const counts = applications.reduce((acc, app) => {
-      acc[app.status] = (acc[app.status] || 0) + 1;
-      return acc;
-    }, {} as Record<JobApplication['status'], number>);
-    
-    return counts;
+  const handleDeleteApplication = async (id: string) => {
+    await deleteApplication(id);
   };
 
   const statusCounts = getStatusCounts();
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-32 pb-20 px-6 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="pt-32 pb-20 px-6">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center px-4 py-2 bg-orange-100 rounded-full text-orange-800 text-sm font-medium mb-6">
+            <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
               <Clipboard className="w-4 h-4 mr-2" />
               Job Application Tracker
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               Track Your
-              <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"> Job Applications</span>
+              <span className="text-gradient-primary"> Job Applications</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Stay organized and never lose track of your job applications. Monitor progress and optimize your job search.
             </p>
           </div>
@@ -178,13 +165,13 @@ const JobTracker = () => {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
             {Object.entries(statusLabels).map(([status, label]) => (
-              <Card key={status}>
+              <Card key={status} className="card-enhanced">
                 <CardContent className="pt-6">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">
-                      {statusCounts[status as JobApplication['status']] || 0}
+                    <div className="text-2xl font-bold text-foreground">
+                      {statusCounts[status] || 0}
                     </div>
-                    <div className="text-sm text-gray-600">{label}</div>
+                    <div className="text-sm text-muted-foreground">{label}</div>
                   </div>
                 </CardContent>
               </Card>
@@ -193,11 +180,11 @@ const JobTracker = () => {
 
           {/* Header Actions */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Applications ({applications.length})</h2>
+            <h2 className="text-2xl font-bold text-foreground">Applications ({applications.length})</h2>
             
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90">
+                <Button className="btn-gradient">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Application
                 </Button>
@@ -255,7 +242,7 @@ const JobTracker = () => {
                     <Label htmlFor="status">Status</Label>
                     <Select 
                       value={newApplication.status || 'applied'} 
-                      onValueChange={(value) => setNewApplication({...newApplication, status: value as JobApplication['status']})}
+                      onValueChange={(value) => setNewApplication({...newApplication, status: value as 'applied' | 'phone-screen' | 'technical' | 'onsite' | 'offer' | 'rejected'})}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -273,8 +260,8 @@ const JobTracker = () => {
                     <Input
                       id="appliedDate"
                       type="date"
-                      value={newApplication.appliedDate || ''}
-                      onChange={(e) => setNewApplication({...newApplication, appliedDate: e.target.value})}
+                      value={newApplication.applied_date || ''}
+                      onChange={(e) => setNewApplication({...newApplication, applied_date: e.target.value})}
                     />
                   </div>
                   
@@ -283,8 +270,8 @@ const JobTracker = () => {
                     <Input
                       id="jobUrl"
                       placeholder="https://..."
-                      value={newApplication.jobUrl || ''}
-                      onChange={(e) => setNewApplication({...newApplication, jobUrl: e.target.value})}
+                      value={newApplication.job_url || ''}
+                      onChange={(e) => setNewApplication({...newApplication, job_url: e.target.value})}
                     />
                   </div>
                   
@@ -301,7 +288,8 @@ const JobTracker = () => {
                 </div>
                 
                 <div className="flex gap-3 mt-6">
-                  <Button onClick={addApplication} className="flex-1">
+                  <Button onClick={handleAddApplication} className="flex-1" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     Add Application
                   </Button>
                   <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -315,26 +303,26 @@ const JobTracker = () => {
           {/* Applications List */}
           <div className="space-y-4">
             {applications.length === 0 ? (
-              <Card>
+              <Card className="card-enhanced">
                 <CardContent className="text-center py-12">
-                  <Clipboard className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-gray-500">No applications tracked yet. Add your first application to get started!</p>
+                  <Clipboard className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <p className="text-muted-foreground">No applications tracked yet. Add your first application to get started!</p>
                 </CardContent>
               </Card>
             ) : (
               applications.map((app) => (
-                <Card key={app.id} className="hover:shadow-md transition-shadow">
+                <Card key={app.id} className="card-enhanced">
                   <CardContent className="pt-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-xl font-semibold text-gray-900">{app.position}</h3>
+                          <h3 className="text-xl font-semibold text-foreground">{app.position}</h3>
                           <Badge className={statusColors[app.status]}>
                             {statusLabels[app.status]}
                           </Badge>
                         </div>
                         
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                           <div className="flex items-center">
                             <Building2 className="w-4 h-4 mr-1" />
                             {app.company}
@@ -353,20 +341,20 @@ const JobTracker = () => {
                           )}
                           <div className="flex items-center">
                             <Calendar className="w-4 h-4 mr-1" />
-                            Applied {new Date(app.appliedDate).toLocaleDateString()}
+                            Applied {new Date(app.applied_date).toLocaleDateString()}
                           </div>
                         </div>
                         
                         {app.notes && (
-                          <p className="text-gray-700 mb-3">{app.notes}</p>
+                          <p className="text-foreground/80 mb-3">{app.notes}</p>
                         )}
                         
-                        {app.jobUrl && (
+                        {app.job_url && (
                           <a 
-                            href={app.jobUrl} 
+                            href={app.job_url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-orange-600 hover:text-orange-700 text-sm"
+                            className="text-primary hover:text-primary/80 text-sm"
                           >
                             View Job Posting →
                           </a>
@@ -374,7 +362,10 @@ const JobTracker = () => {
                       </div>
                       
                       <div className="flex items-center gap-2 ml-4">
-                        <Select value={app.status} onValueChange={(value) => updateStatus(app.id, value as JobApplication['status'])}>
+                        <Select 
+                          value={app.status} 
+                          onValueChange={(value) => handleUpdateStatus(app.id, value, app.company, app.position, app.status)}
+                        >
                           <SelectTrigger className="w-40">
                             <SelectValue />
                           </SelectTrigger>
@@ -388,8 +379,8 @@ const JobTracker = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => deleteApplication(app.id)}
-                          className="text-red-600 hover:text-red-700"
+                          onClick={() => handleDeleteApplication(app.id)}
+                          className="text-destructive hover:text-destructive/80"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
