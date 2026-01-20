@@ -13,29 +13,19 @@ import {
   TrendingUp, 
   Clock,
   CheckCircle2,
-  XCircle,
   Phone,
   Building2,
   MapPin,
   ChevronRight,
   Plus,
-  CalendarDays
+  Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { DashboardCalendar } from "@/components/dashboard/DashboardCalendar";
-
-interface JobApplication {
-  id: string;
-  company: string;
-  position: string;
-  location: string;
-  status: 'applied' | 'phone-screen' | 'technical' | 'onsite' | 'offer' | 'rejected';
-  appliedDate: string;
-  interviewDate?: string;
-}
+import { WeeklyProgressReport } from "@/components/dashboard/WeeklyProgressReport";
+import { useJobApplicationsDB } from "@/hooks/useJobApplicationsDB";
 
 interface CareerMilestone {
   id: string;
@@ -59,56 +49,17 @@ interface CareerPlan {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { toast } = useToast();
   
   const [careerPlans, setCareerPlans] = useState<CareerPlan[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
   
-  // Local job applications state - in a real app, this would come from a database
-  const [applications] = useState<JobApplication[]>([
-    {
-      id: '1',
-      company: 'Google',
-      position: 'Software Engineer',
-      location: 'Mountain View, CA',
-      status: 'technical',
-      appliedDate: '2024-01-15',
-      interviewDate: '2024-01-25'
-    },
-    {
-      id: '2',
-      company: 'Meta',
-      position: 'Product Manager',
-      location: 'Menlo Park, CA',
-      status: 'phone-screen',
-      appliedDate: '2024-01-10',
-      interviewDate: '2024-01-22'
-    },
-    {
-      id: '3',
-      company: 'Amazon',
-      position: 'Senior Developer',
-      location: 'Seattle, WA',
-      status: 'applied',
-      appliedDate: '2024-01-18'
-    },
-    {
-      id: '4',
-      company: 'Netflix',
-      position: 'Frontend Engineer',
-      location: 'Los Gatos, CA',
-      status: 'offer',
-      appliedDate: '2024-01-05'
-    },
-    {
-      id: '5',
-      company: 'Apple',
-      position: 'iOS Developer',
-      location: 'Cupertino, CA',
-      status: 'rejected',
-      appliedDate: '2024-01-02'
-    }
-  ]);
+  // Use the database hook for job applications
+  const { 
+    applications, 
+    isLoading: isLoadingApps, 
+    getStatusCounts, 
+    getWeeklyStats 
+  } = useJobApplicationsDB();
 
   useEffect(() => {
     if (user) {
@@ -137,11 +88,11 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error loading career plans:', error);
     } finally {
-      setIsLoading(false);
+      setIsLoadingPlans(false);
     }
   };
 
-  const statusColors: Record<JobApplication['status'], string> = {
+  const statusColors: Record<string, string> = {
     applied: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
     'phone-screen': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
     technical: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
@@ -150,7 +101,7 @@ const Dashboard = () => {
     rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
   };
 
-  const statusLabels: Record<JobApplication['status'], string> = {
+  const statusLabels: Record<string, string> = {
     applied: 'Applied',
     'phone-screen': 'Phone Screen',
     technical: 'Technical',
@@ -159,22 +110,16 @@ const Dashboard = () => {
     rejected: 'Rejected'
   };
 
-  const getStatusCounts = () => {
-    return applications.reduce((acc, app) => {
-      acc[app.status] = (acc[app.status] || 0) + 1;
-      return acc;
-    }, {} as Record<JobApplication['status'], number>);
-  };
-
   const statusCounts = getStatusCounts();
+  const weeklyStats = getWeeklyStats();
   const totalApps = applications.length;
   const activeApps = applications.filter(a => !['rejected', 'offer'].includes(a.status)).length;
   const successRate = totalApps > 0 ? Math.round((statusCounts['offer'] || 0) / totalApps * 100) : 0;
 
   // Get upcoming interviews (applications with interview dates in the future)
   const upcomingInterviews = applications
-    .filter(app => app.interviewDate && new Date(app.interviewDate) >= new Date())
-    .sort((a, b) => new Date(a.interviewDate!).getTime() - new Date(b.interviewDate!).getTime());
+    .filter(app => app.interview_date && new Date(app.interview_date) >= new Date())
+    .sort((a, b) => new Date(a.interview_date!).getTime() - new Date(b.interview_date!).getTime());
 
   // Get milestones from career plans
   const allMilestones: (CareerMilestone & { planTitle: string })[] = careerPlans.flatMap(plan => 
@@ -185,6 +130,30 @@ const Dashboard = () => {
     .filter(m => !m.completed && new Date(m.targetDate) >= new Date())
     .sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime())
     .slice(0, 5);
+
+  // Calculate milestone stats
+  const milestoneStats = {
+    totalMilestones: allMilestones.length,
+    completedMilestones: allMilestones.filter(m => m.completed).length,
+    upcomingMilestones: upcomingMilestones.length,
+    completionRate: allMilestones.length > 0 
+      ? Math.round((allMilestones.filter(m => m.completed).length / allMilestones.length) * 100) 
+      : 0
+  };
+
+  const isLoading = isLoadingApps || isLoadingPlans;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-32 pb-20 px-6 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -265,6 +234,14 @@ const Dashboard = () => {
             </Card>
           </div>
 
+          {/* Weekly Progress Report */}
+          <div className="mb-6">
+            <WeeklyProgressReport 
+              weeklyStats={weeklyStats}
+              milestoneStats={milestoneStats}
+            />
+          </div>
+
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Application Progress */}
             <Card className="lg:col-span-2 card-enhanced">
@@ -285,7 +262,7 @@ const Dashboard = () => {
                 {/* Progress Pipeline */}
                 <div className="grid grid-cols-6 gap-2 mb-6">
                   {Object.entries(statusLabels).map(([status, label]) => {
-                    const count = statusCounts[status as JobApplication['status']] || 0;
+                    const count = statusCounts[status] || 0;
                     const percentage = totalApps > 0 ? (count / totalApps) * 100 : 0;
                     return (
                       <div key={status} className="text-center">
@@ -299,28 +276,40 @@ const Dashboard = () => {
 
                 {/* Recent Applications */}
                 <div className="space-y-3">
-                  {applications.slice(0, 4).map((app) => (
-                    <div key={app.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-background rounded-lg">
-                          <Building2 className="w-5 h-5 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{app.position}</p>
-                          <p className="text-sm text-muted-foreground flex items-center gap-2">
-                            {app.company}
-                            <span className="flex items-center">
-                              <MapPin className="w-3 h-3 mr-1" />
-                              {app.location}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                      <Badge className={statusColors[app.status]}>
-                        {statusLabels[app.status]}
-                      </Badge>
+                  {applications.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Briefcase className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
+                      <p className="text-muted-foreground">No applications yet</p>
+                      <Button variant="link" onClick={() => navigate('/job-tracker')} className="mt-2">
+                        Add your first application
+                      </Button>
                     </div>
-                  ))}
+                  ) : (
+                    applications.slice(0, 4).map((app) => (
+                      <div key={app.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-background rounded-lg">
+                            <Building2 className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{app.position}</p>
+                            <p className="text-sm text-muted-foreground flex items-center gap-2">
+                              {app.company}
+                              {app.location && (
+                                <span className="flex items-center">
+                                  <MapPin className="w-3 h-3 mr-1" />
+                                  {app.location}
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={statusColors[app.status]}>
+                          {statusLabels[app.status]}
+                        </Badge>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -358,7 +347,7 @@ const Dashboard = () => {
                         <p className="text-sm text-muted-foreground mb-2">{interview.company}</p>
                         <div className="flex items-center text-sm text-primary">
                           <Clock className="w-4 h-4 mr-1" />
-                          {new Date(interview.interviewDate!).toLocaleDateString('en-US', {
+                          {new Date(interview.interview_date!).toLocaleDateString('en-US', {
                             weekday: 'short',
                             month: 'short',
                             day: 'numeric'
@@ -379,7 +368,7 @@ const Dashboard = () => {
                 id: interview.id,
                 company: interview.company,
                 position: interview.position,
-                interviewDate: interview.interviewDate!,
+                interviewDate: interview.interview_date!,
                 status: interview.status,
               }))}
               milestones={allMilestones.map((m) => ({
@@ -408,13 +397,7 @@ const Dashboard = () => {
               </Button>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="p-4 rounded-lg bg-muted/50 animate-pulse h-32" />
-                  ))}
-                </div>
-              ) : upcomingMilestones.length === 0 ? (
+              {upcomingMilestones.length === 0 ? (
                 <div className="text-center py-12">
                   <Target className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
                   <p className="text-muted-foreground mb-4">No career milestones set yet</p>

@@ -98,6 +98,54 @@ export type Database = {
         }
         Relationships: []
       }
+      job_applications: {
+        Row: {
+          applied_date: string
+          company: string
+          created_at: string
+          id: string
+          interview_date: string | null
+          job_url: string | null
+          location: string | null
+          notes: string | null
+          position: string
+          salary: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          applied_date?: string
+          company: string
+          created_at?: string
+          id?: string
+          interview_date?: string | null
+          job_url?: string | null
+          location?: string | null
+          notes?: string | null
+          position: string
+          salary?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          applied_date?: string
+          company?: string
+          created_at?: string
+          id?: string
+          interview_date?: string | null
+          job_url?: string | null
+          location?: string | null
+          notes?: string | null
+          position?: string
+          salary?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       portfolios: {
         Row: {
           bio: string | null
