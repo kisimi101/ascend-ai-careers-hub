@@ -26,3 +26,12 @@ verify_jwt = false
 
 [functions.send-job-alerts]
 verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
+
+[functions.send-interview-reminders]
+verify_jwt = false
+
+[functions.send-weekly-digest]
+verify_jwt = false

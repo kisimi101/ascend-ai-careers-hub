@@ -9,11 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Clipboard, Plus, Calendar, Building2, MapPin, DollarSign, Trash2, Loader2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Clipboard, Plus, Calendar as CalendarIcon, Building2, MapPin, DollarSign, Trash2, Loader2, Clock, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useJobApplicationsDB, JobApplicationInsert } from "@/hooks/useJobApplicationsDB";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 const JobTracker = () => {
   const { user } = useAuth();
@@ -28,11 +33,15 @@ const JobTracker = () => {
     status: 'applied',
     applied_date: new Date().toISOString().split('T')[0],
     notes: '',
-    job_url: ''
+    job_url: '',
+    interview_date: null
   });
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingInterviewId, setEditingInterviewId] = useState<string | null>(null);
+  const [interviewDateTime, setInterviewDateTime] = useState<Date | undefined>();
+  const [interviewTime, setInterviewTime] = useState<string>("09:00");
 
   const statusColors: Record<string, string> = {
     applied: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
@@ -92,7 +101,7 @@ const JobTracker = () => {
       salary: newApplication.salary || null,
       status: (newApplication.status as 'applied' | 'phone-screen' | 'technical' | 'onsite' | 'offer' | 'rejected') || 'applied',
       applied_date: newApplication.applied_date || new Date().toISOString().split('T')[0],
-      interview_date: null,
+      interview_date: newApplication.interview_date || null,
       notes: newApplication.notes || null,
       job_url: newApplication.job_url || null,
     });
@@ -109,11 +118,47 @@ const JobTracker = () => {
         status: 'applied',
         applied_date: new Date().toISOString().split('T')[0],
         notes: '',
-        job_url: ''
+        job_url: '',
+        interview_date: null
       });
       setIsDialogOpen(false);
     }
     setIsSubmitting(false);
+  };
+
+  const handleScheduleInterview = async (id: string, company: string, position: string) => {
+    if (!interviewDateTime) {
+      toast({
+        title: "Select a date",
+        description: "Please select an interview date and time",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Combine date and time
+    const [hours, minutes] = interviewTime.split(':').map(Number);
+    const fullDateTime = new Date(interviewDateTime);
+    fullDateTime.setHours(hours, minutes, 0, 0);
+
+    const success = await updateApplication(id, { interview_date: fullDateTime.toISOString() });
+    if (success) {
+      toast({
+        title: "Interview Scheduled! 📅",
+        description: `Interview scheduled for ${format(fullDateTime, "PPP 'at' p")}. You'll receive a reminder 24 hours before.`,
+      });
+      setEditingInterviewId(null);
+      setInterviewDateTime(undefined);
+      setInterviewTime("09:00");
+    }
+  };
+
+  const handleClearInterview = async (id: string) => {
+    await updateApplication(id, { interview_date: null });
+    toast({
+      title: "Interview Cleared",
+      description: "Interview date has been removed",
+    });
   };
 
   const handleUpdateStatus = async (id: string, newStatus: string, company: string, position: string, oldStatus: string) => {
@@ -179,16 +224,24 @@ const JobTracker = () => {
           </div>
 
           {/* Header Actions */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h2 className="text-2xl font-bold text-foreground">Applications ({applications.length})</h2>
             
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="btn-gradient">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Application
+            <div className="flex gap-3">
+              <Link to="/job-analytics">
+                <Button variant="outline">
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  View Analytics
                 </Button>
-              </DialogTrigger>
+              </Link>
+              
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="btn-gradient">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Application
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Add New Application</DialogTitle>
@@ -298,6 +351,7 @@ const JobTracker = () => {
                 </div>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           {/* Applications List */}
@@ -340,9 +394,93 @@ const JobTracker = () => {
                             </div>
                           )}
                           <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
+                            <CalendarIcon className="w-4 h-4 mr-1" />
                             Applied {new Date(app.applied_date).toLocaleDateString()}
                           </div>
+                        </div>
+
+                        {/* Interview Date Section */}
+                        <div className="mb-3">
+                          {app.interview_date ? (
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                              <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                Interview: {format(new Date(app.interview_date), "PPP 'at' p")}
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 w-6 p-0 text-purple-600 hover:text-destructive"
+                                onClick={() => handleClearInterview(app.id)}
+                              >
+                                ×
+                              </Button>
+                            </div>
+                          ) : (
+                            editingInterviewId === app.id ? (
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 bg-muted rounded-lg">
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      className={cn(
+                                        "w-[200px] justify-start text-left font-normal",
+                                        !interviewDateTime && "text-muted-foreground"
+                                      )}
+                                    >
+                                      <CalendarIcon className="mr-2 h-4 w-4" />
+                                      {interviewDateTime ? format(interviewDateTime, "PPP") : "Pick a date"}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                      mode="single"
+                                      selected={interviewDateTime}
+                                      onSelect={setInterviewDateTime}
+                                      disabled={(date) => date < new Date()}
+                                      initialFocus
+                                      className="pointer-events-auto"
+                                    />
+                                  </PopoverContent>
+                                </Popover>
+                                <Input
+                                  type="time"
+                                  value={interviewTime}
+                                  onChange={(e) => setInterviewTime(e.target.value)}
+                                  className="w-[130px]"
+                                />
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleScheduleInterview(app.id, app.company, app.position)}
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => {
+                                      setEditingInterviewId(null);
+                                      setInterviewDateTime(undefined);
+                                      setInterviewTime("09:00");
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setEditingInterviewId(app.id)}
+                                className="text-purple-600 border-purple-300 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-700 dark:hover:bg-purple-900/30"
+                              >
+                                <Clock className="w-4 h-4 mr-2" />
+                                Schedule Interview
+                              </Button>
+                            )
+                          )}
                         </div>
                         
                         {app.notes && (
