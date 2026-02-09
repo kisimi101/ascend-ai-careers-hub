@@ -48,6 +48,7 @@ export const Navigation = () => {
     { label: "Skills Gap Analyzer", path: "/skills-gap-analyzer" },
     { label: "Career Path Planner", path: "/career-path-planner" },
     { label: "Portfolio Builder", path: "/portfolio-builder" },
+    { label: "Company Research", path: "/company-research" },
     { label: "Network", path: "/network" },
   ];
   
@@ -112,6 +113,7 @@ export const Navigation = () => {
                   <div className="flex flex-col space-y-4 text-sm">
                     <HoveredLink to="/network">Find Recruiters & Contacts</HoveredLink>
                     <HoveredLink to="/linkedin-optimizer">LinkedIn Optimizer</HoveredLink>
+                    <HoveredLink to="/company-research">Company Research</HoveredLink>
                     <HoveredLink to="/skills-gap-analyzer">Skills Gap Analyzer</HoveredLink>
                     <HoveredLink to="/reference-manager">Reference Manager</HoveredLink>
                     <HoveredLink to="/career-path-planner">Career Path Planner</HoveredLink>
