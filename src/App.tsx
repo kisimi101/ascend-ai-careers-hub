@@ -40,6 +40,7 @@ import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import LinkedInImport from "./pages/LinkedInImport";
 import JobAnalytics from "./pages/JobAnalytics";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -97,6 +98,7 @@ const App = () => (
                   <Route path="/portfolio-builder" element={<ProtectedRoute><PortfolioBuilder /></ProtectedRoute>} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/job-analytics" element={<ProtectedRoute><JobAnalytics /></ProtectedRoute>} />
+                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

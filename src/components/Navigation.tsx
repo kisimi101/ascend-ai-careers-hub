@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 import LanguageSelector from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { User, Menu as MenuIcon, X, LayoutDashboard } from "lucide-react";
+import { User, Menu as MenuIcon, X, LayoutDashboard, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 
 export const Navigation = () => {
@@ -166,6 +166,16 @@ export const Navigation = () => {
                             Profile
                           </Button>
                         </SheetClose>
+                        <SheetClose asChild>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => navigate('/settings')}
+                            className="w-full justify-start"
+                          >
+                            <Settings className="w-4 h-4 mr-2" />
+                            Settings
+                          </Button>
+                        </SheetClose>
                         <Button variant="outline" onClick={() => { logout(); setMobileMenuOpen(false); }} className="w-full">
                           Sign Out
                         </Button>
@@ -196,6 +206,15 @@ export const Navigation = () => {
                 >
                   <User className="w-4 h-4" />
                   <span className="hidden md:inline">Profile</span>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => navigate('/settings')}
+                  className="hidden sm:flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden md:inline">Settings</span>
                 </Button>
                 <Button variant="outline" onClick={logout} className="hidden sm:inline-flex focus-ring">
                   Sign Out

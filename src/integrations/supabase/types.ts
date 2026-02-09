@@ -296,6 +296,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          created_at: string
+          digest_day: string
+          digest_frequency: string
+          email_reminders_enabled: boolean
+          id: string
+          interview_reminders_enabled: boolean
+          status_change_notifications: boolean
+          updated_at: string
+          user_id: string
+          weekly_digest_enabled: boolean
+        }
+        Insert: {
+          created_at?: string
+          digest_day?: string
+          digest_frequency?: string
+          email_reminders_enabled?: boolean
+          id?: string
+          interview_reminders_enabled?: boolean
+          status_change_notifications?: boolean
+          updated_at?: string
+          user_id: string
+          weekly_digest_enabled?: boolean
+        }
+        Update: {
+          created_at?: string
+          digest_day?: string
+          digest_frequency?: string
+          email_reminders_enabled?: boolean
+          id?: string
+          interview_reminders_enabled?: boolean
+          status_change_notifications?: boolean
+          updated_at?: string
+          user_id?: string
+          weekly_digest_enabled?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
