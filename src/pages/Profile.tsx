@@ -624,10 +624,23 @@ const Profile = () => {
 
                   <div className="pt-4 border-t">
                     <h3 className="font-medium mb-4">Account</h3>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-4">
                       <Mail className="w-4 h-4 text-muted-foreground" />
                       <span>{user?.email}</span>
                     </div>
+                    
+                    {/* Link to Full Settings Page */}
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/settings')}
+                      className="w-full sm:w-auto"
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Notification Settings
+                    </Button>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Manage email notifications, interview reminders, and weekly digests.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
