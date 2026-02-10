@@ -125,7 +125,7 @@ export const Navigation = () => {
             </div>
           </div>
           
-          <div className="flex items-center space-x-1 sm:space-x-3">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <LanguageSelector />
             
@@ -198,40 +198,42 @@ export const Navigation = () => {
             </Sheet>
             
             {/* Desktop Auth Buttons */}
-            {isAuthenticated ? (
-              <>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate('/profile')}
-                  className="hidden sm:flex items-center gap-2"
-                >
-                  <User className="w-4 h-4" />
-                  <span className="hidden md:inline">Profile</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate('/settings')}
-                  className="hidden sm:flex items-center gap-2"
-                >
-                  <Settings className="w-4 h-4" />
-                  <span className="hidden md:inline">Settings</span>
-                </Button>
-                <Button variant="outline" onClick={logout} className="hidden sm:inline-flex focus-ring">
-                  Sign Out
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="outline" onClick={handleSignIn} className="hidden sm:inline-flex focus-ring">
-                  Sign In
-                </Button>
-                <Button className="hidden sm:inline-flex btn-gradient focus-ring" onClick={handleGetStarted}>
-                  Get Started
-                </Button>
-              </>
-            )}
+            <div className="hidden md:flex items-center gap-1.5">
+              {isAuthenticated ? (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => navigate('/profile')}
+                    className="flex items-center gap-1.5 h-9 px-3"
+                  >
+                    <User className="w-4 h-4" />
+                    Profile
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => navigate('/settings')}
+                    className="flex items-center gap-1.5 h-9 px-3"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={logout} className="h-9 px-4 focus-ring">
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" size="sm" onClick={handleSignIn} className="h-9 px-4 focus-ring">
+                    Sign In
+                  </Button>
+                  <Button size="sm" className="btn-gradient h-9 px-4 focus-ring" onClick={handleGetStarted}>
+                    Get Started
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

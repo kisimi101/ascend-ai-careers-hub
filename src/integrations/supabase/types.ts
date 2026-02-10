@@ -50,6 +50,69 @@ export type Database = {
         }
         Relationships: []
       }
+      favorite_companies: {
+        Row: {
+          benefits: string[] | null
+          company_facebook: string | null
+          company_instagram: string | null
+          company_linkedin: string | null
+          company_name: string
+          company_twitter: string | null
+          company_website: string | null
+          created_at: string
+          culture: string[] | null
+          description: string | null
+          employee_count: string | null
+          founded: string | null
+          headquarters: string | null
+          id: string
+          industry: string | null
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          benefits?: string[] | null
+          company_facebook?: string | null
+          company_instagram?: string | null
+          company_linkedin?: string | null
+          company_name: string
+          company_twitter?: string | null
+          company_website?: string | null
+          created_at?: string
+          culture?: string[] | null
+          description?: string | null
+          employee_count?: string | null
+          founded?: string | null
+          headquarters?: string | null
+          id?: string
+          industry?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          benefits?: string[] | null
+          company_facebook?: string | null
+          company_instagram?: string | null
+          company_linkedin?: string | null
+          company_name?: string
+          company_twitter?: string | null
+          company_website?: string | null
+          created_at?: string
+          culture?: string[] | null
+          description?: string | null
+          employee_count?: string | null
+          founded?: string | null
+          headquarters?: string | null
+          id?: string
+          industry?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       job_alerts: {
         Row: {
           created_at: string
