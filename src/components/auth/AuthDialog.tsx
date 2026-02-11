@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, User, Mail, Lock, Apple } from 'lucide-react';
 
 interface AuthDialogProps {
   open: boolean;
@@ -18,6 +18,7 @@ interface AuthDialogProps {
 export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defaultTab = 'signin' }) => {
   const [activeTab, setActiveTab] = useState(defaultTab === 'signup' ? 'signup' : 'login');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
   
   useEffect(() => {
     setActiveTab(defaultTab === 'signup' ? 'signup' : 'login');
@@ -29,8 +30,21 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defa
     name: '',
   });
 
-  const { login, signup, loginWithGoogle, isLoading } = useAuth();
+  const { login, signup, loginWithGoogle, loginWithApple, isLoading } = useAuth();
   const { toast } = useToast();
+
+  const handleAppleSignIn = async () => {
+    setIsAppleLoading(true);
+    const result = await loginWithApple();
+    if (!result.success) {
+      toast({
+        title: "Error",
+        description: result.error || "Failed to sign in with Apple. Please try again.",
+        variant: "destructive",
+      });
+      setIsAppleLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
@@ -118,6 +132,18 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defa
               {isGoogleLoading ? "Connecting..." : "Continue with Google"}
             </Button>
 
+            {/* Apple Sign-In Button */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleAppleSignIn}
+              disabled={isAppleLoading || isLoading}
+            >
+              <Apple className="w-5 h-5" />
+              {isAppleLoading ? "Connecting..." : "Continue with Apple"}
+            </Button>
+
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <Separator className="w-full" />
@@ -203,6 +229,18 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defa
                 />
               </svg>
               {isGoogleLoading ? "Connecting..." : "Continue with Google"}
+            </Button>
+
+            {/* Apple Sign-Up Button */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleAppleSignIn}
+              disabled={isAppleLoading || isLoading}
+            >
+              <Apple className="w-5 h-5" />
+              {isAppleLoading ? "Connecting..." : "Continue with Apple"}
             </Button>
 
             <div className="relative">
