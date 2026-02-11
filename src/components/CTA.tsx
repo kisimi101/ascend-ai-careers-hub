@@ -17,7 +17,7 @@ export const CTA = () => {
       name: "Free AI Resume Builder",
       description: "Build ATS-friendly resumes with AI assistance",
       icon: User,
-      color: "from-green-500 to-green-600",
+      color: "from-emerald-500 to-emerald-600",
     },
     {
       name: "Free Resume Checker",
@@ -31,8 +31,8 @@ export const CTA = () => {
     <section className="py-20 px-6">
       <div className="container mx-auto">
         <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-3xl blur-3xl"></div>
-          <div className="relative bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl p-12 text-center text-white">
+          <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-3xl"></div>
+          <div className="relative btn-gradient rounded-3xl p-12 text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Ready to Transform Your Career?
             </h2>
@@ -44,12 +44,12 @@ export const CTA = () => {
               <Button 
                 size="lg" 
                 variant="secondary" 
-                className="px-8 py-4 text-lg bg-white text-orange-600 hover:bg-gray-100"
+                className="px-8 py-4 text-lg bg-card text-primary hover:bg-card/90"
                 onClick={() => navigate('/tools')}
               >
                 Start Free Trial
               </Button>
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg border-white text-white hover:bg-white hover:text-orange-600">
+              <Button size="lg" variant="outline" className="px-8 py-4 text-lg border-white text-white hover:bg-white/10">
                 Schedule Demo
               </Button>
             </div>
@@ -63,23 +63,23 @@ export const CTA = () => {
       {/* Free Tools Section */}
       <div className="mt-20 container mx-auto">
         <div className="text-center mb-12">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">Free AI Career Tools</h3>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <h3 className="text-3xl font-bold text-foreground mb-4">Free AI Career Tools</h3>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Get started with our powerful AI tools - completely free, no signup required
           </p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
-          {freeTools.map((tool, index) => (
+          {freeTools.map((tool) => (
             <div
               key={tool.name}
-              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:scale-105"
+              className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-border/50 hover:scale-105"
             >
               <div className={`w-12 h-12 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-6`}>
                 <tool.icon className="h-6 w-6 text-white" />
               </div>
-              <h4 className="text-xl font-bold text-gray-900 mb-3">{tool.name}</h4>
-              <p className="text-gray-600 mb-6">{tool.description}</p>
+              <h4 className="text-xl font-bold text-foreground mb-3">{tool.name}</h4>
+              <p className="text-muted-foreground mb-6">{tool.description}</p>
               <Button 
                 className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90`}
                 onClick={() => navigate('/tools')}
@@ -90,20 +90,6 @@ export const CTA = () => {
           ))}
         </div>
       </div>
-      
-      <footer className="mt-20 pt-12 border-t border-gray-200">
-        <div className="container mx-auto text-center text-gray-600">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">AI</span>
-            </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-              CareerHub
-            </span>
-          </div>
-          <p>&copy; 2024 CareerHub. All rights reserved.</p>
-        </div>
-      </footer>
     </section>
   );
 };

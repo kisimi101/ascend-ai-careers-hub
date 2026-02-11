@@ -134,11 +134,11 @@
 @layer components {
   /* Glass effect utility */
   .glass {
-    @apply bg-white/80 backdrop-blur-lg border border-white/20;
+    @apply bg-card/80 backdrop-blur-lg border border-border/20;
   }
   
   .glass-dark {
-    @apply bg-black/20 backdrop-blur-lg border border-white/10;
+    @apply bg-card/20 backdrop-blur-lg border border-border/10;
   }
   
   /* Gradient text utilities */

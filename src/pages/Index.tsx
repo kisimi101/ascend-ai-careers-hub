@@ -1,5 +1,6 @@
 
 import { Hero } from "@/components/Hero";
+import { DashboardPreview } from "@/components/DashboardPreview";
 import { ResumeTemplates } from "@/components/ResumeTemplates";
 import { JobShowcase } from "@/components/JobShowcase";
 import { Features } from "@/components/Features";
@@ -14,11 +15,12 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background dark:bg-background">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <FloatingCTA />
       <FloatingSideTools />
       <Hero />
+      <DashboardPreview />
       <ResumeTemplates />
       <JobShowcase />
       <Features />
