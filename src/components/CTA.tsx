@@ -49,8 +49,13 @@ export const CTA = () => {
               >
                 Start Free Trial
               </Button>
-              <Button size="lg" variant="outline" className="px-8 py-4 text-lg border-white text-white hover:bg-white/10">
-                Schedule Demo
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="px-8 py-4 text-lg border-white text-white hover:bg-white/10"
+                onClick={() => document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                View Plans
               </Button>
             </div>
             <div className="mt-8 text-sm opacity-75">

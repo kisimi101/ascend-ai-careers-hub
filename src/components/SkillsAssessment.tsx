@@ -195,6 +195,7 @@ export const SkillsAssessment = () => {
                   </Button>
                   <Button
                     className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white flex-1"
+                    onClick={() => window.location.href = '/job-search'}
                   >
                     View Job Matches
                   </Button>

@@ -75,10 +75,10 @@ export const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button size="lg" className="btn-gradient px-8 py-4 text-lg">
-                Request a Demo
+              <Button size="lg" className="btn-gradient px-8 py-4 text-lg" onClick={() => document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                View Pricing
               </Button>
-              <Button variant="outline" size="lg" className="px-8 py-4 text-lg">
+              <Button variant="outline" size="lg" className="px-8 py-4 text-lg" onClick={() => window.location.href = '/tools'}>
                 Start Free Trial
               </Button>
             </div>
