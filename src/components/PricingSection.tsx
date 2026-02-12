@@ -8,55 +8,64 @@ const pricingPlans = [
   {
     name: "Free",
     price: "$0",
-    period: "/month",
-    description: "Perfect for getting started",
+    period: "/forever",
+    description: "Explore all tools with limited access",
     icon: Zap,
     gradient: "from-zinc-500 to-zinc-600",
     features: [
       "3 Resume Templates",
-      "Basic AI Resume Builder",
-      "Job Search Engine Access",
-      "Community Support",
-      "5 Applications per month"
+      "AI Resume Builder (preview only)",
+      "Resume Checker & Grader",
+      "Cover Letter Generator (1/day)",
+      "Job Search Engine",
+      "Skills Assessment Quiz",
     ],
-    limitations: ["Limited templates", "Basic AI features", "No priority support"]
+    limitations: ["No resume downloads", "Limited AI generations", "No priority support"],
+    cta: "Get Started Free"
   },
   {
     name: "Pro",
-    price: "$19",
+    price: "$12",
     period: "/month",
-    description: "Most popular for job seekers",
+    description: "Everything you need to land your dream job",
     icon: Star,
     gradient: "from-primary to-primary/80",
     popular: true,
     features: [
       "Unlimited Resume Templates",
-      "Advanced AI Resume Builder",
-      "AI Interview Simulator",
-      "24/7 AI Career Coach",
-      "Unlimited Applications",
-      "ATS Optimization",
-      "Priority Support"
+      "Unlimited PDF/DOCX/PNG Downloads",
+      "AI Resume Optimizer & Enhancer",
+      "ATS Score Analysis",
+      "AI Interview Practice",
+      "Unlimited Cover Letters",
+      "LinkedIn Profile Optimizer",
+      "Company Research Tool",
+      "Job Alerts & Tracking",
+      "Priority Support",
     ],
-    limitations: []
+    limitations: [],
+    cta: "Start 7-Day Free Trial"
   },
   {
     name: "Enterprise",
-    price: "$49",
+    price: "$39",
     period: "/month",
-    description: "For teams and organizations",
+    description: "For career coaches, agencies & teams",
     icon: Crown,
     gradient: "from-purple-500 to-indigo-500",
     features: [
       "Everything in Pro",
-      "Team Management",
-      "Custom Branding",
-      "Analytics Dashboard",
+      "Up to 25 Team Members",
+      "Team Analytics Dashboard",
+      "Custom Resume Branding",
+      "Portfolio Builder",
+      "Career Path Planner",
       "API Access",
       "Dedicated Account Manager",
-      "Custom Integrations"
+      "White-label Options",
     ],
-    limitations: []
+    limitations: [],
+    cta: "Contact Sales"
   }
 ];
 
@@ -64,7 +73,7 @@ export const PricingSection = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
   return (
-    <section className="py-20 px-6 bg-muted/30">
+    <section id="pricing-section" className="py-20 px-6 bg-muted/30">
       <div className="container mx-auto">
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
@@ -157,8 +166,13 @@ export const PricingSection = () => {
                       ? "btn-gradient"
                       : "bg-foreground text-background hover:bg-foreground/90"
                   } transition-all`}
+                  onClick={() => {
+                    if (plan.name === "Free") window.location.href = '/tools';
+                    else if (plan.name === "Enterprise") window.location.href = '/tools';
+                    else window.location.href = '/tools';
+                  }}
                 >
-                  {plan.name === "Free" ? "Get Started" : `Choose ${plan.name}`}
+                  {plan.cta}
                 </Button>
               </CardContent>
             </Card>
