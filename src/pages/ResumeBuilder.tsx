@@ -459,6 +459,7 @@ const ResumeBuilder = () => {
             <EnhancedResumePreview
               resumeData={resumeData}
               selectedTemplate={selectedTemplate}
+              accentColor={accentColor}
               onDownloadPDF={downloadPDF}
               onDownloadDOCX={downloadDOCX}
               onDownloadPNG={downloadPNG}
