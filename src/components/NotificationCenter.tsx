@@ -36,6 +36,7 @@ export const NotificationCenter = () => {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { showBrowserNotification } = usePushNotifications();
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -50,13 +51,16 @@ export const NotificationCenter = () => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
         (payload) => {
-          setNotifications((prev) => [payload.new as Notification, ...prev]);
+          const newNotif = payload.new as Notification;
+          setNotifications((prev) => [newNotif, ...prev]);
+          // Trigger browser push notification
+          showBrowserNotification(newNotif.title, newNotif.message, newNotif.link || undefined);
         }
       )
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [user]);
+  }, [user, showBrowserNotification]);
 
   const fetchNotifications = async () => {
     if (!user) return;

@@ -96,6 +96,7 @@ const JobSearch = () => {
               <ResumeApplyBanner resumeData={resumeData} searchQuery={searchQuery} location={location} />
               <JobSearchFilters filters={filters} setFilters={setFilters} />
               <QuickApplyLinks jobTitle={searchQuery} location={location} />
+              <JobAlertManager defaultTitle={searchQuery} defaultLocation={location} />
             </div>
             
             {/* Results */}
