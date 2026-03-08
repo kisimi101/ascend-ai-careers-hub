@@ -17,9 +17,16 @@ const jobSearchTourSteps = [
   { title: "Quick Apply", description: "Use the Quick Apply panel to open pre-filled searches on Indeed, LinkedIn, Glassdoor, and more." },
 ];
 
+interface ResumeData {
+  personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
+  experience: Array<{ company: string; position: string; duration: string; description: string }>;
+  skills: string[];
+}
+
 const JobSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("");
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [filters, setFilters] = useState({
     jobType: [],
     experience: [],
@@ -28,6 +35,13 @@ const JobSearch = () => {
     datePosted: "",
     company: []
   });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('resume-data');
+    if (saved) {
+      try { setResumeData(JSON.parse(saved)); } catch {}
+    }
+  }, []);
 
   const handleSearch = () => {
     console.log("Searching for jobs:", { searchQuery, location, filters });
