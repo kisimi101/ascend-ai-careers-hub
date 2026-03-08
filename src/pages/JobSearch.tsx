@@ -1,10 +1,11 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { JobSearchFilters } from "@/components/job-search/JobSearchFilters";
 import { JobSearchResults } from "@/components/job-search/JobSearchResults";
 import { JobSearchHeader } from "@/components/job-search/JobSearchHeader";
 import { QuickApplyLinks } from "@/components/job-search/QuickApplyLinks";
+import { ResumeApplyBanner } from "@/components/job-search/ResumeApplyBanner";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
