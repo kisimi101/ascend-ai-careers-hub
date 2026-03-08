@@ -51,8 +51,8 @@ const ResumeJobSearch = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load resume data from localStorage
-    const savedResume = localStorage.getItem('resumeData');
+    // Load resume data from localStorage (matches useResumeData hook key)
+    const savedResume = localStorage.getItem('resume-data');
     if (savedResume) {
       try {
         setResumeData(JSON.parse(savedResume));

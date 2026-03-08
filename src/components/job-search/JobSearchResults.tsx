@@ -150,7 +150,7 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
                     ))}
                   </div>
 
-                  <p className="text-gray-700 line-clamp-2">{job.description}</p>
+                  <p className="text-muted-foreground line-clamp-2">{job.description}</p>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
