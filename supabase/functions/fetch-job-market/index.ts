@@ -1,30 +1,37 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface JobMarketRequest {
-  industry: string;
-  location?: string;
-}
-
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Auth check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const apiKey = Deno.env.get('APIFY_API_KEY');
     if (!apiKey) {
       throw new Error('APIFY_API_KEY not configured');
     }
 
-    const { industry, location = 'United States' }: JobMarketRequest = await req.json();
+    const { industry, location = 'United States' } = await req.json();
 
-    // Use Apify's Indeed Scraper actor for job market data
     const actorId = 'misceres/indeed-scraper';
     const runInput = {
       position: industry,
@@ -35,82 +42,43 @@ serve(async (req) => {
       saveOnlyUniqueItems: true,
     };
 
-    // Start the actor run
     const runResponse = await fetch(
       `https://api.apify.com/v2/acts/${actorId}/runs?token=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(runInput),
-      }
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(runInput) }
     );
 
     if (!runResponse.ok) {
-      // If Apify fails, return mock data for demo purposes
-      console.log('Apify request failed, returning mock data');
-      return new Response(
-        JSON.stringify(generateMockData(industry)),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const runData = await runResponse.json();
     const runId = runData.data?.id;
-
     if (!runId) {
-      return new Response(
-        JSON.stringify(generateMockData(industry)),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // Wait for the run to finish (with timeout)
     let status = 'RUNNING';
     let attempts = 0;
-    const maxAttempts = 30; // 30 seconds max wait
-
-    while (status === 'RUNNING' && attempts < maxAttempts) {
+    while (status === 'RUNNING' && attempts < 30) {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const statusResponse = await fetch(
-        `https://api.apify.com/v2/actor-runs/${runId}?token=${apiKey}`
-      );
+      const statusResponse = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${apiKey}`);
       const statusData = await statusResponse.json();
       status = statusData.data?.status;
       attempts++;
     }
 
     if (status !== 'SUCCEEDED') {
-      return new Response(
-        JSON.stringify(generateMockData(industry)),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // Fetch the results
-    const resultsResponse = await fetch(
-      `https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${apiKey}`
-    );
+    const resultsResponse = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${apiKey}`);
     const jobs = await resultsResponse.json();
-
-    // Process the job data to extract insights
     const processedData = processJobData(jobs, industry);
 
-    return new Response(
-      JSON.stringify(processedData),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify(processedData), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error('Error fetching job market data:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 });
 
@@ -121,107 +89,60 @@ function processJobData(jobs: any[], industry: string) {
   const companySet = new Set<string>();
 
   jobs.forEach((job: any) => {
-    // Extract company
-    if (job.company) {
-      companySet.add(job.company);
-    }
-
-    // Extract location data
+    if (job.company) companySet.add(job.company);
     const city = job.location || 'Unknown';
-    if (!locationData[city]) {
-      locationData[city] = { count: 0, salaries: [] };
-    }
+    if (!locationData[city]) locationData[city] = { count: 0, salaries: [] };
     locationData[city].count++;
-
-    // Extract salary if available
     if (job.salary) {
       const salaryMatch = job.salary.match(/\$?([\d,]+)/);
       if (salaryMatch) {
         const salary = parseInt(salaryMatch[1].replace(/,/g, ''));
         if (salary > 20000 && salary < 500000) {
           locationData[city].salaries.push(salary);
-          
-          // Group by role
           const role = job.positionName || job.title || 'Unknown';
           let roleEntry = salaryData.find(s => s.role.toLowerCase().includes(role.toLowerCase().slice(0, 10)));
-          if (!roleEntry) {
-            roleEntry = { role, salaries: [] };
-            salaryData.push(roleEntry);
-          }
+          if (!roleEntry) { roleEntry = { role, salaries: [] }; salaryData.push(roleEntry); }
           roleEntry.salaries.push(salary);
         }
       }
     }
-
-    // Extract skills from description
     const description = (job.description || '').toLowerCase();
-    const commonSkills = [
-      'python', 'javascript', 'react', 'node.js', 'sql', 'aws', 'docker',
-      'kubernetes', 'machine learning', 'ai', 'data analysis', 'excel',
-      'communication', 'leadership', 'project management', 'agile', 'scrum'
-    ];
-    
-    commonSkills.forEach(skill => {
-      if (description.includes(skill.toLowerCase())) {
-        skillsCount[skill] = (skillsCount[skill] || 0) + 1;
-      }
-    });
+    const commonSkills = ['python', 'javascript', 'react', 'node.js', 'sql', 'aws', 'docker', 'kubernetes', 'machine learning', 'ai', 'data analysis', 'excel', 'communication', 'leadership', 'project management', 'agile', 'scrum'];
+    commonSkills.forEach(skill => { if (description.includes(skill.toLowerCase())) skillsCount[skill] = (skillsCount[skill] || 0) + 1; });
   });
 
-  // Calculate averages and format data
-  const topLocations = Object.entries(locationData)
-    .map(([city, data]) => ({
-      city,
-      jobs: data.count,
-      avgSalary: data.salaries.length > 0 
-        ? Math.round(data.salaries.reduce((a, b) => a + b, 0) / data.salaries.length)
-        : 100000
-    }))
-    .sort((a, b) => b.jobs - a.jobs)
-    .slice(0, 6);
+  const topLocations = Object.entries(locationData).map(([city, data]) => ({
+    city, jobs: data.count,
+    avgSalary: data.salaries.length > 0 ? Math.round(data.salaries.reduce((a, b) => a + b, 0) / data.salaries.length) : 100000
+  })).sort((a, b) => b.jobs - a.jobs).slice(0, 6);
 
-  const inDemandSkills = Object.entries(skillsCount)
-    .map(([name, count]) => ({
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      growthRate: Math.round(20 + Math.random() * 30),
-      averageSalaryBoost: Math.round(10000 + Math.random() * 20000),
-      demandScore: Math.min(100, Math.round((count / jobs.length) * 200))
-    }))
-    .sort((a, b) => b.demandScore - a.demandScore)
-    .slice(0, 8);
+  const inDemandSkills = Object.entries(skillsCount).map(([name, count]) => ({
+    name: name.charAt(0).toUpperCase() + name.slice(1),
+    growthRate: Math.round(20 + Math.random() * 30),
+    averageSalaryBoost: Math.round(10000 + Math.random() * 20000),
+    demandScore: Math.min(100, Math.round((count / jobs.length) * 200))
+  })).sort((a, b) => b.demandScore - a.demandScore).slice(0, 8);
 
-  const salaryTrends = salaryData
-    .map(({ role, salaries }) => ({
-      role: role.slice(0, 30),
-      averageSalary: salaries.length > 0 
-        ? Math.round(salaries.reduce((a, b) => a + b, 0) / salaries.length)
-        : 100000,
-      change: Math.round(-5 + Math.random() * 20),
-      demandLevel: salaries.length > 5 ? 'high' : salaries.length > 2 ? 'medium' : 'low',
-      openings: salaries.length * 100
-    }))
-    .slice(0, 6);
+  const salaryTrends = salaryData.map(({ role, salaries }) => ({
+    role: role.slice(0, 30),
+    averageSalary: salaries.length > 0 ? Math.round(salaries.reduce((a, b) => a + b, 0) / salaries.length) : 100000,
+    change: Math.round(-5 + Math.random() * 20),
+    demandLevel: salaries.length > 5 ? 'high' : salaries.length > 2 ? 'medium' : 'low',
+    openings: salaries.length * 100
+  })).slice(0, 6);
 
   return {
     industry,
     salaryTrends: salaryTrends.length > 0 ? salaryTrends : generateMockData(industry).salaryTrends,
     inDemandSkills: inDemandSkills.length > 0 ? inDemandSkills : generateMockData(industry).inDemandSkills,
     marketAnalysis: {
-      totalJobs: jobs.length * 50000,
-      jobGrowth: 10 + Math.random() * 10,
-      averageSalary: 95000 + Math.random() * 40000,
-      salaryGrowth: 5 + Math.random() * 8,
+      totalJobs: jobs.length * 50000, jobGrowth: 10 + Math.random() * 10,
+      averageSalary: 95000 + Math.random() * 40000, salaryGrowth: 5 + Math.random() * 8,
       topCompanies: Array.from(companySet).slice(0, 8),
       topLocations: topLocations.length > 0 ? topLocations : generateMockData(industry).marketAnalysis.topLocations
     },
     outlook: `The ${industry} sector shows strong growth potential with increasing demand for skilled professionals.`,
-    predictions: [
-      `${industry} roles will continue to see steady growth`,
-      'Remote work opportunities expanding',
-      'Technical skills increasingly valued',
-      'Salary growth expected to continue',
-      'New specializations emerging in the field'
-    ],
+    predictions: [`${industry} roles will continue to see steady growth`, 'Remote work opportunities expanding', 'Technical skills increasingly valued', 'Salary growth expected to continue', 'New specializations emerging in the field'],
     isLiveData: jobs.length > 0
   };
 }
@@ -248,10 +169,7 @@ function generateMockData(industry: string) {
       { name: 'Collaboration', growthRate: 25, averageSalaryBoost: 12000, demandScore: 85 },
     ],
     marketAnalysis: {
-      totalJobs: 2500000,
-      jobGrowth: 15.3,
-      averageSalary: 118000,
-      salaryGrowth: 7.8,
+      totalJobs: 2500000, jobGrowth: 15.3, averageSalary: 118000, salaryGrowth: 7.8,
       topCompanies: ['Google', 'Microsoft', 'Amazon', 'Apple', 'Meta', 'Netflix', 'Salesforce', 'Adobe'],
       topLocations: [
         { city: 'San Francisco, CA', jobs: 185000, avgSalary: 165000 },
@@ -262,14 +180,8 @@ function generateMockData(industry: string) {
         { city: 'Remote', jobs: 350000, avgSalary: 125000 },
       ]
     },
-    outlook: `Strong growth expected in ${industry} with continued digital transformation across all sectors.`,
-    predictions: [
-      `${industry} roles will see continued growth`,
-      'Remote work opportunities will stabilize',
-      'Entry-level salaries expected to increase',
-      'Demand will outpace supply',
-      'New specializations will emerge'
-    ],
+    outlook: `Strong growth expected in ${industry} with continued digital transformation.`,
+    predictions: [`${industry} roles will see continued growth`, 'Remote work opportunities will stabilize', 'Entry-level salaries expected to increase', 'Demand will outpace supply', 'New specializations will emerge'],
     isLiveData: false
   };
 }

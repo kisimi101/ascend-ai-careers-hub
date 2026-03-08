@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +12,19 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const { resumeText, jobDescription } = await req.json();
     console.log('Scanning keywords for resume');
 
@@ -19,7 +33,6 @@ Deno.serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Call AI to analyze keywords
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -60,10 +73,7 @@ ${jobDescription}`
 
     const data = await response.json();
     const aiResponse = data.choices[0].message.content;
-    
-    console.log('AI response:', aiResponse);
 
-    // Parse AI response
     let scanResults;
     try {
       const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
@@ -74,7 +84,6 @@ ${jobDescription}`
       }
     } catch (e) {
       console.error('Failed to parse AI response:', e);
-      // Return fallback results
       scanResults = {
         matchScore: 70,
         foundKeywords: ['JavaScript', 'React', 'Communication'],
@@ -87,28 +96,15 @@ ${jobDescription}`
       };
     }
 
-    return new Response(
-      JSON.stringify(scanResults),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return new Response(JSON.stringify(scanResults), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200,
+    });
 
   } catch (error) {
     console.error('Error in scan-keywords function:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        matchScore: 0,
-        foundKeywords: [],
-        missingKeywords: [],
-        suggestions: ['Error analyzing keywords. Please try again.']
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
+      JSON.stringify({ error: error.message, matchScore: 0, foundKeywords: [], missingKeywords: [], suggestions: ['Error analyzing keywords. Please try again.'] }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });
