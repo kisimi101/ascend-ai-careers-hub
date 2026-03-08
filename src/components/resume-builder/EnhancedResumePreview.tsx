@@ -34,6 +34,7 @@ export const EnhancedResumePreview = ({
   onDownloadPNG
 }: EnhancedResumePreviewProps) => {
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const navigate = useNavigate();
 
   const renderTemplate = () => {
