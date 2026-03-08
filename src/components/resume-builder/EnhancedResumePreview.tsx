@@ -95,8 +95,21 @@ export const EnhancedResumePreview = ({
               word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ')}
           </div>
+          
+          {/* Auto-Fill Panel */}
+          <div className="mt-3">
+            <AutoFillPanel resumeData={resumeData} />
+          </div>
         </CardContent>
       </Card>
+
+      {/* Share Dialog */}
+      <ShareResumeDialog
+        resumeData={resumeData}
+        selectedTemplate={selectedTemplate}
+        open={showShare}
+        onOpenChange={setShowShare}
+      />
 
       {/* Paywall Dialog */}
       <Dialog open={showPaywall} onOpenChange={setShowPaywall}>
