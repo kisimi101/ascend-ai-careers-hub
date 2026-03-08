@@ -352,7 +352,7 @@ const ResumeBuilder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 dark:from-background dark:via-background dark:to-background">
       {/* Navigation */}
       <nav className="bg-white shadow-sm">
         <div className="container mx-auto px-6 py-4">
