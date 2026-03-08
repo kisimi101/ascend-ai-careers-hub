@@ -120,9 +120,10 @@ const JobSearch = () => {
               <Button 
                 onClick={handleSearch}
                 className="h-12 px-8"
+                disabled={isLoading}
               >
-                <Search className="w-4 h-4 mr-2" />
-                Search Jobs
+                {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Search className="w-4 h-4 mr-2" />}
+                {isLoading ? "Searching..." : "Search Jobs"}
               </Button>
             </div>
           </div>
