@@ -308,6 +308,8 @@ const ResumeBuilder = () => {
           <TemplateSelector
             selectedTemplate={selectedTemplate}
             onSelectTemplate={setSelectedTemplate}
+            accentColor={accentColor}
+            onAccentColorChange={setAccentColor}
           />
         );
       case 1:
