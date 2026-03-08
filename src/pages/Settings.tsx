@@ -38,6 +38,7 @@ const Settings = () => {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const { isSupported, isEnabled, permission, requestPermission, disable } = usePushNotifications();
 
   useEffect(() => {
     if (user) {
