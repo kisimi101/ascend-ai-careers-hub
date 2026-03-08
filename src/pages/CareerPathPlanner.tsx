@@ -626,6 +626,7 @@ const CareerPathPlanner = () => {
       </main>
 
       <Footer />
+      <OnboardingTour tourId="career-path-planner" steps={careerTourSteps} />
     </div>
   );
 };

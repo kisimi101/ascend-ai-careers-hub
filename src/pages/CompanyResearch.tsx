@@ -64,6 +64,7 @@ const CompanyResearch = () => {
       </main>
 
       <Footer />
+      <OnboardingTour tourId="company-research" steps={companyTourSteps} />
     </div>
   );
 };

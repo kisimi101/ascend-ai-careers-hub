@@ -351,6 +351,7 @@ const InterviewPractice = () => {
       </div>
 
       <Footer />
+      <OnboardingTour tourId="interview-practice" steps={interviewTourSteps} />
     </div>
   );
 };

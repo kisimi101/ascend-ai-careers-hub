@@ -540,6 +540,7 @@ const JobTracker = () => {
       </div>
 
       <Footer />
+      <OnboardingTour tourId="job-tracker" steps={jobTrackerTourSteps} />
     </div>
   );
 };
