@@ -144,7 +144,7 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
 
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary">{job.type}</Badge>
-                    {job.remote && <Badge variant="outline" className="text-green-600 border-green-600">Remote</Badge>}
+                    {job.remote && <Badge variant="outline" className="text-primary border-primary">Remote</Badge>}
                     {job.requirements.slice(0, 3).map((req, index) => (
                       <Badge key={index} variant="outline">{req}</Badge>
                     ))}
