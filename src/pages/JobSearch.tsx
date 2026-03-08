@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { JobSearchFilters } from "@/components/job-search/JobSearchFilters";
 import { JobSearchResults } from "@/components/job-search/JobSearchResults";
@@ -10,7 +11,9 @@ import { JobAlertManager } from "@/components/job-search/JobAlertManager";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const jobSearchTourSteps = [
   { title: "Search Jobs", description: "Enter a job title and location to find matching positions across multiple sources." },
