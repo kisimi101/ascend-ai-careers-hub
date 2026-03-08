@@ -3,63 +3,34 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Bookmark, ExternalLink, Building, DollarSign } from "lucide-react";
+import { MapPin, Clock, Bookmark, ExternalLink, Building, Search, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface Job {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  url?: string;
+  description: string;
+  source?: string;
+  postedDate?: string;
+}
 
 interface JobSearchResultsProps {
   searchQuery: string;
   location: string;
   filters: any;
+  jobs: Job[];
+  isLoading: boolean;
+  hasSearched: boolean;
 }
 
-export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchResultsProps) => {
+export const JobSearchResults = ({ searchQuery, location, filters, jobs, isLoading, hasSearched }: JobSearchResultsProps) => {
   const [sortBy, setSortBy] = useState("relevance");
-  const [savedJobs, setSavedJobs] = useState<number[]>([]);
+  const [savedJobs, setSavedJobs] = useState<string[]>([]);
 
-  // Mock job data
-  const jobs = [
-    {
-      id: 1,
-      title: "Senior Frontend Developer",
-      company: "TechCorp Inc.",
-      location: "San Francisco, CA",
-      type: "Full-time",
-      salary: "$120,000 - $150,000",
-      postedDate: "2 days ago",
-      description: "We're looking for a senior frontend developer to join our team...",
-      requirements: ["React", "TypeScript", "5+ years experience"],
-      remote: true,
-      logo: "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=80&h=80&fit=crop&crop=center"
-    },
-    {
-      id: 2,
-      title: "Product Manager",
-      company: "StartupXYZ",
-      location: "New York, NY",
-      type: "Full-time",
-      salary: "$100,000 - $130,000",
-      postedDate: "1 day ago",
-      description: "Join our product team to drive innovation and growth...",
-      requirements: ["Product Strategy", "Analytics", "3+ years experience"],
-      remote: false,
-      logo: "https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=80&h=80&fit=crop&crop=center"
-    },
-    {
-      id: 3,
-      title: "UX Designer",
-      company: "Design Studio",
-      location: "Remote",
-      type: "Contract",
-      salary: "$80,000 - $100,000",
-      postedDate: "3 days ago",
-      description: "Create amazing user experiences for our clients...",
-      requirements: ["Figma", "User Research", "2+ years experience"],
-      remote: true,
-      logo: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=80&h=80&fit=crop&crop=center"
-    }
-  ];
-
-  const toggleSaveJob = (jobId: number) => {
+  const toggleSaveJob = (jobId: string) => {
     setSavedJobs(prev => 
       prev.includes(jobId) 
         ? prev.filter(id => id !== jobId)
@@ -67,13 +38,43 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary" />
+        <p className="text-lg font-medium">Searching for jobs...</p>
+        <p className="text-sm">This may take a moment while we scan multiple sources.</p>
+      </div>
+    );
+  }
+
+  if (!hasSearched) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <Search className="w-12 h-12 mb-4 opacity-30" />
+        <p className="text-lg font-medium">Search for jobs</p>
+        <p className="text-sm">Enter a job title or keywords above to find matching positions.</p>
+      </div>
+    );
+  }
+
+  if (jobs.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+        <Search className="w-12 h-12 mb-4 opacity-30" />
+        <p className="text-lg font-medium">No jobs found</p>
+        <p className="text-sm">Try different keywords or broaden your search criteria.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Results Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">Job Results</h2>
-          <p className="text-muted-foreground">{jobs.length} jobs found</p>
+          <p className="text-muted-foreground">{jobs.length} jobs found for "{searchQuery}"</p>
         </div>
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-48">
@@ -82,7 +83,6 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
           <SelectContent>
             <SelectItem value="relevance">Most Relevant</SelectItem>
             <SelectItem value="date">Most Recent</SelectItem>
-            <SelectItem value="salary">Highest Salary</SelectItem>
             <SelectItem value="company">Company A-Z</SelectItem>
           </SelectContent>
         </Select>
@@ -91,18 +91,9 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
       {/* Job Cards */}
       <div className="space-y-4">
         {jobs.map((job) => (
-          <Card key={job.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Card key={job.id} className="hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row lg:items-start gap-4">
-                {/* Company Logo */}
-                <div className="flex-shrink-0">
-                  <img 
-                    src={job.logo} 
-                    alt={job.company}
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                </div>
-
                 {/* Job Details */}
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
@@ -132,47 +123,35 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
                       <MapPin className="w-4 h-4" />
                       <span>{job.location}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4" />
-                      <span>{job.salary}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>{job.postedDate}</span>
-                    </div>
+                    {job.postedDate && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{job.postedDate}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">{job.type}</Badge>
-                    {job.remote && <Badge variant="outline" className="text-primary border-primary">Remote</Badge>}
-                    {job.requirements.slice(0, 3).map((req, index) => (
-                      <Badge key={index} variant="outline">{req}</Badge>
-                    ))}
+                    {job.source && <Badge variant="secondary">{job.source}</Badge>}
                   </div>
 
                   <p className="text-muted-foreground line-clamp-2">{job.description}</p>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <Button className="btn-gradient">
-                      Apply Now
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <ExternalLink className="w-4 h-4" />
-                      View Details
-                    </Button>
+                    {job.url && (
+                      <Button asChild>
+                        <a href={job.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                          <ExternalLink className="w-4 h-4" />
+                          View & Apply
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      {/* Load More */}
-      <div className="text-center pt-8">
-        <Button variant="outline" size="lg">
-          Load More Jobs
-        </Button>
       </div>
     </div>
   );
