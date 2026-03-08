@@ -4,9 +4,17 @@ import { Navigation } from "@/components/Navigation";
 import { JobSearchFilters } from "@/components/job-search/JobSearchFilters";
 import { JobSearchResults } from "@/components/job-search/JobSearchResults";
 import { JobSearchHeader } from "@/components/job-search/JobSearchHeader";
+import { QuickApplyLinks } from "@/components/job-search/QuickApplyLinks";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Briefcase } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
+
+const jobSearchTourSteps = [
+  { title: "Search Jobs", description: "Enter a job title and location to find matching positions across multiple sources." },
+  { title: "Filter Results", description: "Use the sidebar filters to narrow down by job type, experience level, and salary range." },
+  { title: "Quick Apply", description: "Use the Quick Apply panel to open pre-filled searches on Indeed, LinkedIn, Glassdoor, and more." },
+];
 
 const JobSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,18 +33,18 @@ const JobSearch = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="pt-20">
         <JobSearchHeader />
         
         {/* Main Search Bar */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="container mx-auto px-6 py-6">
-            <div className="flex flex-col md:flex-row gap-4">
+        <div className="bg-card shadow-sm border-b">
+          <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   placeholder="Job title, keywords, or company"
                   value={searchQuery}
@@ -45,7 +53,7 @@ const JobSearch = () => {
                 />
               </div>
               <div className="flex-1 relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   placeholder="City, state, or remote"
                   value={location}
@@ -55,7 +63,7 @@ const JobSearch = () => {
               </div>
               <Button 
                 onClick={handleSearch}
-                className="h-12 px-8 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                className="h-12 px-8"
               >
                 <Search className="w-4 h-4 mr-2" />
                 Search Jobs
@@ -65,11 +73,12 @@ const JobSearch = () => {
         </div>
 
         {/* Main Content */}
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex flex-col lg:flex-row gap-8">
+        <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
             {/* Filters Sidebar */}
-            <div className="lg:w-1/4">
+            <div className="lg:w-1/4 space-y-4">
               <JobSearchFilters filters={filters} setFilters={setFilters} />
+              <QuickApplyLinks jobTitle={searchQuery} location={location} />
             </div>
             
             {/* Results */}
@@ -79,6 +88,8 @@ const JobSearch = () => {
           </div>
         </div>
       </div>
+
+      <OnboardingTour tourId="job-search" steps={jobSearchTourSteps} />
     </div>
   );
 };

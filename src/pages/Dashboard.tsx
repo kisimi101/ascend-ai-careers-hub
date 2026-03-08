@@ -478,6 +478,14 @@ const Dashboard = () => {
         </div>
       </div>
 
+      <OnboardingTour 
+        tourId="dashboard" 
+        steps={[
+          { title: "Welcome to your Dashboard!", description: "This is your career command center. Track applications, interviews, and milestones all in one place." },
+          { title: "Application Pipeline", description: "See your job applications at every stage — from applied to offer. Click 'View All' for details." },
+          { title: "Quick Actions", description: "Use the buttons at the bottom to quickly jump to Resume Builder, Job Search, Interview Practice, and more." },
+        ]}
+      />
       <Footer />
     </div>
   );

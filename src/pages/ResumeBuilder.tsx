@@ -464,6 +464,14 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
+      <OnboardingTour 
+        tourId="resume-builder" 
+        steps={[
+          { title: "Choose a Template", description: "Start by selecting a professional template. Each is optimized for ATS systems." },
+          { title: "Fill Your Details", description: "Step through Personal Info, Experience, Education, and Skills. AI will help optimize." },
+          { title: "Share or Download", description: "Preview your resume live, share a tracking link, or upgrade to download as PDF." },
+        ]}
+      />
       <Footer />
     </div>
   );
