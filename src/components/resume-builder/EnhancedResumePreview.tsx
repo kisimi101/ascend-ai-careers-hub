@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, FileText, Image, Lock, Crown } from "lucide-react";
+import { Download, FileText, Image, Lock, Crown, Share2 } from "lucide-react";
 import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { TechTemplate } from "./templates/TechTemplate";
@@ -15,6 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { ShareResumeDialog } from "./ShareResumeDialog";
+import { AutoFillPanel } from "./AutoFillPanel";
 
 interface EnhancedResumePreviewProps {
   resumeData: ResumeData;
