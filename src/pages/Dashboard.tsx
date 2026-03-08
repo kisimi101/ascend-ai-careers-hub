@@ -26,6 +26,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { DashboardCalendar } from "@/components/dashboard/DashboardCalendar";
 import { WeeklyProgressReport } from "@/components/dashboard/WeeklyProgressReport";
 import { useJobApplicationsDB } from "@/hooks/useJobApplicationsDB";
+import { OnboardingTour } from "@/components/OnboardingTour";
+import { useJobApplicationsDB } from "@/hooks/useJobApplicationsDB";
 
 interface CareerMilestone {
   id: string;
