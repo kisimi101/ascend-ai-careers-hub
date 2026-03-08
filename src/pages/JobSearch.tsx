@@ -1,10 +1,11 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { JobSearchFilters } from "@/components/job-search/JobSearchFilters";
 import { JobSearchResults } from "@/components/job-search/JobSearchResults";
 import { JobSearchHeader } from "@/components/job-search/JobSearchHeader";
 import { QuickApplyLinks } from "@/components/job-search/QuickApplyLinks";
+import { ResumeApplyBanner } from "@/components/job-search/ResumeApplyBanner";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,9 +17,16 @@ const jobSearchTourSteps = [
   { title: "Quick Apply", description: "Use the Quick Apply panel to open pre-filled searches on Indeed, LinkedIn, Glassdoor, and more." },
 ];
 
+interface ResumeData {
+  personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
+  experience: Array<{ company: string; position: string; duration: string; description: string }>;
+  skills: string[];
+}
+
 const JobSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("");
+  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [filters, setFilters] = useState({
     jobType: [],
     experience: [],
@@ -27,6 +35,13 @@ const JobSearch = () => {
     datePosted: "",
     company: []
   });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('resume-data');
+    if (saved) {
+      try { setResumeData(JSON.parse(saved)); } catch {}
+    }
+  }, []);
 
   const handleSearch = () => {
     console.log("Searching for jobs:", { searchQuery, location, filters });
@@ -77,6 +92,7 @@ const JobSearch = () => {
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
             {/* Filters Sidebar */}
             <div className="lg:w-1/4 space-y-4">
+              <ResumeApplyBanner resumeData={resumeData} searchQuery={searchQuery} location={location} />
               <JobSearchFilters filters={filters} setFilters={setFilters} />
               <QuickApplyLinks jobTitle={searchQuery} location={location} />
             </div>

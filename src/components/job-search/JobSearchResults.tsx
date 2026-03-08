@@ -73,7 +73,7 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">Job Results</h2>
-          <p className="text-gray-600">{jobs.length} jobs found</p>
+          <p className="text-muted-foreground">{jobs.length} jobs found</p>
         </div>
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-48">
@@ -107,10 +107,10 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 hover:text-orange-600 transition-colors">
+                      <h3 className="text-xl font-semibold text-foreground hover:text-primary transition-colors">
                         {job.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-gray-600 mt-1">
+                      <div className="flex items-center gap-2 text-muted-foreground mt-1">
                         <Building className="w-4 h-4" />
                         <span className="font-medium">{job.company}</span>
                       </div>
@@ -119,15 +119,15 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleSaveJob(job.id)}
-                      className="text-gray-500 hover:text-orange-600"
+                      className="text-muted-foreground hover:text-primary"
                     >
                       <Bookmark 
-                        className={`w-5 h-5 ${savedJobs.includes(job.id) ? 'fill-current text-orange-600' : ''}`} 
+                        className={`w-5 h-5 ${savedJobs.includes(job.id) ? 'fill-current text-primary' : ''}`} 
                       />
                     </Button>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
                       <span>{job.location}</span>
@@ -144,16 +144,16 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
 
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary">{job.type}</Badge>
-                    {job.remote && <Badge variant="outline" className="text-green-600 border-green-600">Remote</Badge>}
+                    {job.remote && <Badge variant="outline" className="text-primary border-primary">Remote</Badge>}
                     {job.requirements.slice(0, 3).map((req, index) => (
                       <Badge key={index} variant="outline">{req}</Badge>
                     ))}
                   </div>
 
-                  <p className="text-gray-700 line-clamp-2">{job.description}</p>
+                  <p className="text-muted-foreground line-clamp-2">{job.description}</p>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <Button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
+                    <Button className="btn-gradient">
                       Apply Now
                     </Button>
                     <Button variant="outline" className="flex items-center gap-2">

@@ -78,11 +78,19 @@ export const Navigation = () => {
                   </div>
                 </MenuItem>
                 <MenuItem setActive={setActive} active={active} item="Job Search">
-                  <div className="text-sm grid grid-cols-2 gap-10 p-4">
-                    <div className="flex flex-col space-y-4">
-                      <HoveredLink to="/job-search">Job Search</HoveredLink>
-                      <HoveredLink to="/resume-job-search">Jobs for Your Resume</HoveredLink>
-                    </div>
+                  <div className="text-sm grid grid-cols-2 gap-6 p-4 min-w-[520px]">
+                    <ProductItem
+                      title="Job Search"
+                      href="/job-search"
+                      src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=140&h=70&fit=crop"
+                      description="Search thousands of jobs across top boards"
+                    />
+                    <ProductItem
+                      title="Jobs for Your Resume"
+                      href="/resume-job-search"
+                      src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=140&h=70&fit=crop"
+                      description="AI-matched jobs based on your resume skills"
+                    />
                     <ProductItem
                       title="Cover Letter Generator"
                       href="/cover-letter-generator"
@@ -92,14 +100,14 @@ export const Navigation = () => {
                     <ProductItem
                       title="Interview Practice"
                       href="/interview-practice"
-                      src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=140&h=70&fit=crop"
+                      src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=140&h=70&fit=crop"
                       description="Practice with AI-powered interview questions"
                     />
                     <ProductItem
                       title="Job Tracker"
                       href="/job-tracker"
-                      src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=140&h=70&fit=crop"
-                      description="Track your job applications efficiently"
+                      src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=140&h=70&fit=crop"
+                      description="Track all your applications in one place"
                     />
                     <ProductItem
                       title="Salary Estimator"
