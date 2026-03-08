@@ -306,6 +306,46 @@ const Settings = () => {
             </CardContent>
           </Card>
 
+          {/* Browser Push Notifications */}
+          {isSupported && (
+            <Card className="mb-6">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Smartphone className="h-5 w-5 text-primary" />
+                  <CardTitle>Browser Notifications</CardTitle>
+                </div>
+                <CardDescription>
+                  Get notified even when you're not on the app
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Push Notifications</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {permission === "denied"
+                        ? "Blocked by browser — enable in browser settings"
+                        : "Receive browser notifications for new job alerts and updates"}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={isEnabled}
+                    disabled={permission === "denied"}
+                    onCheckedChange={async (checked) => {
+                      if (checked) {
+                        const ok = await requestPermission();
+                        if (ok) toast({ title: "Push notifications enabled!" });
+                      } else {
+                        disable();
+                        toast({ title: "Push notifications disabled" });
+                      }
+                    }}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Save Button */}
           <div className="flex justify-end">
             <Button
