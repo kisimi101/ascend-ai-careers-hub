@@ -119,10 +119,10 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleSaveJob(job.id)}
-                      className="text-gray-500 hover:text-orange-600"
+                      className="text-muted-foreground hover:text-primary"
                     >
                       <Bookmark 
-                        className={`w-5 h-5 ${savedJobs.includes(job.id) ? 'fill-current text-orange-600' : ''}`} 
+                        className={`w-5 h-5 ${savedJobs.includes(job.id) ? 'fill-current text-primary' : ''}`} 
                       />
                     </Button>
                   </div>
