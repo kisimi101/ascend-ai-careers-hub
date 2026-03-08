@@ -142,7 +142,7 @@ const JobSearch = () => {
             
             {/* Results */}
             <div className="lg:w-3/4">
-              <JobSearchResults searchQuery={searchQuery} location={location} filters={filters} />
+              <JobSearchResults searchQuery={searchQuery} location={location} filters={filters} jobs={jobs} isLoading={isLoading} hasSearched={hasSearched} />
             </div>
           </div>
         </div>
