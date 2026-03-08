@@ -59,9 +59,13 @@ export const EnhancedResumePreview = ({
     <>
       <Card className="sticky top-8">
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <CardTitle className="text-lg">Resume Preview</CardTitle>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => setShowShare(true)} size="sm" variant="secondary">
+                <Share2 className="h-3 w-3 mr-1" />
+                Share
+              </Button>
               <Button onClick={() => handleDownload(onDownloadPDF)} size="sm" variant="default">
                 <Lock className="h-3 w-3 mr-1" />
                 PDF
