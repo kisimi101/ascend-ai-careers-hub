@@ -20,7 +20,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { OnboardingTour } from "@/components/OnboardingTour";
 
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -352,7 +352,7 @@ const ResumeBuilder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 dark:from-background dark:via-background dark:to-background">
       {/* Navigation */}
       <nav className="bg-white shadow-sm">
         <div className="container mx-auto px-6 py-4">
@@ -381,7 +381,7 @@ const ResumeBuilder = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Form Section */}
           <div>
             <ProgressSteps steps={steps} currentStep={currentStep} />
@@ -464,6 +464,14 @@ const ResumeBuilder = () => {
         </div>
       </div>
 
+      <OnboardingTour 
+        tourId="resume-builder" 
+        steps={[
+          { title: "Choose a Template", description: "Start by selecting a professional template. Each is optimized for ATS systems." },
+          { title: "Fill Your Details", description: "Step through Personal Info, Experience, Education, and Skills. AI will help optimize." },
+          { title: "Share or Download", description: "Preview your resume live, share a tracking link, or upgrade to download as PDF." },
+        ]}
+      />
       <Footer />
     </div>
   );

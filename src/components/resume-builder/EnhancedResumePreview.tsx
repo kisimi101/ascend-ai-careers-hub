@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, FileText, Image, Lock, Crown } from "lucide-react";
+import { Download, FileText, Image, Lock, Crown, Share2 } from "lucide-react";
 import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { TechTemplate } from "./templates/TechTemplate";
@@ -15,6 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { ShareResumeDialog } from "./ShareResumeDialog";
+import { AutoFillPanel } from "./AutoFillPanel";
 
 interface EnhancedResumePreviewProps {
   resumeData: ResumeData;
@@ -32,6 +34,7 @@ export const EnhancedResumePreview = ({
   onDownloadPNG
 }: EnhancedResumePreviewProps) => {
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const navigate = useNavigate();
 
   const renderTemplate = () => {
@@ -56,9 +59,13 @@ export const EnhancedResumePreview = ({
     <>
       <Card className="sticky top-8">
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <CardTitle className="text-lg">Resume Preview</CardTitle>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => setShowShare(true)} size="sm" variant="secondary">
+                <Share2 className="h-3 w-3 mr-1" />
+                Share
+              </Button>
               <Button onClick={() => handleDownload(onDownloadPDF)} size="sm" variant="default">
                 <Lock className="h-3 w-3 mr-1" />
                 PDF
@@ -88,8 +95,21 @@ export const EnhancedResumePreview = ({
               word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ')}
           </div>
+          
+          {/* Auto-Fill Panel */}
+          <div className="mt-3">
+            <AutoFillPanel resumeData={resumeData} />
+          </div>
         </CardContent>
       </Card>
+
+      {/* Share Dialog */}
+      <ShareResumeDialog
+        resumeData={resumeData}
+        selectedTemplate={selectedTemplate}
+        open={showShare}
+        onOpenChange={setShowShare}
+      />
 
       {/* Paywall Dialog */}
       <Dialog open={showPaywall} onOpenChange={setShowPaywall}>

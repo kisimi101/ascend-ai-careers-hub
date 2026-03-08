@@ -332,6 +332,45 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_resumes: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          resume_data: Json
+          share_token: string
+          template: string
+          title: string | null
+          updated_at: string
+          user_id: string
+          view_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          resume_data: Json
+          share_token?: string
+          template?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          view_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          resume_data?: Json
+          share_token?: string
+          template?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       user_progress: {
         Row: {
           action_type: string
