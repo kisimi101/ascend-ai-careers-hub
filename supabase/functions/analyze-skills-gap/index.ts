@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +12,19 @@ serve(async (req) => {
   }
 
   try {
+    // Auth check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const { resumeSkills, jobDescription, targetRole } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
@@ -50,14 +64,7 @@ Your response must be a valid JSON object with this exact structure:
     }
   ],
   "careerTips": ["<tip 1>", "<tip 2>", "<tip 3>"]
-}
-
-Focus on:
-- Identifying all required skills from the job description
-- Matching them against the candidate's current skills
-- Prioritizing skills by importance for the role
-- Providing real, actionable learning resources
-- Creating a realistic learning timeline`;
+}`;
 
     const userMessage = `Target Role: ${targetRole || 'Not specified'}
 
@@ -91,7 +98,6 @@ ${jobDescription}`;
     const data = await response.json();
     const content = data.choices[0]?.message?.content || '';
 
-    // Parse the JSON response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error('Failed to parse AI response');
@@ -105,8 +111,7 @@ ${jobDescription}`;
   } catch (error) {
     console.error('Error in analyze-skills-gap function:', error);
     return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });

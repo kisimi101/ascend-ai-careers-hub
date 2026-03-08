@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +12,19 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const { resumeData } = await req.json();
     console.log('Optimizing resume for:', resumeData.personalInfo.fullName);
 
@@ -37,7 +51,6 @@ ${resumeData.education.map((edu: any) =>
 Skills: ${resumeData.skills.join(', ')}
     `.trim();
 
-    // Call AI to optimize resume
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -76,13 +89,9 @@ ${resumeContext}`
 
     const data = await response.json();
     const aiResponse = data.choices[0].message.content;
-    
-    console.log('AI response:', aiResponse);
 
-    // Parse AI response (try to extract JSON)
     let optimizations;
     try {
-      // Try to find JSON in the response
       const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         optimizations = JSON.parse(jsonMatch[0]);
@@ -91,7 +100,6 @@ ${resumeContext}`
       }
     } catch (e) {
       console.error('Failed to parse AI response:', e);
-      // Return original resume if parsing fails
       optimizations = {
         optimizedSummary: resumeData.personalInfo.summary,
         optimizedExperience: resumeData.experience,
@@ -99,7 +107,6 @@ ${resumeContext}`
       };
     }
 
-    // Build optimized resume
     const optimizedResume = {
       ...resumeData,
       personalInfo: {
@@ -110,27 +117,15 @@ ${resumeContext}`
     };
 
     return new Response(
-      JSON.stringify({
-        optimizedResume,
-        suggestions: optimizations.suggestions || []
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
+      JSON.stringify({ optimizedResume, suggestions: optimizations.suggestions || [] }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
 
   } catch (error) {
     console.error('Error in optimize-resume function:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        optimizedResume: null
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
+      JSON.stringify({ error: error.message, optimizedResume: null }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
 });
