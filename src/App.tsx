@@ -43,6 +43,7 @@ import JobAnalytics from "./pages/JobAnalytics";
 import Settings from "./pages/Settings";
 import CompanyResearch from "./pages/CompanyResearch";
 import SharedResume from "./pages/SharedResume";
+import ResumeAnalytics from "./pages/ResumeAnalytics";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
