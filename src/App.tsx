@@ -103,6 +103,7 @@ const App = () => (
                   <Route path="/job-analytics" element={<ProtectedRoute><JobAnalytics /></ProtectedRoute>} />
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
+                  <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
                   
                   {/* Public shared resume view */}
                   <Route path="/shared-resume/:token" element={<SharedResume />} />
