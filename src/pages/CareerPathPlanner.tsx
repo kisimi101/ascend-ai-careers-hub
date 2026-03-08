@@ -13,6 +13,13 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
+import { OnboardingTour } from '@/components/OnboardingTour';
+
+const careerTourSteps = [
+  { title: "Enter Your Details", description: "Fill in your current role, industry, and experience to generate a personalized career roadmap." },
+  { title: "Explore Your Path", description: "View a visual timeline of roles, required skills, and salary ranges on your career trajectory." },
+  { title: "Save & Export", description: "Save your plan to the cloud or export it as a PDF for future reference." },
+];
 import html2canvas from 'html2canvas';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
