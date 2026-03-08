@@ -5,6 +5,8 @@ import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { TechTemplate } from "./templates/TechTemplate";
 import { CreativeTemplate } from "./templates/CreativeTemplate";
+import { ExecutiveTemplate } from "./templates/ExecutiveTemplate";
+import { MinimalistTemplate } from "./templates/MinimalistTemplate";
 import { ResumeData } from "./types";
 import { useState } from "react";
 import {
@@ -21,6 +23,7 @@ import { AutoFillPanel } from "./AutoFillPanel";
 interface EnhancedResumePreviewProps {
   resumeData: ResumeData;
   selectedTemplate: string;
+  accentColor?: string;
   onDownloadPDF: () => void;
   onDownloadDOCX: () => void;
   onDownloadPNG: () => void;
@@ -28,7 +31,8 @@ interface EnhancedResumePreviewProps {
 
 export const EnhancedResumePreview = ({ 
   resumeData, 
-  selectedTemplate, 
+  selectedTemplate,
+  accentColor,
   onDownloadPDF,
   onDownloadDOCX,
   onDownloadPNG
@@ -38,20 +42,18 @@ export const EnhancedResumePreview = ({
   const navigate = useNavigate();
 
   const renderTemplate = () => {
+    const props = { resumeData, accentColor };
     switch (selectedTemplate) {
-      case "classic-minimal":
-        return <ClassicTemplate resumeData={resumeData} />;
-      case "tech-specialist":
-        return <TechTemplate resumeData={resumeData} />;
-      case "creative-designer":
-        return <CreativeTemplate resumeData={resumeData} />;
-      default:
-        return <ModernTemplate resumeData={resumeData} />;
+      case "classic-minimal": return <ClassicTemplate {...props} />;
+      case "tech-specialist": return <TechTemplate {...props} />;
+      case "creative-designer": return <CreativeTemplate {...props} />;
+      case "executive": return <ExecutiveTemplate {...props} />;
+      case "minimalist": return <MinimalistTemplate {...props} />;
+      default: return <ModernTemplate {...props} />;
     }
   };
 
   const handleDownload = (downloadFn: () => void) => {
-    // For now, show paywall. In production, check subscription status.
     setShowPaywall(true);
   };
 
@@ -96,14 +98,12 @@ export const EnhancedResumePreview = ({
             ).join(' ')}
           </div>
           
-          {/* Auto-Fill Panel */}
           <div className="mt-3">
             <AutoFillPanel resumeData={resumeData} />
           </div>
         </CardContent>
       </Card>
 
-      {/* Share Dialog */}
       <ShareResumeDialog
         resumeData={resumeData}
         selectedTemplate={selectedTemplate}
@@ -111,7 +111,6 @@ export const EnhancedResumePreview = ({
         onOpenChange={setShowShare}
       />
 
-      {/* Paywall Dialog */}
       <Dialog open={showPaywall} onOpenChange={setShowPaywall}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

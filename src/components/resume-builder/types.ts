@@ -30,5 +30,5 @@ export interface ResumeTemplate {
   color: string;
   preview: string;
   atsScore: number;
-  category: "modern" | "classic" | "creative" | "tech" | "executive";
+  category: "modern" | "classic" | "creative" | "tech" | "executive" | "minimalist";
 }

@@ -25,6 +25,7 @@ import { OnboardingTour } from "@/components/OnboardingTour";
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState("modern-professional");
+  const [accentColor, setAccentColor] = useState("#2563eb");
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
@@ -307,6 +308,8 @@ const ResumeBuilder = () => {
           <TemplateSelector
             selectedTemplate={selectedTemplate}
             onSelectTemplate={setSelectedTemplate}
+            accentColor={accentColor}
+            onAccentColorChange={setAccentColor}
           />
         );
       case 1:
@@ -456,6 +459,7 @@ const ResumeBuilder = () => {
             <EnhancedResumePreview
               resumeData={resumeData}
               selectedTemplate={selectedTemplate}
+              accentColor={accentColor}
               onDownloadPDF={downloadPDF}
               onDownloadDOCX={downloadDOCX}
               onDownloadPNG={downloadPNG}
