@@ -11,6 +11,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { User, Menu as MenuIcon, X, LayoutDashboard, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 export const Navigation = () => {
   const [active, setActive] = useState<string | null>(null);
