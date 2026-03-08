@@ -381,7 +381,7 @@ const ResumeBuilder = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Form Section */}
           <div>
             <ProgressSteps steps={steps} currentStep={currentStep} />
