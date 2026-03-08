@@ -6,6 +6,7 @@ import { JobSearchResults } from "@/components/job-search/JobSearchResults";
 import { JobSearchHeader } from "@/components/job-search/JobSearchHeader";
 import { QuickApplyLinks } from "@/components/job-search/QuickApplyLinks";
 import { ResumeApplyBanner } from "@/components/job-search/ResumeApplyBanner";
+import { JobAlertManager } from "@/components/job-search/JobAlertManager";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,6 +96,7 @@ const JobSearch = () => {
               <ResumeApplyBanner resumeData={resumeData} searchQuery={searchQuery} location={location} />
               <JobSearchFilters filters={filters} setFilters={setFilters} />
               <QuickApplyLinks jobTitle={searchQuery} location={location} />
+              <JobAlertManager defaultTitle={searchQuery} defaultLocation={location} />
             </div>
             
             {/* Results */}
