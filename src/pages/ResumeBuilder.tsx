@@ -20,7 +20,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { OnboardingTour } from "@/components/OnboardingTour";
 
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(0);
