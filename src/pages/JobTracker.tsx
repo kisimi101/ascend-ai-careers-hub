@@ -14,6 +14,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { Clipboard, Plus, Calendar as CalendarIcon, Building2, MapPin, DollarSign, Trash2, Loader2, Clock, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useJobApplicationsDB, JobApplicationInsert } from "@/hooks/useJobApplicationsDB";
+import { OnboardingTour } from "@/components/OnboardingTour";
+
+const jobTrackerTourSteps = [
+  { title: "Add Applications", description: "Click 'Add Application' to log a new job you've applied to with company, position, and status." },
+  { title: "Track Progress", description: "Update application statuses as you move through the hiring pipeline — applied, interviewing, offered." },
+  { title: "View Analytics", description: "Head to Job Analytics to see charts and insights about your application trends." },
+];
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
@@ -533,6 +540,7 @@ const JobTracker = () => {
       </div>
 
       <Footer />
+      <OnboardingTour tourId="job-tracker" steps={jobTrackerTourSteps} />
     </div>
   );
 };

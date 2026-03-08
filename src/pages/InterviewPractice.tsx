@@ -9,6 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { MessageCircle, Play, RotateCcw, Trophy, Clock, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { OnboardingTour } from "@/components/OnboardingTour";
+
+const interviewTourSteps = [
+  { title: "Choose Your Setup", description: "Select the interview type (behavioral, technical) and target role to get relevant questions." },
+  { title: "Practice Answering", description: "Type your answer and get AI-powered feedback on clarity, structure, and content." },
+  { title: "Track Your Score", description: "Review your session score and tips to improve your interview performance over time." },
+];
 
 interface Question {
   id: number;
@@ -344,6 +351,7 @@ const InterviewPractice = () => {
       </div>
 
       <Footer />
+      <OnboardingTour tourId="interview-practice" steps={interviewTourSteps} />
     </div>
   );
 };
