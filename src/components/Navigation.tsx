@@ -137,6 +137,7 @@ export const Navigation = () => {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <LanguageSelector />
+            {isAuthenticated && <NotificationCenter />}
             
             {/* Mobile Menu Button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
