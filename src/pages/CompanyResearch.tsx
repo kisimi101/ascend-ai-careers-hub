@@ -5,6 +5,13 @@ import { CompanyLookup } from "@/components/company-research/CompanyLookup";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { OnboardingTour } from "@/components/OnboardingTour";
+
+const companyTourSteps = [
+  { title: "Search a Company", description: "Enter a company name or website URL to pull detailed employer information." },
+  { title: "Review Insights", description: "Explore culture, benefits, social links, and industry data to tailor your application." },
+  { title: "Save Favorites", description: "Save companies you're interested in to quickly reference them when applying." },
+];
 
 const CompanyResearch = () => {
   const navigate = useNavigate();
