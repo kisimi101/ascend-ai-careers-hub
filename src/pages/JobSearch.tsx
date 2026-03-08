@@ -92,6 +92,7 @@ const JobSearch = () => {
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
             {/* Filters Sidebar */}
             <div className="lg:w-1/4 space-y-4">
+              <ResumeApplyBanner resumeData={resumeData} searchQuery={searchQuery} location={location} />
               <JobSearchFilters filters={filters} setFilters={setFilters} />
               <QuickApplyLinks jobTitle={searchQuery} location={location} />
             </div>
