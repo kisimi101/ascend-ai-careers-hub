@@ -73,7 +73,7 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">Job Results</h2>
-          <p className="text-gray-600">{jobs.length} jobs found</p>
+          <p className="text-muted-foreground">{jobs.length} jobs found</p>
         </div>
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-48">
