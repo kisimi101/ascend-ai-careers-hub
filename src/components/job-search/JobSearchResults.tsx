@@ -107,10 +107,10 @@ export const JobSearchResults = ({ searchQuery, location, filters }: JobSearchRe
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 hover:text-orange-600 transition-colors">
+                      <h3 className="text-xl font-semibold text-foreground hover:text-primary transition-colors">
                         {job.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-gray-600 mt-1">
+                      <div className="flex items-center gap-2 text-muted-foreground mt-1">
                         <Building className="w-4 h-4" />
                         <span className="font-medium">{job.company}</span>
                       </div>
