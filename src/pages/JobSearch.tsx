@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { JobSearchFilters } from "@/components/job-search/JobSearchFilters";
 import { JobSearchResults } from "@/components/job-search/JobSearchResults";
@@ -10,7 +11,9 @@ import { JobAlertManager } from "@/components/job-search/JobAlertManager";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const jobSearchTourSteps = [
   { title: "Search Jobs", description: "Enter a job title and location to find matching positions across multiple sources." },
@@ -25,9 +28,13 @@ interface ResumeData {
 }
 
 const JobSearch = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [location, setLocation] = useState(searchParams.get("loc") || "");
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [filters, setFilters] = useState({
     jobType: [],
     experience: [],
@@ -44,9 +51,42 @@ const JobSearch = () => {
     }
   }, []);
 
-  const handleSearch = () => {
-    console.log("Searching for jobs:", { searchQuery, location, filters });
+  // Auto-search when coming from notification link with query params
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && q.trim()) {
+      setSearchQuery(q);
+      setLocation(searchParams.get("loc") || "");
+      handleSearchJobs(q, searchParams.get("loc") || "");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSearchJobs = async (query?: string, loc?: string) => {
+    const q = query || searchQuery;
+    if (!q.trim()) {
+      toast({ title: "Please enter a search term", variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    setHasSearched(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("search-jobs", {
+        body: { jobTitle: q, location: loc || location, skills: [] },
+      });
+      if (error) throw error;
+      setJobs(data?.jobs || []);
+      if ((data?.jobs || []).length === 0) {
+        toast({ title: "No jobs found", description: "Try different keywords or location." });
+      }
+    } catch (err: any) {
+      console.error("Search error:", err);
+      toast({ title: "Search failed", description: err.message, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleSearch = () => handleSearchJobs();
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,9 +120,10 @@ const JobSearch = () => {
               <Button 
                 onClick={handleSearch}
                 className="h-12 px-8"
+                disabled={isLoading}
               >
-                <Search className="w-4 h-4 mr-2" />
-                Search Jobs
+                {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Search className="w-4 h-4 mr-2" />}
+                {isLoading ? "Searching..." : "Search Jobs"}
               </Button>
             </div>
           </div>
@@ -101,7 +142,7 @@ const JobSearch = () => {
             
             {/* Results */}
             <div className="lg:w-3/4">
-              <JobSearchResults searchQuery={searchQuery} location={location} filters={filters} />
+              <JobSearchResults searchQuery={searchQuery} location={location} filters={filters} jobs={jobs} isLoading={isLoading} hasSearched={hasSearched} />
             </div>
           </div>
         </div>
