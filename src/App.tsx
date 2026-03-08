@@ -42,6 +42,7 @@ import LinkedInImport from "./pages/LinkedInImport";
 import JobAnalytics from "./pages/JobAnalytics";
 import Settings from "./pages/Settings";
 import CompanyResearch from "./pages/CompanyResearch";
+import SharedResume from "./pages/SharedResume";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
