@@ -76,7 +76,13 @@ export const PricingSection = () => {
   return (
     <section id="pricing-section" className="py-20 px-6 bg-muted/30">
       <div className="container mx-auto">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="inline-block mb-4">
             <span className="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
               💰 Pricing Plans
