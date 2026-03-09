@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Search, Eye, Download, Star, Filter, FileText, Briefcase, GraduationCap, Code, Palette, HeartPulse, DollarSign } from 'lucide-react';
+import {
+  Search, Eye, Download, Star, FileText, Briefcase, GraduationCap,
+  Code, Palette, HeartPulse, DollarSign, ArrowRight, Sparkles, TrendingUp, Users
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+
+/* ------------------------------------------------------------------ */
+/*  Data                                                               */
+/* ------------------------------------------------------------------ */
 
 interface ResumeExample {
   id: number;
@@ -20,7 +27,10 @@ interface ResumeExample {
   downloads: number;
   description: string;
   tags: string[];
+  accent: string;          // HSL accent for the card header
+  icon: React.ElementType;
   content: {
+    name: string;
     summary: string;
     experience: { title: string; company: string; duration: string; bullets: string[] }[];
     education: { degree: string; school: string; year: string }[];
@@ -28,486 +38,434 @@ interface ResumeExample {
   };
 }
 
+const categories = [
+  { id: 'all', name: 'All Examples', icon: FileText },
+  { id: 'technology', name: 'Technology', icon: Code },
+  { id: 'marketing', name: 'Marketing', icon: Briefcase },
+  { id: 'finance', name: 'Finance', icon: DollarSign },
+  { id: 'healthcare', name: 'Healthcare', icon: HeartPulse },
+  { id: 'education', name: 'Education', icon: GraduationCap },
+  { id: 'design', name: 'Design', icon: Palette },
+];
+
+const resumeExamples: ResumeExample[] = [
+  {
+    id: 1, title: 'Senior Software Engineer', category: 'technology', experience: 'Senior · 8+ yrs',
+    rating: 4.9, downloads: 12543, description: 'Full-stack developer with deep React, Node.js, and cloud expertise. Scalable architectures & team leadership.',
+    tags: ['React', 'Node.js', 'AWS', 'Python', 'TypeScript', 'Docker'],
+    accent: '221 83% 53%', icon: Code,
+    content: {
+      name: 'Alex Johnson',
+      summary: 'Results-driven Senior Software Engineer with 8+ years building scalable web apps. Expert in React, Node.js & cloud architecture. Led teams delivering high-impact products to 2M+ users.',
+      experience: [
+        { title: 'Senior Software Engineer', company: 'Tech Corp Inc.', duration: '2020 – Present', bullets: ['Led microservices architecture serving 2M+ daily users', 'Reduced page load time by 40% through performance optimization', 'Mentored 5 junior developers, improving team velocity by 25%'] },
+        { title: 'Software Engineer', company: 'StartupXYZ', duration: '2016 – 2020', bullets: ['Built React dashboard processing $10M+ monthly transactions', 'Implemented CI/CD pipeline reducing deployment time by 60%', 'Developed RESTful APIs for mobile and web'] },
+      ],
+      education: [{ degree: 'B.S. Computer Science', school: 'Stanford University', year: '2016' }],
+      skills: ['React', 'Node.js', 'TypeScript', 'AWS', 'PostgreSQL', 'Docker', 'GraphQL', 'Python'],
+    },
+  },
+  {
+    id: 2, title: 'Digital Marketing Manager', category: 'marketing', experience: 'Mid · 5+ yrs',
+    rating: 4.8, downloads: 8876, description: 'Data-driven marketer with SEO, PPC, and content strategy wins across SaaS and e-commerce.',
+    tags: ['SEO', 'Google Ads', 'Analytics', 'Content Strategy', 'Email Marketing'],
+    accent: '262 83% 58%', icon: Briefcase,
+    content: {
+      name: 'Sarah Mitchell',
+      summary: 'Creative Digital Marketing Manager with 5+ years driving brand growth through data-driven strategies. Grew organic traffic 150% and managed $500K annual ad budgets at 3.5× ROAS.',
+      experience: [
+        { title: 'Digital Marketing Manager', company: 'Growth Agency', duration: '2021 – Present', bullets: ['Increased organic traffic by 150% through comprehensive SEO strategy', 'Managed $500K annual PPC budget with 3.5× ROAS', 'Led content team producing 50+ pieces monthly'] },
+        { title: 'Marketing Specialist', company: 'E-commerce Brand', duration: '2018 – 2021', bullets: ['Grew email list from 10K to 100K subscribers', 'Achieved 25% increase in customer retention via lifecycle campaigns', 'Launched influencer program generating $2M attributed revenue'] },
+      ],
+      education: [{ degree: 'B.A. Marketing', school: 'Northwestern University', year: '2018' }],
+      skills: ['Google Ads', 'SEO', 'Analytics', 'Content Strategy', 'Social Media', 'Email Marketing', 'CRM', 'A/B Testing'],
+    },
+  },
+  {
+    id: 3, title: 'Financial Analyst', category: 'finance', experience: 'Entry · 0-2 yrs',
+    rating: 4.7, downloads: 6432, description: 'Recent Ivy League graduate with investment banking internship experience and advanced financial modeling skills.',
+    tags: ['Excel', 'Financial Modeling', 'SQL', 'Bloomberg', 'Valuation'],
+    accent: '142 71% 45%', icon: DollarSign,
+    content: {
+      name: 'James Park',
+      summary: 'Detail-oriented Financial Analyst with strong foundation in financial modeling and data analysis. Goldman Sachs internship experience; proven ability to deliver actionable insights under pressure.',
+      experience: [
+        { title: 'Financial Analyst Intern', company: 'Goldman Sachs', duration: 'Summer 2023', bullets: ['Built financial models for M&A transactions totaling $500M', 'Conducted industry research supporting 3 live client pitches', 'Automated weekly reporting saving 10+ hours per week'] },
+        { title: 'Research Assistant', company: 'University Finance Dept.', duration: '2022 – 2023', bullets: ['Analyzed 10 years of market data for faculty research paper', 'Created visualizations presenting complex financial trends', 'Presented findings to department of 50+ members'] },
+      ],
+      education: [{ degree: 'B.S. Finance, magna cum laude', school: 'Columbia University', year: '2023' }],
+      skills: ['Excel', 'Financial Modeling', 'SQL', 'Bloomberg', 'Python', 'Tableau', 'PowerPoint', 'Valuation'],
+    },
+  },
+  {
+    id: 4, title: 'Registered Nurse (ICU)', category: 'healthcare', experience: 'Mid · 5 yrs',
+    rating: 4.9, downloads: 4987, description: 'Critical-care RN with 98% patient satisfaction scores, BLS/ACLS certified, and quality improvement leadership.',
+    tags: ['Critical Care', 'Patient Assessment', 'EMR', 'BLS/ACLS', 'IV Therapy'],
+    accent: '0 84% 60%', icon: HeartPulse,
+    content: {
+      name: 'Maria Gonzalez',
+      summary: 'Dedicated Registered Nurse with 5 years of critical-care experience. Known for exceptional patient outcomes (98% satisfaction), emergency leadership, and mentoring new hires.',
+      experience: [
+        { title: 'Critical Care Nurse', company: 'City General Hospital', duration: '2020 – Present', bullets: ['Provide care for 4-6 critically ill patients per shift in 20-bed ICU', 'Achieved 98% patient satisfaction scores consistently', 'Train new nurses on ventilator management and cardiac monitoring'] },
+        { title: 'Staff Nurse', company: 'Regional Medical Center', duration: '2018 – 2020', bullets: ['Managed care for 8-10 patients on medical-surgical unit', 'Reduced medication errors by 30% through protocol improvements', 'Led unit quality improvement committee'] },
+      ],
+      education: [{ degree: 'B.S. Nursing', school: 'Johns Hopkins School of Nursing', year: '2018' }],
+      skills: ['Critical Care', 'Patient Assessment', 'EMR Systems', 'BLS/ACLS', 'IV Therapy', 'Wound Care', 'Team Leadership', 'Patient Education'],
+    },
+  },
+  {
+    id: 5, title: 'Elementary School Teacher', category: 'education', experience: 'Mid · 6 yrs',
+    rating: 4.6, downloads: 3756, description: 'Passionate educator specializing in differentiated instruction and STEM enrichment with measurable student growth.',
+    tags: ['Curriculum Design', 'Classroom Management', 'STEM', 'Google Classroom'],
+    accent: '35 92% 50%', icon: GraduationCap,
+    content: {
+      name: 'Emily Turner',
+      summary: 'Passionate Elementary Teacher with 6 years creating engaging learning environments. Expertise in differentiated instruction and STEM enrichment; achieved 35% reading proficiency improvement.',
+      experience: [
+        { title: '3rd Grade Teacher', company: 'Sunshine Elementary', duration: '2019 – Present', bullets: ['Increased class reading proficiency by 35% through personalized intervention', 'Implemented project-based learning curriculum adopted school-wide', 'Mentored 3 student teachers and 2 new faculty members'] },
+        { title: '2nd Grade Teacher', company: 'Valley School District', duration: '2017 – 2019', bullets: ['Managed classroom of 25 diverse learners with varied needs', 'Created STEM enrichment program for gifted students', 'Organized annual science fair with 100+ participants'] },
+      ],
+      education: [{ degree: 'M.Ed. Elementary Education', school: 'Columbia Teachers College', year: '2017' }],
+      skills: ['Curriculum Design', 'Differentiated Instruction', 'Classroom Management', 'Assessment', 'Google Classroom', 'Parent Communication', 'IEP Development', 'STEM Education'],
+    },
+  },
+  {
+    id: 6, title: 'UX / UI Designer', category: 'design', experience: 'Mid · 4+ yrs',
+    rating: 4.8, downloads: 7243, description: 'User-centered designer who increased conversion by 45% through research-driven redesigns and scalable design systems.',
+    tags: ['Figma', 'User Research', 'Prototyping', 'Design Systems', 'Interaction Design'],
+    accent: '292 84% 51%', icon: Palette,
+    content: {
+      name: 'Jordan Lee',
+      summary: 'Innovative UX/UI Designer with 4+ years crafting user-centered digital products. Built design systems used across 12 products; increased e-commerce conversion by 45%.',
+      experience: [
+        { title: 'Senior UX Designer', company: 'Design Studio Pro', duration: '2021 – Present', bullets: ['Redesigned e-commerce platform increasing conversion by 45%', 'Built comprehensive design system used across 12 products', 'Conducted 50+ user interviews informing product roadmap'] },
+        { title: 'UX Designer', company: 'Tech Startup', duration: '2019 – 2021', bullets: ['Designed mobile app achieving 4.8★ rating with 100K+ downloads', 'Reduced user onboarding drop-off by 60% through UX improvements', 'Created interactive prototypes for investor presentations'] },
+      ],
+      education: [{ degree: 'B.F.A. Graphic Design', school: 'Rhode Island School of Design', year: '2019' }],
+      skills: ['Figma', 'Adobe XD', 'User Research', 'Prototyping', 'Design Systems', 'Usability Testing', 'Wireframing', 'Interaction Design'],
+    },
+  },
+  {
+    id: 7, title: 'Data Scientist', category: 'technology', experience: 'Mid · 4 yrs',
+    rating: 4.8, downloads: 9120, description: 'ML-focused data scientist with experience deploying production models, driving $3M+ annual revenue impact.',
+    tags: ['Python', 'Machine Learning', 'SQL', 'TensorFlow', 'Spark'],
+    accent: '199 89% 48%', icon: TrendingUp,
+    content: {
+      name: 'Priya Sharma',
+      summary: 'Data Scientist with 4 years of experience building and deploying machine-learning models at scale. Delivered $3M+ annual revenue impact through predictive analytics and recommendation engines.',
+      experience: [
+        { title: 'Data Scientist', company: 'DataDriven Inc.', duration: '2021 – Present', bullets: ['Built recommendation engine increasing user engagement by 28%', 'Deployed real-time fraud detection model saving $1.2M annually', 'Created automated reporting pipeline reducing analysis time by 70%'] },
+        { title: 'Junior Data Scientist', company: 'Analytics Co.', duration: '2019 – 2021', bullets: ['Developed churn prediction model with 92% accuracy', 'Analyzed 50M+ rows of user behavior data for product insights', 'Presented quarterly findings to C-suite stakeholders'] },
+      ],
+      education: [{ degree: 'M.S. Data Science', school: 'UC Berkeley', year: '2019' }],
+      skills: ['Python', 'Machine Learning', 'SQL', 'TensorFlow', 'Spark', 'Pandas', 'AWS SageMaker', 'Statistics'],
+    },
+  },
+  {
+    id: 8, title: 'Product Manager', category: 'technology', experience: 'Senior · 7 yrs',
+    rating: 4.9, downloads: 10340, description: 'Strategic PM who launched 5 products from 0→1 and grew ARR from $2M to $15M across B2B SaaS.',
+    tags: ['Roadmapping', 'Agile', 'Analytics', 'User Stories', 'Go-To-Market'],
+    accent: '340 82% 52%', icon: Users,
+    content: {
+      name: 'Michael Chen',
+      summary: 'Strategic Product Manager with 7 years launching B2B SaaS products. Grew ARR from $2M to $15M, launched 5 products from 0→1, and led cross-functional teams of 20+.',
+      experience: [
+        { title: 'Senior Product Manager', company: 'SaaS Platform', duration: '2020 – Present', bullets: ['Grew product ARR from $5M to $15M over 3 years', 'Defined and executed roadmap across 4 engineering squads', 'Increased NPS from 32 to 58 through user-feedback loops'] },
+        { title: 'Product Manager', company: 'Enterprise SaaS', duration: '2017 – 2020', bullets: ['Launched 2 products from concept to $2M ARR in 18 months', 'Reduced churn by 40% with onboarding redesign', 'Managed backlog of 200+ user stories with Agile methodology'] },
+      ],
+      education: [{ degree: 'MBA', school: 'Wharton School of Business', year: '2017' }],
+      skills: ['Roadmapping', 'Agile / Scrum', 'Analytics', 'User Stories', 'Go-To-Market', 'SQL', 'Jira', 'Stakeholder Management'],
+    },
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Mini Resume Preview Card                                           */
+/* ------------------------------------------------------------------ */
+
+const MiniResume = ({ example, accent }: { example: ResumeExample; accent: string }) => (
+  <div className="h-full w-full bg-white text-gray-800 p-5 flex flex-col text-[9px] leading-[1.45] font-[system-ui] overflow-hidden select-none">
+    {/* Header */}
+    <div className="mb-3 pb-2" style={{ borderBottom: `2px solid hsl(${accent})` }}>
+      <div className="text-[13px] font-bold tracking-tight" style={{ color: `hsl(${accent})` }}>{example.content.name}</div>
+      <div className="text-[10px] text-gray-500 mt-0.5">{example.title} · {example.experience}</div>
+    </div>
+    {/* Summary */}
+    <p className="text-gray-600 mb-2 line-clamp-2">{example.content.summary}</p>
+    {/* Experience */}
+    <div className="mb-2">
+      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: `hsl(${accent})` }}>Experience</div>
+      {example.content.experience.slice(0, 1).map((exp, i) => (
+        <div key={i}>
+          <div className="font-semibold">{exp.title}</div>
+          <div className="text-gray-500">{exp.company} · {exp.duration}</div>
+          <ul className="mt-0.5 space-y-0.5 list-none">
+            {exp.bullets.slice(0, 2).map((b, j) => (
+              <li key={j} className="flex gap-1"><span className="shrink-0" style={{ color: `hsl(${accent})` }}>▸</span><span className="line-clamp-1">{b}</span></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+    {/* Skills */}
+    <div className="mt-auto">
+      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: `hsl(${accent})` }}>Skills</div>
+      <div className="flex flex-wrap gap-1">
+        {example.content.skills.slice(0, 5).map((s, i) => (
+          <span key={i} className="px-1.5 py-0.5 rounded text-[8px] font-medium" style={{ backgroundColor: `hsl(${accent} / 0.1)`, color: `hsl(${accent})` }}>{s}</span>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+/* ------------------------------------------------------------------ */
+/*  Page Component                                                     */
+/* ------------------------------------------------------------------ */
+
 const ResumeExamples = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('all');
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedExample, setSelectedExample] = useState<ResumeExample | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const categories = [
-    { id: 'all', name: 'All', icon: FileText },
-    { id: 'technology', name: 'Tech', icon: Code },
-    { id: 'marketing', name: 'Marketing', icon: Briefcase },
-    { id: 'finance', name: 'Finance', icon: DollarSign },
-    { id: 'healthcare', name: 'Healthcare', icon: HeartPulse },
-    { id: 'education', name: 'Education', icon: GraduationCap },
-    { id: 'design', name: 'Design', icon: Palette }
-  ];
+  const filtered = useMemo(() =>
+    resumeExamples.filter(ex => {
+      const matchSearch = !searchTerm || ex.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ex.tags.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchCat = activeCategory === 'all' || ex.category === activeCategory;
+      return matchSearch && matchCat;
+    }),
+    [searchTerm, activeCategory]
+  );
 
-  const resumeExamples: ResumeExample[] = [
-    {
-      id: 1,
-      title: 'Senior Software Engineer',
-      category: 'technology',
-      experience: 'Senior Level',
-      rating: 4.9,
-      downloads: 2543,
-      description: 'Full-stack developer with 8+ years experience in React, Node.js, and cloud architecture.',
-      tags: ['React', 'Node.js', 'AWS', 'Python'],
-      content: {
-        summary: 'Results-driven Senior Software Engineer with 8+ years of experience building scalable web applications. Expert in React, Node.js, and cloud architecture with a proven track record of leading development teams and delivering high-impact projects.',
-        experience: [
-          {
-            title: 'Senior Software Engineer',
-            company: 'Tech Corp Inc.',
-            duration: '2020 - Present',
-            bullets: [
-              'Led development of microservices architecture serving 2M+ daily users',
-              'Reduced page load time by 40% through performance optimization',
-              'Mentored team of 5 junior developers, improving team velocity by 25%'
-            ]
-          },
-          {
-            title: 'Software Engineer',
-            company: 'StartupXYZ',
-            duration: '2016 - 2020',
-            bullets: [
-              'Built React-based dashboard processing $10M+ monthly transactions',
-              'Implemented CI/CD pipeline reducing deployment time by 60%',
-              'Developed RESTful APIs serving mobile and web applications'
-            ]
-          }
-        ],
-        education: [{ degree: 'B.S. Computer Science', school: 'State University', year: '2016' }],
-        skills: ['React', 'Node.js', 'TypeScript', 'AWS', 'PostgreSQL', 'Docker', 'GraphQL', 'Python']
-      }
-    },
-    {
-      id: 2,
-      title: 'Digital Marketing Manager',
-      category: 'marketing',
-      experience: 'Mid Level',
-      rating: 4.8,
-      downloads: 1876,
-      description: 'Results-driven marketing professional with expertise in SEO, PPC, and content strategy.',
-      tags: ['SEO', 'Google Ads', 'Analytics', 'Content Strategy'],
-      content: {
-        summary: 'Creative Digital Marketing Manager with 5+ years driving brand growth through data-driven strategies. Expertise in SEO, PPC, and content marketing with proven success increasing organic traffic and conversion rates.',
-        experience: [
-          {
-            title: 'Digital Marketing Manager',
-            company: 'Growth Agency',
-            duration: '2021 - Present',
-            bullets: [
-              'Increased organic traffic by 150% through comprehensive SEO strategy',
-              'Managed $500K annual PPC budget with 3.5x ROAS',
-              'Led content team producing 50+ pieces monthly across channels'
-            ]
-          },
-          {
-            title: 'Marketing Specialist',
-            company: 'E-commerce Brand',
-            duration: '2018 - 2021',
-            bullets: [
-              'Grew email list from 10K to 100K subscribers',
-              'Achieved 25% increase in customer retention through email campaigns',
-              'Launched influencer program generating $2M in attributed revenue'
-            ]
-          }
-        ],
-        education: [{ degree: 'B.A. Marketing', school: 'Business University', year: '2018' }],
-        skills: ['Google Ads', 'SEO', 'Analytics', 'Content Strategy', 'Social Media', 'Email Marketing', 'CRM', 'A/B Testing']
-      }
-    },
-    {
-      id: 3,
-      title: 'Financial Analyst',
-      category: 'finance',
-      experience: 'Entry Level',
-      rating: 4.7,
-      downloads: 1432,
-      description: 'Recent graduate with strong analytical skills and internship experience in investment banking.',
-      tags: ['Excel', 'Financial Modeling', 'SQL', 'Bloomberg'],
-      content: {
-        summary: 'Detail-oriented Financial Analyst with strong foundation in financial modeling and data analysis. Recent graduate with internship experience at top investment bank and proven ability to deliver actionable insights.',
-        experience: [
-          {
-            title: 'Financial Analyst Intern',
-            company: 'Goldman Sachs',
-            duration: 'Summer 2023',
-            bullets: [
-              'Built financial models for M&A transactions totaling $500M',
-              'Conducted industry research supporting 3 client pitches',
-              'Automated weekly reporting saving 10+ hours per week'
-            ]
-          },
-          {
-            title: 'Research Assistant',
-            company: 'University Finance Department',
-            duration: '2022 - 2023',
-            bullets: [
-              'Analyzed 10 years of market data for faculty research paper',
-              'Created visualizations presenting complex financial trends',
-              'Presented findings to department of 50+ students and faculty'
-            ]
-          }
-        ],
-        education: [{ degree: 'B.S. Finance', school: 'Ivy University', year: '2023' }],
-        skills: ['Excel', 'Financial Modeling', 'SQL', 'Bloomberg Terminal', 'Python', 'Tableau', 'PowerPoint', 'Valuation']
-      }
-    },
-    {
-      id: 4,
-      title: 'Registered Nurse',
-      category: 'healthcare',
-      experience: 'Mid Level',
-      rating: 4.9,
-      downloads: 987,
-      description: 'Compassionate RN with 5 years experience in critical care and patient management.',
-      tags: ['Patient Care', 'Critical Care', 'EMR', 'BLS Certified'],
-      content: {
-        summary: 'Dedicated Registered Nurse with 5 years of critical care experience. Known for exceptional patient outcomes, leadership abilities, and expertise in emergency response protocols.',
-        experience: [
-          {
-            title: 'Critical Care Nurse',
-            company: 'City General Hospital',
-            duration: '2020 - Present',
-            bullets: [
-              'Provide care for 4-6 critically ill patients per shift in 20-bed ICU',
-              'Achieved 98% patient satisfaction scores consistently',
-              'Train new nurses on ventilator management and cardiac monitoring'
-            ]
-          },
-          {
-            title: 'Staff Nurse',
-            company: 'Regional Medical Center',
-            duration: '2018 - 2020',
-            bullets: [
-              'Managed care for 8-10 patients on medical-surgical unit',
-              'Reduced medication errors by 30% through protocol improvements',
-              'Led unit quality improvement committee'
-            ]
-          }
-        ],
-        education: [{ degree: 'B.S. Nursing', school: 'Nursing College', year: '2018' }],
-        skills: ['Critical Care', 'Patient Assessment', 'EMR Systems', 'BLS/ACLS', 'IV Therapy', 'Wound Care', 'Team Leadership', 'Patient Education']
-      }
-    },
-    {
-      id: 5,
-      title: 'Elementary School Teacher',
-      category: 'education',
-      experience: 'Mid Level',
-      rating: 4.6,
-      downloads: 756,
-      description: 'Dedicated educator with 6 years experience in elementary education and curriculum development.',
-      tags: ['Curriculum Development', 'Classroom Management', 'Assessment', 'Technology Integration'],
-      content: {
-        summary: 'Passionate Elementary School Teacher with 6 years creating engaging learning environments. Expertise in differentiated instruction and technology integration with proven success improving student outcomes.',
-        experience: [
-          {
-            title: '3rd Grade Teacher',
-            company: 'Sunshine Elementary',
-            duration: '2019 - Present',
-            bullets: [
-              'Increased class reading proficiency by 35% through personalized intervention',
-              'Implemented project-based learning curriculum adopted school-wide',
-              'Mentored 3 student teachers and 2 new faculty members'
-            ]
-          },
-          {
-            title: '2nd Grade Teacher',
-            company: 'Valley School District',
-            duration: '2017 - 2019',
-            bullets: [
-              'Managed classroom of 25 diverse learners with varied needs',
-              'Created STEM enrichment program for gifted students',
-              'Organized annual science fair with 100+ student participants'
-            ]
-          }
-        ],
-        education: [{ degree: 'M.Ed. Elementary Education', school: 'Teachers College', year: '2017' }],
-        skills: ['Curriculum Design', 'Differentiated Instruction', 'Classroom Management', 'Assessment', 'Google Classroom', 'Parent Communication', 'IEP Development', 'STEM Education']
-      }
-    },
-    {
-      id: 6,
-      title: 'UX/UI Designer',
-      category: 'design',
-      experience: 'Mid Level',
-      rating: 4.8,
-      downloads: 1243,
-      description: 'Creative designer with expertise in user research, prototyping, and design systems.',
-      tags: ['Figma', 'User Research', 'Prototyping', 'Design Systems'],
-      content: {
-        summary: 'Innovative UX/UI Designer with 4+ years creating user-centered digital experiences. Expert in design thinking methodology with a portfolio of successful product launches for startups and enterprise clients.',
-        experience: [
-          {
-            title: 'Senior UX Designer',
-            company: 'Design Studio Pro',
-            duration: '2021 - Present',
-            bullets: [
-              'Redesigned e-commerce platform increasing conversion by 45%',
-              'Built comprehensive design system used across 12 products',
-              'Conducted 50+ user interviews informing product roadmap'
-            ]
-          },
-          {
-            title: 'UX Designer',
-            company: 'Tech Startup',
-            duration: '2019 - 2021',
-            bullets: [
-              'Designed mobile app achieving 4.8 star rating with 100K+ downloads',
-              'Reduced user onboarding drop-off by 60% through UX improvements',
-              'Created interactive prototypes for investor presentations'
-            ]
-          }
-        ],
-        education: [{ degree: 'B.F.A. Graphic Design', school: 'Art Institute', year: '2019' }],
-        skills: ['Figma', 'Adobe XD', 'User Research', 'Prototyping', 'Design Systems', 'Usability Testing', 'Wireframing', 'Interaction Design']
-      }
-    }
-  ];
-
-  const filteredExamples = resumeExamples.filter(example => {
-    const matchesSearch = example.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         example.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         example.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === 'all' || example.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const handlePreview = (example: ResumeExample) => {
-    setSelectedExample(example);
-    setPreviewOpen(true);
-  };
-
-  const handleUseTemplate = (example: ResumeExample) => {
-    toast({
-      title: "Template selected!",
-      description: "Redirecting to Resume Builder with this template..."
-    });
+  const handleUseTemplate = (ex: ResumeExample) => {
+    toast({ title: "Template selected!", description: "Opening Resume Builder…" });
     navigate('/resume-builder');
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-24">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
-            <FileText className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium">Resume Examples</span>
-          </div>
-          <h1 className="text-4xl font-bold mb-4">Professional Resume Examples</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Browse real resume examples from professionals across industries. Preview and use as templates for your own resume.
-          </p>
-        </div>
 
-        <div className="max-w-6xl mx-auto space-y-8">
+      {/* Hero */}
+      <section className="pt-28 pb-16 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+        <div className="container mx-auto max-w-5xl text-center relative z-10">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Badge variant="secondary" className="mb-4 gap-1.5 px-4 py-1.5 text-sm">
+              <Sparkles className="w-3.5 h-3.5" /> Curated by career experts
+            </Badge>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+              Professional Resume
+              <span className="text-gradient-primary block">Examples & Templates</span>
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+              Browse real-world resumes that landed jobs at top companies.
+              Preview full details, then use any template in our builder.
+            </p>
+          </motion.div>
+
           {/* Search */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by job title, skills, or industry..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="max-w-xl mx-auto">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Search by title, skill, or industry…"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 text-base rounded-xl border-border/60 bg-card/80 backdrop-blur-sm shadow-sm"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-          {/* Categories */}
-          <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 h-auto">
-              {categories.map((category) => (
-                <TabsTrigger key={category.id} value={category.id} className="text-xs py-2 flex flex-col sm:flex-row items-center gap-1">
-                  <category.icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{category.name}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
+      {/* Categories */}
+      <section className="px-4 pb-4">
+        <div className="container mx-auto max-w-5xl">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+            {categories.map(cat => {
+              const active = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                    active
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground'
+                  }`}
+                >
+                  <cat.icon className="w-4 h-4" />
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-            <TabsContent value={selectedCategory} className="mt-8">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredExamples.map((example) => (
-                  <Card key={example.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
-                    {/* Mini Preview */}
-                    <div className="aspect-[3/4] bg-gradient-to-br from-muted to-muted/50 p-4 relative">
-                      <div className="bg-background rounded-lg shadow-sm p-3 h-full overflow-hidden text-[8px] leading-tight">
-                        <div className="font-bold text-[10px] mb-1">{example.content.experience[0]?.title || example.title}</div>
-                        <div className="text-muted-foreground mb-2">{example.content.experience[0]?.company}</div>
-                        <div className="space-y-1">
-                          {example.content.experience[0]?.bullets.slice(0, 2).map((bullet, idx) => (
-                            <div key={idx} className="flex gap-1">
-                              <span>•</span>
-                              <span className="line-clamp-1">{bullet}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-2 text-[10px] font-medium">Skills</div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {example.content.skills.slice(0, 4).map((skill, idx) => (
-                            <span key={idx} className="bg-muted px-1 rounded text-[7px]">{skill}</span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <Button size="sm" variant="secondary" onClick={() => handlePreview(example)}>
-                          <Eye className="w-4 h-4 mr-1" />
-                          Preview
+      {/* Grid */}
+      <main className="px-4 pb-20">
+        <div className="container mx-auto max-w-6xl">
+          <AnimatePresence mode="popLayout">
+            <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {filtered.map((ex, i) => (
+                <motion.div
+                  key={ex.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: i * 0.04 }}
+                >
+                  <Card className="group overflow-hidden border-border/50 bg-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
+                    {/* Mini preview */}
+                    <div className="aspect-[3/4] relative overflow-hidden border-b border-border/30">
+                      <MiniResume example={ex} accent={ex.accent} />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <Button
+                          size="sm"
+                          className="shadow-lg"
+                          onClick={() => { setSelectedExample(ex); setPreviewOpen(true); }}
+                        >
+                          <Eye className="w-4 h-4 mr-1" /> Preview
                         </Button>
                       </div>
+                      {/* Accent bar */}
+                      <div className="absolute top-0 left-0 right-0 h-1" style={{ background: `hsl(${ex.accent})` }} />
                     </div>
-                    
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div>
-                          <h3 className="font-semibold text-lg">{example.title}</h3>
-                          <p className="text-sm text-muted-foreground">{example.experience}</p>
-                        </div>
-                        
-                        <p className="text-sm line-clamp-2">{example.description}</p>
-                        
-                        <div className="flex flex-wrap gap-1">
-                          {example.tags.slice(0, 3).map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                          {example.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{example.tags.length - 3}
-                            </Badge>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center justify-between text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span>{example.rating}</span>
-                          </div>
-                          <span>{example.downloads.toLocaleString()} downloads</span>
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="flex-1" onClick={() => handlePreview(example)}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            Preview
-                          </Button>
-                          <Button size="sm" className="flex-1" onClick={() => handleUseTemplate(example)}>
-                            <Download className="h-4 w-4 mr-1" />
-                            Use Template
-                          </Button>
-                        </div>
+
+                    {/* Card info */}
+                    <CardContent className="p-4 flex flex-col gap-2.5 flex-1">
+                      <div>
+                        <h3 className="font-semibold text-sm text-foreground leading-tight">{ex.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">{ex.experience}</p>
                       </div>
+
+                      <div className="flex flex-wrap gap-1">
+                        {ex.tags.slice(0, 3).map(tag => (
+                          <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0 h-5 font-medium">{tag}</Badge>
+                        ))}
+                        {ex.tags.length > 3 && <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">+{ex.tags.length - 3}</Badge>}
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-auto">
+                        <span className="flex items-center gap-0.5"><Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />{ex.rating}</span>
+                        <span className="flex items-center gap-0.5"><Download className="w-3.5 h-3.5" />{(ex.downloads / 1000).toFixed(1)}K</span>
+                      </div>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full mt-1 text-xs group/btn"
+                        onClick={() => handleUseTemplate(ex)}
+                      >
+                        Use This Template <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover/btn:translate-x-0.5 transition-transform" />
+                      </Button>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
 
-          {filteredExamples.length === 0 && (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">
-                  No resume examples found matching your criteria. Try adjusting your search or filters.
-                </p>
-              </CardContent>
-            </Card>
+          {filtered.length === 0 && (
+            <div className="text-center py-20 text-muted-foreground">
+              <FileText className="w-12 h-12 mx-auto mb-4 opacity-30" />
+              <p className="text-lg font-medium">No examples found</p>
+              <p className="text-sm">Try a different search or category.</p>
+            </div>
           )}
         </div>
       </main>
 
-      {/* Preview Dialog */}
+      {/* Full Preview Dialog */}
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{selectedExample?.title} Resume</DialogTitle>
-            <DialogDescription>
-              Preview this professional resume example
-            </DialogDescription>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle className="text-xl">{selectedExample?.title} Resume</DialogTitle>
+            <DialogDescription>Full preview — click "Use Template" to start editing</DialogDescription>
           </DialogHeader>
-          
+
           {selectedExample && (
-            <div className="bg-white text-gray-900 p-8 rounded-lg border shadow-sm">
-              {/* Header */}
-              <div className="text-center border-b pb-4 mb-4">
-                <h1 className="text-2xl font-bold">{selectedExample.title}</h1>
-                <p className="text-muted-foreground">{selectedExample.experience}</p>
-              </div>
-
-              {/* Summary */}
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold border-b pb-1 mb-2">Professional Summary</h2>
-                <p className="text-sm">{selectedExample.content.summary}</p>
-              </div>
-
-              {/* Experience */}
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold border-b pb-1 mb-3">Experience</h2>
-                <div className="space-y-4">
-                  {selectedExample.content.experience.map((exp, idx) => (
-                    <div key={idx}>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-medium">{exp.title}</h3>
-                          <p className="text-sm text-muted-foreground">{exp.company}</p>
-                        </div>
-                        <span className="text-sm text-muted-foreground">{exp.duration}</span>
-                      </div>
-                      <ul className="list-disc list-inside mt-2 space-y-1">
-                        {exp.bullets.map((bullet, bidx) => (
-                          <li key={bidx} className="text-sm">{bullet}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+            <div className="px-6 pb-6">
+              <div className="bg-white text-gray-900 rounded-xl border shadow-sm overflow-hidden">
+                {/* Header band */}
+                <div className="px-8 py-6" style={{ background: `linear-gradient(135deg, hsl(${selectedExample.accent}), hsl(${selectedExample.accent} / 0.8))` }}>
+                  <h1 className="text-2xl font-bold text-white">{selectedExample.content.name}</h1>
+                  <p className="text-white/80 text-sm mt-1">{selectedExample.title} · {selectedExample.experience}</p>
                 </div>
-              </div>
 
-              {/* Education */}
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold border-b pb-1 mb-2">Education</h2>
-                {selectedExample.content.education.map((edu, idx) => (
-                  <div key={idx} className="flex justify-between">
-                    <div>
-                      <span className="font-medium">{edu.degree}</span>
-                      <span className="text-muted-foreground"> - {edu.school}</span>
-                    </div>
-                    <span className="text-sm text-muted-foreground">{edu.year}</span>
+                <div className="p-8 space-y-6">
+                  {/* Summary */}
+                  <div>
+                    <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: `hsl(${selectedExample.accent})` }}>Professional Summary</h2>
+                    <p className="text-sm text-gray-700 leading-relaxed">{selectedExample.content.summary}</p>
                   </div>
-                ))}
+
+                  {/* Experience */}
+                  <div>
+                    <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: `hsl(${selectedExample.accent})` }}>Experience</h2>
+                    <div className="space-y-5">
+                      {selectedExample.content.experience.map((exp, idx) => (
+                        <div key={idx}>
+                          <div className="flex justify-between items-baseline flex-wrap gap-1">
+                            <h3 className="font-semibold text-gray-900">{exp.title}</h3>
+                            <span className="text-xs text-gray-500">{exp.duration}</span>
+                          </div>
+                          <p className="text-sm text-gray-500 mb-1.5">{exp.company}</p>
+                          <ul className="space-y-1">
+                            {exp.bullets.map((b, j) => (
+                              <li key={j} className="flex gap-2 text-sm text-gray-700">
+                                <span className="shrink-0 mt-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `hsl(${selectedExample.accent})` }} />
+                                {b}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Education */}
+                  <div>
+                    <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: `hsl(${selectedExample.accent})` }}>Education</h2>
+                    {selectedExample.content.education.map((edu, idx) => (
+                      <div key={idx} className="flex justify-between text-sm">
+                        <span><span className="font-medium text-gray-900">{edu.degree}</span> · {edu.school}</span>
+                        <span className="text-gray-500">{edu.year}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Skills */}
+                  <div>
+                    <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: `hsl(${selectedExample.accent})` }}>Skills</h2>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedExample.content.skills.map((skill, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1 rounded-full text-xs font-medium"
+                          style={{ backgroundColor: `hsl(${selectedExample.accent} / 0.1)`, color: `hsl(${selectedExample.accent})` }}
+                        >{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Skills */}
-              <div>
-                <h2 className="text-lg font-semibold border-b pb-1 mb-2">Skills</h2>
-                <div className="flex flex-wrap gap-2">
-                  {selectedExample.content.skills.map((skill, idx) => (
-                    <Badge key={idx} variant="secondary">{skill}</Badge>
-                  ))}
-                </div>
+              <div className="flex gap-3 mt-5">
+                <Button variant="outline" className="flex-1" onClick={() => setPreviewOpen(false)}>Close</Button>
+                <Button className="flex-1 btn-gradient" onClick={() => { setPreviewOpen(false); handleUseTemplate(selectedExample); }}>
+                  <Download className="w-4 h-4 mr-2" /> Use This Template
+                </Button>
               </div>
             </div>
           )}
-
-          <div className="flex gap-2 mt-4">
-            <Button variant="outline" className="flex-1" onClick={() => setPreviewOpen(false)}>
-              Close
-            </Button>
-            <Button className="flex-1" onClick={() => selectedExample && handleUseTemplate(selectedExample)}>
-              <Download className="w-4 h-4 mr-2" />
-              Use This Template
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
 
