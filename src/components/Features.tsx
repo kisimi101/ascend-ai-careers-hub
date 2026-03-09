@@ -66,7 +66,14 @@ export const Features = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {features.slice(0, 2).map((feature, index) => (
-            <Card key={index} className="group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+            >
+            <Card className="group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm h-full">
               <CardHeader>
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="text-white" size={24} />
