@@ -138,8 +138,7 @@ export const PricingSection = () => {
               transition={{ duration: 0.5, delay: index * 0.15 }}
             >
             <Card
-              key={plan.name}
-              className={`relative group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden ${
+              className={`relative group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden h-full ${
                 plan.popular ? "scale-105 ring-2 ring-primary/30" : ""
               }`}
             >
