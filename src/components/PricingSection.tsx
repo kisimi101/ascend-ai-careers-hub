@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Check, Zap, Star, Crown } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { createCheckout, POLAR_PRODUCTS } from "@/lib/polar";
+import { toast } from "sonner";
 
 const pricingPlans = [
   {
