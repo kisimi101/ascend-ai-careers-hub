@@ -63,17 +63,17 @@ export const JobShowcase = () => {
           </div>
         </motion.div>
 
-        {/* Three sliding rows */}
-        <div className={`space-y-8 ${isPaused ? '[&_*]:pause' : ''}`}>
-          {/* Row 1: Right to Left */}
+        <motion.div
+          className={`space-y-8 ${isPaused ? '[&_*]:pause' : ''}`}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8 }}
+        >
           <SlidingRow jobs={row1} direction="left" speed={20} />
-          
-          {/* Row 2: Left to Right */}
           <SlidingRow jobs={row2} direction="right" speed={25} />
-          
-          {/* Row 3: Right to Left */}
           <SlidingRow jobs={row3} direction="left" speed={30} />
-        </div>
+        </motion.div>
 
         {/* CTA Section */}
         <div className="text-center mt-16">

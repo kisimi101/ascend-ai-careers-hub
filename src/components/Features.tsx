@@ -129,7 +129,7 @@ export const Features = () => {
                 </Button>
               </CardContent>
             </Card>
-          ))}
+            </motion.div>
         </div>
       </div>
     </section>
