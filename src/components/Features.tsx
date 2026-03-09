@@ -95,7 +95,7 @@ export const Features = () => {
                 </Button>
               </CardContent>
             </Card>
-          ))}
+            </motion.div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
