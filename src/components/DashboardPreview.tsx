@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { AnnotatedResumePreview } from "./AnnotatedResumePreview";
 
 const stats = [
   {
@@ -171,6 +172,19 @@ export const DashboardPreview = () => {
               </Card>
             </motion.div>
           </div>
+
+          {/* Annotated Sample Resume */}
+          <motion.div variants={item}>
+            <div className="text-center mt-10 mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-2">
+                See What Your Resume Could Look Like
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Every section annotated — built to pass ATS systems and impress recruiters
+              </p>
+            </div>
+            <AnnotatedResumePreview />
+          </motion.div>
 
           <motion.div variants={item} className="text-center mt-10">
             <Button
