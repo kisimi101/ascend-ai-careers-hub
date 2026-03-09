@@ -41,3 +41,12 @@ verify_jwt = false
 
 [functions.scrape-linkedin]
 verify_jwt = false
+
+[functions.polar-checkout]
+verify_jwt = false
+
+[functions.polar-verify]
+verify_jwt = false
+
+[functions.polar-customer-state]
+verify_jwt = false
