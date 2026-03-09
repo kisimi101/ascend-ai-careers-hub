@@ -365,6 +365,36 @@ export type Database = {
         }
         Relationships: []
       }
+      resume_drafts: {
+        Row: {
+          accent_color: string | null
+          created_at: string
+          id: string
+          resume_data: Json
+          template: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accent_color?: string | null
+          created_at?: string
+          id?: string
+          resume_data: Json
+          template?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accent_color?: string | null
+          created_at?: string
+          id?: string
+          resume_data?: Json
+          template?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shared_resumes: {
         Row: {
           created_at: string
