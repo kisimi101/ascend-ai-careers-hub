@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Check, Zap, Star, Crown } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { createCheckout, POLAR_PRODUCTS } from "@/lib/polar";
+import { toast } from "sonner";
 
 const pricingPlans = [
   {
@@ -72,6 +75,29 @@ const pricingPlans = [
 
 export const PricingSection = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
+
+  const handlePlanClick = async (planName: string) => {
+    if (planName === "Free") {
+      window.location.href = "/tools";
+      return;
+    }
+    if (!isAuthenticated) {
+      toast.error("Please sign in first to subscribe");
+      return;
+    }
+    const productId = planName === "Pro" ? POLAR_PRODUCTS.pro : POLAR_PRODUCTS.enterprise;
+    try {
+      setLoadingPlan(planName);
+      const url = await createCheckout(productId);
+      window.location.href = url;
+    } catch (err: any) {
+      toast.error(err.message || "Failed to start checkout");
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
 
   return (
     <section id="pricing-section" className="py-20 px-6 bg-muted/30">
@@ -179,13 +205,10 @@ export const PricingSection = () => {
                       ? "btn-gradient"
                       : "bg-foreground text-background hover:bg-foreground/90"
                   } transition-all`}
-                  onClick={() => {
-                    if (plan.name === "Free") window.location.href = '/tools';
-                    else if (plan.name === "Enterprise") window.location.href = '/tools';
-                    else window.location.href = '/tools';
-                  }}
+                  disabled={loadingPlan === plan.name}
+                  onClick={() => handlePlanClick(plan.name)}
                 >
-                  {plan.cta}
+                  {loadingPlan === plan.name ? "Loading…" : plan.cta}
                 </Button>
               </CardContent>
             </Card>
