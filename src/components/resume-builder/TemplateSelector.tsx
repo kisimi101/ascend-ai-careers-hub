@@ -195,6 +195,17 @@ export const TemplateSelector = ({
                     <Check size={14} />
                   </div>
                 )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewTemplate(template.id);
+                  }}
+                  className="absolute bottom-2 right-2 bg-background/80 backdrop-blur-sm text-foreground rounded-md p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-background"
+                  title="Preview full size"
+                >
+                  <Expand size={14} />
+                </button>
               </div>
 
               {/* Info */}
