@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { SlidingRow } from "./job-showcase/SlidingRow";
 import { jobImages } from "./job-showcase/jobsData";
+import { motion } from "framer-motion";
 
 export const JobShowcase = () => {
   const [isPaused, setIsPaused] = useState(false);
