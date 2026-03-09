@@ -99,7 +99,7 @@ const Footer = () => {
 
             <div className="text-center md:text-right">
               <p className="text-sm text-muted-foreground">© 2026 CareerHub. All rights reserved.</p>
-              <p className="text-xs text-muted-foreground/80 mt-1">Built for job seekers • Powered by Lovable Cloud</p>
+              <p className="text-xs text-muted-foreground/80 mt-1">Built for job seekers, by job seekers</p>
             </div>
           </div>
         </div>
