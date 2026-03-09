@@ -186,10 +186,19 @@ export const DashboardPreview = () => {
             <AnnotatedResumePreview />
           </motion.div>
 
-          <motion.div variants={item} className="text-center mt-10">
+          <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
             <Button
               size="lg"
               className="btn-gradient px-8 py-4 text-lg gap-2"
+              onClick={() => navigate("/resume-builder")}
+            >
+              Build Your Resume
+              <ArrowUpRight size={18} />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-8 py-4 text-lg gap-2"
               onClick={() => navigate("/dashboard")}
             >
               Open Your Dashboard
