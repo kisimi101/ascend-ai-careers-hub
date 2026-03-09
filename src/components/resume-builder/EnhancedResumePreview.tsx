@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { ShareResumeDialog } from "./ShareResumeDialog";
 import { AutoFillPanel } from "./AutoFillPanel";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { createCheckout, POLAR_PRODUCTS } from "@/lib/polar";
 import { toast } from "sonner";
 
@@ -45,6 +46,7 @@ export const EnhancedResumePreview = ({
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { isPro } = useSubscription();
 
   const renderTemplate = () => {
     const props = { resumeData, accentColor };
