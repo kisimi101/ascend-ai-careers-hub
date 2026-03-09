@@ -282,6 +282,32 @@ export const TemplateSelector = ({
           </div>
         </div>
       )}
+      {/* Template Preview Modal */}
+      <Dialog open={!!previewTemplate} onOpenChange={(open) => !open && setPreviewTemplate(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle className="flex items-center justify-between">
+              <span>{previewTpl?.name} Template</span>
+              {previewTpl && (
+                <Badge variant="secondary" className="text-xs">
+                  ATS {previewTpl.atsScore}%
+                </Badge>
+              )}
+            </DialogTitle>
+            {previewTpl && (
+              <p className="text-sm text-muted-foreground">{previewTpl.description}</p>
+            )}
+          </DialogHeader>
+          <div className="p-4 pt-2">
+            <div className="border rounded-lg overflow-hidden bg-white" style={{ aspectRatio: '8.5/11' }}>
+              {previewTemplate && renderMiniTemplate(
+                previewTemplate,
+                selectedTemplate === previewTemplate ? effectiveAccent : (previewTpl?.defaultAccent || "#2563eb")
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
