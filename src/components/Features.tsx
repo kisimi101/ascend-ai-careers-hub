@@ -46,7 +46,13 @@ export const Features = () => {
   return (
     <section id="features" className="py-20 px-6">
       <div className="container mx-auto">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Everything You Need to
             <span className="text-gradient-primary block">
@@ -56,7 +62,7 @@ export const Features = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Our comprehensive AI-powered platform provides all the tools you need to land your dream job.
           </p>
-        </div>
+        </motion.div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {features.slice(0, 2).map((feature, index) => (
