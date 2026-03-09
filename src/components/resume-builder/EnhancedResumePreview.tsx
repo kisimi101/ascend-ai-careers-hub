@@ -61,7 +61,11 @@ export const EnhancedResumePreview = ({
   };
 
   const handleDownload = (downloadFn: () => void) => {
-    setShowPaywall(true);
+    if (isPro) {
+      downloadFn();
+    } else {
+      setShowPaywall(true);
+    }
   };
 
   return (
