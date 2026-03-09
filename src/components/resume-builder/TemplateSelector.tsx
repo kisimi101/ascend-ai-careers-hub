@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Star, Download, Check, Palette } from "lucide-react";
+import { Star, Download, Check, Palette, Expand } from "lucide-react";
 import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { TechTemplate } from "./templates/TechTemplate";
@@ -9,6 +9,7 @@ import { ExecutiveTemplate } from "./templates/ExecutiveTemplate";
 import { MinimalistTemplate } from "./templates/MinimalistTemplate";
 import { ResumeData } from "./types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export interface ResumeTemplate {
   id: string;
