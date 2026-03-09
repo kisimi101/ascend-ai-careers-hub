@@ -19,6 +19,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { ShareResumeDialog } from "./ShareResumeDialog";
 import { AutoFillPanel } from "./AutoFillPanel";
+import { useAuth } from "@/contexts/AuthContext";
+import { createCheckout, POLAR_PRODUCTS } from "@/lib/polar";
+import { toast } from "sonner";
 
 interface EnhancedResumePreviewProps {
   resumeData: ResumeData;
