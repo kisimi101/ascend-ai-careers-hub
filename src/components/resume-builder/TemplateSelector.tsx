@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Star, Download, Check, Palette } from "lucide-react";
+import { Star, Download, Check, Palette, Expand } from "lucide-react";
 import { ModernTemplate } from "./templates/ModernTemplate";
 import { ClassicTemplate } from "./templates/ClassicTemplate";
 import { TechTemplate } from "./templates/TechTemplate";
@@ -9,6 +9,7 @@ import { ExecutiveTemplate } from "./templates/ExecutiveTemplate";
 import { MinimalistTemplate } from "./templates/MinimalistTemplate";
 import { ResumeData } from "./types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export interface ResumeTemplate {
   id: string;
@@ -147,7 +148,9 @@ export const TemplateSelector = ({
   accentColor,
   onAccentColorChange,
 }: TemplateSelectorProps) => {
+  const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
   const currentTemplate = templates.find(t => t.id === selectedTemplate);
+  const previewTpl = previewTemplate ? templates.find(t => t.id === previewTemplate) : null;
   const effectiveAccent = accentColor || currentTemplate?.defaultAccent || "#2563eb";
 
   return (
@@ -192,6 +195,17 @@ export const TemplateSelector = ({
                     <Check size={14} />
                   </div>
                 )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewTemplate(template.id);
+                  }}
+                  className="absolute bottom-2 right-2 bg-background/80 backdrop-blur-sm text-foreground rounded-md p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-background"
+                  title="Preview full size"
+                >
+                  <Expand size={14} />
+                </button>
               </div>
 
               {/* Info */}
@@ -268,6 +282,32 @@ export const TemplateSelector = ({
           </div>
         </div>
       )}
+      {/* Template Preview Modal */}
+      <Dialog open={!!previewTemplate} onOpenChange={(open) => !open && setPreviewTemplate(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle className="flex items-center justify-between">
+              <span>{previewTpl?.name} Template</span>
+              {previewTpl && (
+                <Badge variant="secondary" className="text-xs">
+                  ATS {previewTpl.atsScore}%
+                </Badge>
+              )}
+            </DialogTitle>
+            {previewTpl && (
+              <p className="text-sm text-muted-foreground">{previewTpl.description}</p>
+            )}
+          </DialogHeader>
+          <div className="p-4 pt-2">
+            <div className="border rounded-lg overflow-hidden bg-white" style={{ aspectRatio: '8.5/11' }}>
+              {previewTemplate && renderMiniTemplate(
+                previewTemplate,
+                selectedTemplate === previewTemplate ? effectiveAccent : (previewTpl?.defaultAccent || "#2563eb")
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
