@@ -2,6 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Search, User, Book, CheckCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 const features = [
   {
@@ -45,7 +46,13 @@ export const Features = () => {
   return (
     <section id="features" className="py-20 px-6">
       <div className="container mx-auto">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Everything You Need to
             <span className="text-gradient-primary block">
@@ -55,11 +62,18 @@ export const Features = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Our comprehensive AI-powered platform provides all the tools you need to land your dream job.
           </p>
-        </div>
+        </motion.div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {features.slice(0, 2).map((feature, index) => (
-            <Card key={index} className="group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+            >
+            <Card className="group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm h-full">
               <CardHeader>
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="text-white" size={24} />
@@ -81,12 +95,20 @@ export const Features = () => {
                 </Button>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.slice(2).map((feature, index) => (
-            <Card key={index + 2} className="group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm">
+            <motion.div
+              key={index + 2}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+            >
+            <Card className="group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm h-full">
               <CardHeader>
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="text-white" size={24} />
@@ -108,6 +130,7 @@ export const Features = () => {
                 </Button>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
       </div>

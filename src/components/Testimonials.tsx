@@ -1,5 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 const testimonials = [
   {
@@ -26,7 +27,13 @@ export const Testimonials = () => {
   return (
     <section className="py-20 px-6 bg-primary/5">
       <div className="container mx-auto">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Trusted by
             <span className="text-gradient-primary">
@@ -36,11 +43,18 @@ export const Testimonials = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Join thousands of job seekers who have accelerated their careers with our AI-powered platform.
           </p>
-        </div>
+        </motion.div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow">
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+            >
+            <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow h-full">
               <CardContent className="p-8">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center text-primary-foreground font-bold mr-4">
@@ -54,6 +68,7 @@ export const Testimonials = () => {
                 <p className="text-foreground/80 italic">"{testimonial.content}"</p>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
       </div>

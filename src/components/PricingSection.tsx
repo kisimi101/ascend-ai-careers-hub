@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Zap, Star, Crown } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 const pricingPlans = [
   {
@@ -75,7 +76,13 @@ export const PricingSection = () => {
   return (
     <section id="pricing-section" className="py-20 px-6 bg-muted/30">
       <div className="container mx-auto">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="inline-block mb-4">
             <span className="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
               💰 Pricing Plans
@@ -119,13 +126,19 @@ export const PricingSection = () => {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {pricingPlans.map((plan) => (
-            <Card
+          {pricingPlans.map((plan, index) => (
+            <motion.div
               key={plan.name}
-              className={`relative group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden ${
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+            >
+            <Card
+              className={`relative group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden h-full ${
                 plan.popular ? "scale-105 ring-2 ring-primary/30" : ""
               }`}
             >
@@ -176,6 +189,7 @@ export const PricingSection = () => {
                 </Button>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
 

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { SlidingRow } from "./job-showcase/SlidingRow";
 import { jobImages } from "./job-showcase/jobsData";
+import { motion } from "framer-motion";
 
 export const JobShowcase = () => {
   const [isPaused, setIsPaused] = useState(false);
@@ -24,7 +25,13 @@ export const JobShowcase = () => {
       </div>
 
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="inline-block mb-4">
             <span className="bg-orange-100 text-orange-600 px-4 py-2 rounded-full text-sm font-semibold">
               🎯 Career Opportunities
@@ -54,19 +61,19 @@ export const JobShowcase = () => {
               <span>95% Success Rate</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Three sliding rows */}
-        <div className={`space-y-8 ${isPaused ? '[&_*]:pause' : ''}`}>
-          {/* Row 1: Right to Left */}
+        <motion.div
+          className={`space-y-8 ${isPaused ? '[&_*]:pause' : ''}`}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8 }}
+        >
           <SlidingRow jobs={row1} direction="left" speed={20} />
-          
-          {/* Row 2: Left to Right */}
           <SlidingRow jobs={row2} direction="right" speed={25} />
-          
-          {/* Row 3: Right to Left */}
           <SlidingRow jobs={row3} direction="left" speed={30} />
-        </div>
+        </motion.div>
 
         {/* CTA Section */}
         <div className="text-center mt-16">
