@@ -205,13 +205,10 @@ export const PricingSection = () => {
                       ? "btn-gradient"
                       : "bg-foreground text-background hover:bg-foreground/90"
                   } transition-all`}
-                  onClick={() => {
-                    if (plan.name === "Free") window.location.href = '/tools';
-                    else if (plan.name === "Enterprise") window.location.href = '/tools';
-                    else window.location.href = '/tools';
-                  }}
+                  disabled={loadingPlan === plan.name}
+                  onClick={() => handlePlanClick(plan.name)}
                 >
-                  {plan.cta}
+                  {loadingPlan === plan.name ? "Loading…" : plan.cta}
                 </Button>
               </CardContent>
             </Card>
