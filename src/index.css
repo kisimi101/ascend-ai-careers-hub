@@ -1,5 +1,4 @@
-
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,18 +12,18 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    
+
     /* Primary - Orange to Red Gradient Theme */
-    --primary: 24 95% 53%;  /* Orange-500 */
+    --primary: 24 95% 53%;
     --primary-foreground: 0 0% 98%;
-    --primary-variant: 4 91% 58%;  /* Red-500 */
-    
+    --primary-variant: 4 91% 58%;
+
     /* Secondary & Accent */
     --secondary: 210 40% 98%;
     --secondary-foreground: 222.2 84% 4.9%;
     --accent: 210 40% 96%;
     --accent-foreground: 222.2 84% 4.9%;
-    
+
     /* Semantic Colors */
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
@@ -32,32 +31,36 @@
     --success-foreground: 0 0% 98%;
     --warning: 43 96% 56%;
     --warning-foreground: 222.2 84% 4.9%;
-    
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 98%;
+
     /* UI Elements */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 24 95% 53%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    
+
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
-    --gradient-secondary: linear-gradient(135deg, hsl(210 40% 98%), hsl(220 13% 91%));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--primary)));
+    --gradient-info: linear-gradient(135deg, hsl(var(--info)), hsl(var(--primary)));
+    --gradient-warning: linear-gradient(135deg, hsl(var(--warning)), hsl(var(--primary-variant)));
     --gradient-bg: linear-gradient(135deg, hsl(24 100% 97%), hsl(0 0% 100%), hsl(4 100% 97%));
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
-    
+    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.28);
+
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.15s ease-out;
-    
+
     /* Border Radius */
     --radius: 0.5rem;
-    
+
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -90,8 +93,13 @@
     --ring: 24 95% 53%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
+
+    --success: 142 76% 42%;
+    --warning: 43 96% 60%;
+    --info: 199 89% 54%;
+
     --gradient-bg: linear-gradient(135deg, hsl(222 84% 5%), hsl(217 33% 18%));
-    
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224 71.4% 4.1%;
@@ -105,27 +113,31 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-background text-foreground transition-colors duration-300;
-    font-family: "Inter", sans-serif;
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
     background: var(--gradient-bg);
   }
-  
+
+  h1, h2, h3, h4 {
+    font-family: "Space Grotesk", ui-sans-serif, system-ui;
+  }
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-muted;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     @apply bg-muted-foreground/30 rounded-md;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/50;
   }
@@ -136,45 +148,75 @@
   .glass {
     @apply bg-card/80 backdrop-blur-lg border border-border/20;
   }
-  
+
   .glass-dark {
     @apply bg-card/20 backdrop-blur-lg border border-border/10;
   }
-  
-  /* Gradient text utilities */
+
+  /* Gradient text utilities (semantic) */
   .text-gradient-primary {
-    @apply bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
-  
-  .text-gradient-secondary {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+
+  /* Gradient backgrounds (semantic) */
+  .bg-gradient-primary {
+    background-image: var(--gradient-primary);
   }
-  
+
+  .bg-gradient-success {
+    background-image: var(--gradient-success);
+  }
+
+  .bg-gradient-info {
+    background-image: var(--gradient-info);
+  }
+
+  .bg-gradient-warning {
+    background-image: var(--gradient-warning);
+  }
+
+  /* Hero vignette overlay */
+  .hero-vignette {
+    background:
+      radial-gradient(80% 70% at 15% 25%, hsl(var(--background) / 0.10) 0%, transparent 55%),
+      radial-gradient(70% 70% at 70% 25%, hsl(var(--primary) / 0.10) 0%, transparent 60%),
+      linear-gradient(to bottom, hsl(var(--background) / 0.30) 0%, hsl(var(--background) / 0.80) 70%, hsl(var(--background)) 100%);
+  }
+
+  /* Surface grid background */
+  .surface-grid {
+    background-image: radial-gradient(hsl(var(--muted-foreground) / 0.10) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
   /* Enhanced button styles */
   .btn-gradient {
-    background: var(--gradient-primary);
-    @apply text-white shadow-lg hover:shadow-xl transition-all duration-300;
+    background-image: var(--gradient-primary);
+    @apply text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300;
   }
-  
+
   .btn-gradient:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-glow);
   }
-  
+
   /* Card enhancements */
   .card-enhanced {
     @apply bg-card border border-border/50 rounded-lg shadow-md hover:shadow-lg transition-all duration-300;
   }
-  
+
   .card-enhanced:hover {
     transform: translateY(-2px);
   }
-  
+
   /* Loading states */
   .skeleton {
     @apply animate-pulse bg-muted rounded;
   }
-  
+
   /* Focus states */
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background;
@@ -188,48 +230,48 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
-  
+
   .line-clamp-3 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
-  
+
   /* Animation utilities */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-out;
   }
-  
+
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
   }
-  
+
   .animate-scale-in {
     animation: scaleIn 0.2s ease-out;
   }
-  
+
   /* Custom animations */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  
+
   @keyframes slideUp {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
-  
+
   @keyframes scaleIn {
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
   }
-  
+
   /* Responsive spacing */
   .section-padding {
     @apply py-16 md:py-24 lg:py-32;
   }
-  
+
   .container-padding {
     @apply px-4 sm:px-6 lg:px-8;
   }

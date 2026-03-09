@@ -1,92 +1,104 @@
-
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Lightbulb, Check, Shield, Eye } from "lucide-react";
+import heroImage from "@/assets/hero-careerhub.jpg";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
-  return (
-    <section className="pt-20 pb-16 px-6 relative overflow-hidden">
-      <div className="container mx-auto text-center">
-        <div className="max-w-4xl mx-auto relative">
-          {/* Floating Elements */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-8 w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <div className="w-16 h-16 bg-card rounded-xl flex items-center justify-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-full"></div>
-              </div>
-            </div>
-            
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 translate-x-16 w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-2xl flex items-center justify-center shadow-lg">
-              <Lightbulb className="w-8 h-8 text-white" />
-            </div>
-            
-            <div className="absolute top-4 right-8 w-16 h-16 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            
-            <div className="absolute top-1/2 left-4 transform -translate-y-1/2 w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <Eye className="w-8 h-8 text-white" />
-            </div>
-            
-            <div className="absolute top-1/2 right-0 transform -translate-y-1/2 w-20 h-20 bg-card rounded-2xl shadow-lg flex items-center justify-center border border-border">
-              <div className="text-2xl font-bold text-foreground">AI</div>
-            </div>
-            
-            <div className="absolute bottom-12 right-12 w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full shadow-lg flex items-center justify-center">
-              <div className="w-12 h-12 bg-card rounded-full flex items-center justify-center">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-full"></div>
-              </div>
-            </div>
-            
-            <svg className="absolute inset-0 w-full h-full" style={{ zIndex: -1 }}>
-              <defs>
-                <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <circle cx="2" cy="2" r="1" className="fill-muted-foreground/20" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#dots)" opacity="0.3" />
-              <path d="M200 100 L400 200" className="stroke-border" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
-              <path d="M600 100 L400 200" className="stroke-border" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
-              <path d="M150 250 L400 200" className="stroke-border" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
-              <path d="M650 250 L400 200" className="stroke-border" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
-            </svg>
-          </div>
+  const navigate = useNavigate();
 
-          {/* Central Success Icon */}
-          <div className="relative z-10 mb-8">
-            <div className="mx-auto w-24 h-24 bg-gradient-to-br from-purple-500 to-blue-500 rounded-3xl flex items-center justify-center shadow-2xl mb-12">
-              <Check className="w-12 h-12 text-white stroke-[3]" />
-            </div>
-          </div>
-          
-          <div className="relative z-10">
-            <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-sm font-medium text-primary mb-8">
-              🚀 Powered by Advanced AI Technology
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-foreground">
-              All-in-one Career
-              <span className="text-gradient-primary block">
-                platform
-              </span>
-            </h1>
-            
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              CareerHub is a modern, all-in-one AI platform designed to perfectly fit your career advancement needs
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button size="lg" className="btn-gradient px-8 py-4 text-lg" onClick={() => document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' })}>
-                View Pricing
-              </Button>
-              <Button variant="outline" size="lg" className="px-8 py-4 text-lg" onClick={() => window.location.href = '/tools'}>
-                Start Free Trial
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-16 animate-bounce">
-          <ArrowDown className="mx-auto text-muted-foreground" size={24} />
+  return (
+    <section className="relative overflow-hidden pt-24 md:pt-28 pb-16 md:pb-24">
+      {/* Image-first hero */}
+      <div className="absolute inset-0">
+        <img
+          src={heroImage}
+          alt="Abstract career growth path"
+          className="h-full w-full object-cover"
+          loading="eager"
+        />
+        {/* readability overlay */}
+        <div className="absolute inset-0 bg-background/55" />
+        <div className="absolute inset-0 hero-vignette" />
+        <div className="absolute inset-0 surface-grid opacity-60" />
+      </div>
+
+      <div className="container mx-auto container-padding relative">
+        <div className="max-w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 backdrop-blur px-4 py-2 text-sm text-muted-foreground"
+          >
+            <span className="h-2 w-2 rounded-full bg-primary" />
+            AI-powered career toolkit — built for job seekers
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.08, ease: "easeOut" }}
+            className="mt-6 text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight text-foreground"
+          >
+            Move faster from
+            <span className="text-gradient-primary block">application → offer</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.16, ease: "easeOut" }}
+            className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl"
+          >
+            Build ATS-friendly resumes, generate tailored cover letters, track applications, and practice interviews — all in one modern platform.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.24, ease: "easeOut" }}
+            className="mt-8 flex flex-col sm:flex-row gap-3"
+          >
+            <Button
+              size="lg"
+              className="btn-gradient h-12 px-7 text-base"
+              onClick={() => navigate("/tools")}
+            >
+              Start free
+              <ArrowRight className="ml-1" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-12 px-7 text-base bg-card/40 backdrop-blur"
+              onClick={() =>
+                document.getElementById("pricing-section")?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              View pricing
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.32, ease: "easeOut" }}
+            className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground"
+          >
+            <span className="inline-flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              No credit card required
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              Built-in dashboard + trackers
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              Fast AI workflows
+            </span>
+          </motion.div>
         </div>
       </div>
     </section>

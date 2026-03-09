@@ -1,6 +1,6 @@
-
 import { Button } from "@/components/ui/button";
-import { FileText, User, CheckCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, FileText, Search, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const CTA = () => {
@@ -8,91 +8,110 @@ export const CTA = () => {
 
   const freeTools = [
     {
-      name: "Free Cover Letter Generator",
-      description: "Create professional cover letters in minutes",
+      name: "Cover Letter Generator",
+      description: "Write tailored cover letters in minutes.",
       icon: FileText,
-      color: "from-blue-500 to-blue-600",
+      path: "/cover-letter-generator",
     },
     {
-      name: "Free AI Resume Builder",
-      description: "Build ATS-friendly resumes with AI assistance",
-      icon: User,
-      color: "from-emerald-500 to-emerald-600",
+      name: "Resume Checker",
+      description: "Instant feedback + keyword insights.",
+      icon: Search,
+      path: "/resume-checker",
     },
     {
-      name: "Free Resume Checker",
-      description: "Get instant feedback on your resume",
-      icon: CheckCircle,
-      color: "from-purple-500 to-purple-600",
+      name: "AI Resume Builder",
+      description: "ATS-friendly structure with smart suggestions.",
+      icon: Sparkles,
+      path: "/resume-builder",
     },
   ];
 
   return (
-    <section className="py-20 px-6">
+    <section className="section-padding container-padding">
       <div className="container mx-auto">
-        <div className="relative">
-          <div className="absolute inset-0 bg-primary/10 rounded-3xl blur-3xl"></div>
-          <div className="relative btn-gradient rounded-3xl p-12 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Transform Your Career?
-            </h2>
-            <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-              Join over 50,000 professionals who have accelerated their careers with our AI-powered platform.
-              Start your free trial today.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                variant="secondary" 
-                className="px-8 py-4 text-lg bg-card text-primary hover:bg-card/90"
-                onClick={() => navigate('/tools')}
-              >
-                Start Free Trial
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="px-8 py-4 text-lg border-white text-white hover:bg-white/10"
-                onClick={() => document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                View Plans
-              </Button>
-            </div>
-            <div className="mt-8 text-sm opacity-75">
-              No credit card required • 14-day free trial • Cancel anytime
+        {/* Primary CTA */}
+        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/60 backdrop-blur">
+          <div className="absolute inset-0 bg-gradient-primary opacity-30" />
+          <div className="relative p-10 md:p-14">
+            <div className="max-w-3xl">
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+                Ready to ship better applications?
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Turn your job search into a repeatable system: resume → keywords → applications → interviews.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <Button
+                  size="lg"
+                  className="btn-gradient h-12 px-7 text-base"
+                  onClick={() => navigate("/tools")}
+                >
+                  Start free
+                  <ArrowRight className="ml-1" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-12 px-7 text-base bg-background/30"
+                  onClick={() =>
+                    document.getElementById("pricing-section")?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  Compare plans
+                </Button>
+              </div>
+
+              <p className="mt-4 text-sm text-muted-foreground">
+                Free tools included • Upgrade anytime
+              </p>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Free Tools Section */}
-      <div className="mt-20 container mx-auto">
-        <div className="text-center mb-12">
-          <h3 className="text-3xl font-bold text-foreground mb-4">Free AI Career Tools</h3>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Get started with our powerful AI tools - completely free, no signup required
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {freeTools.map((tool) => (
-            <div
-              key={tool.name}
-              className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-border/50 hover:scale-105"
-            >
-              <div className={`w-12 h-12 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-6`}>
-                <tool.icon className="h-6 w-6 text-white" />
-              </div>
-              <h4 className="text-xl font-bold text-foreground mb-3">{tool.name}</h4>
-              <p className="text-muted-foreground mb-6">{tool.description}</p>
-              <Button 
-                className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90`}
-                onClick={() => navigate('/tools')}
+        {/* Free tools */}
+        <div className="mt-16">
+          <div className="text-center mb-10">
+            <h3 className="text-3xl md:text-4xl font-bold text-foreground">
+              Free AI career tools
+            </h3>
+            <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
+              Try the tools people use daily to move faster — no setup, no friction.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {freeTools.map((tool) => (
+              <Card
+                key={tool.name}
+                className="group border-border/60 bg-card/70 backdrop-blur hover:shadow-lg transition-all duration-300"
               >
-                Try Now - Free
-              </Button>
-            </div>
-          ))}
+                <CardContent className="p-7">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="h-12 w-12 rounded-2xl bg-primary/12 flex items-center justify-center">
+                      <tool.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <span className="text-xs rounded-full border border-border/60 bg-background/30 px-3 py-1 text-muted-foreground">
+                      Free
+                    </span>
+                  </div>
+                  <h4 className="mt-5 text-xl font-semibold text-foreground">
+                    {tool.name}
+                  </h4>
+                  <p className="mt-2 text-muted-foreground">{tool.description}</p>
+
+                  <Button
+                    className="mt-6 w-full btn-gradient"
+                    onClick={() => navigate(tool.path)}
+                  >
+                    Try now
+                    <ArrowRight className="ml-1" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </section>
