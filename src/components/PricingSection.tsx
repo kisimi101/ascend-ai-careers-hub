@@ -190,6 +190,7 @@ export const PricingSection = () => {
               </CardContent>
             </Card>
             </motion.div>
+          ))}
         </div>
 
         <div className="text-center mt-12">

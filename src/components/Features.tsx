@@ -131,6 +131,7 @@ export const Features = () => {
               </CardContent>
             </Card>
             </motion.div>
+          ))}
         </div>
       </div>
     </section>
