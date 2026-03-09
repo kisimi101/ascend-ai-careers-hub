@@ -148,7 +148,9 @@ export const TemplateSelector = ({
   accentColor,
   onAccentColorChange,
 }: TemplateSelectorProps) => {
+  const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
   const currentTemplate = templates.find(t => t.id === selectedTemplate);
+  const previewTpl = previewTemplate ? templates.find(t => t.id === previewTemplate) : null;
   const effectiveAccent = accentColor || currentTemplate?.defaultAccent || "#2563eb";
 
   return (
