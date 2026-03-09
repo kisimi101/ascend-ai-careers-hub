@@ -25,7 +25,13 @@ export const JobShowcase = () => {
       </div>
 
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="inline-block mb-4">
             <span className="bg-orange-100 text-orange-600 px-4 py-2 rounded-full text-sm font-semibold">
               🎯 Career Opportunities
@@ -55,7 +61,7 @@ export const JobShowcase = () => {
               <span>95% Success Rate</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Three sliding rows */}
         <div className={`space-y-8 ${isPaused ? '[&_*]:pause' : ''}`}>
