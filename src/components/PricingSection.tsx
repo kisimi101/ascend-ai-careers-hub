@@ -75,6 +75,29 @@ const pricingPlans = [
 
 export const PricingSection = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
+
+  const handlePlanClick = async (planName: string) => {
+    if (planName === "Free") {
+      window.location.href = "/tools";
+      return;
+    }
+    if (!isAuthenticated) {
+      toast.error("Please sign in first to subscribe");
+      return;
+    }
+    const productId = planName === "Pro" ? POLAR_PRODUCTS.pro : POLAR_PRODUCTS.enterprise;
+    try {
+      setLoadingPlan(planName);
+      const url = await createCheckout(productId);
+      window.location.href = url;
+    } catch (err: any) {
+      toast.error(err.message || "Failed to start checkout");
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
 
   return (
     <section id="pricing-section" className="py-20 px-6 bg-muted/30">
