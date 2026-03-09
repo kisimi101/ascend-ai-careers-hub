@@ -42,7 +42,9 @@ export const EnhancedResumePreview = ({
 }: EnhancedResumePreviewProps) => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showShare, setShowShare] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const renderTemplate = () => {
     const props = { resumeData, accentColor };
