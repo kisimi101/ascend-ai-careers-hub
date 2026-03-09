@@ -11,8 +11,9 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Settings as SettingsIcon, Bell, Mail, Calendar, ArrowLeft, Loader2, Smartphone } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Mail, Calendar, ArrowLeft, Loader2, Smartphone, Crown, ExternalLink } from "lucide-react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface UserSettings {
   email_reminders_enabled: boolean;
