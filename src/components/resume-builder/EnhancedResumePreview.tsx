@@ -80,15 +80,15 @@ export const EnhancedResumePreview = ({
                 Share
               </Button>
               <Button onClick={() => handleDownload(onDownloadPDF)} size="sm" variant="default">
-                <Lock className="h-3 w-3 mr-1" />
+                {isPro ? <Download className="h-3 w-3 mr-1" /> : <Lock className="h-3 w-3 mr-1" />}
                 PDF
               </Button>
               <Button onClick={() => handleDownload(onDownloadDOCX)} size="sm" variant="outline">
-                <Lock className="h-3 w-3 mr-1" />
+                {isPro ? <Download className="h-3 w-3 mr-1" /> : <Lock className="h-3 w-3 mr-1" />}
                 DOCX
               </Button>
               <Button onClick={() => handleDownload(onDownloadPNG)} size="sm" variant="outline">
-                <Lock className="h-3 w-3 mr-1" />
+                {isPro ? <Download className="h-3 w-3 mr-1" /> : <Lock className="h-3 w-3 mr-1" />}
                 PNG
               </Button>
             </div>

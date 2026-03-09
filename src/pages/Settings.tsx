@@ -39,7 +39,23 @@ const Settings = () => {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const { isSupported, isEnabled, permission, requestPermission, disable } = usePushNotifications();
+  const { isPro, isLoading: subLoading } = useSubscription();
+
+  const openCustomerPortal = async () => {
+    try {
+      setPortalLoading(true);
+      const { data, error } = await supabase.functions.invoke("polar-customer-portal");
+      if (error) throw error;
+      if (!data?.url) throw new Error("No portal URL returned");
+      window.open(data.url, "_blank");
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to open subscription portal", variant: "destructive" });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
