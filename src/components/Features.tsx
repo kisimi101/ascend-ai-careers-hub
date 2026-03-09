@@ -2,6 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Search, User, Book, CheckCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 const features = [
   {
