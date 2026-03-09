@@ -142,8 +142,27 @@ export const EnhancedResumePreview = ({
             </div>
           </div>
           <div className="space-y-3">
-            <Button className="w-full btn-gradient text-lg py-5" onClick={() => { setShowPaywall(false); navigate('/'); setTimeout(() => document.getElementById('pricing-section')?.scrollIntoView({ behavior: 'smooth' }), 500); }}>
-              Upgrade to Pro — $12/mo
+            <Button 
+              className="w-full btn-gradient text-lg py-5" 
+              disabled={checkoutLoading}
+              onClick={async () => {
+                if (!isAuthenticated) {
+                  toast.error("Please sign in first to upgrade");
+                  setShowPaywall(false);
+                  return;
+                }
+                try {
+                  setCheckoutLoading(true);
+                  const url = await createCheckout(POLAR_PRODUCTS.pro);
+                  window.location.href = url;
+                } catch (err: any) {
+                  toast.error(err.message || "Failed to start checkout");
+                } finally {
+                  setCheckoutLoading(false);
+                }
+              }}
+            >
+              {checkoutLoading ? "Loading…" : "Upgrade to Pro — $12/mo"}
             </Button>
             <p className="text-xs text-muted-foreground text-center">
               7-day free trial • Cancel anytime • 30-day money-back guarantee
