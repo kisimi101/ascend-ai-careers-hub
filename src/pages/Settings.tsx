@@ -363,7 +363,56 @@ const Settings = () => {
             </Card>
           )}
 
-          {/* Save Button */}
+          {/* Subscription Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="h-5 w-5 text-primary" />
+                Subscription
+              </CardTitle>
+              <CardDescription>Manage your plan and billing</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Current Plan</p>
+                  <p className="text-sm text-muted-foreground">
+                    {subLoading ? "Loading..." : isPro ? "Pro" : "Free"}
+                  </p>
+                </div>
+                {isPro ? (
+                  <Badge className="bg-primary/10 text-primary border-primary/20">Active</Badge>
+                ) : (
+                  <Badge variant="secondary">Free</Badge>
+                )}
+              </div>
+              {isPro ? (
+                <Button
+                  variant="outline"
+                  onClick={openCustomerPortal}
+                  disabled={portalLoading}
+                  className="w-full"
+                >
+                  {portalLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                  )}
+                  Manage Subscription
+                </Button>
+              ) : (
+                <Button
+                  className="w-full btn-gradient"
+                  onClick={() => navigate("/#pricing-section")}
+                >
+                  <Crown className="h-4 w-4 mr-2" />
+                  Upgrade to Pro
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+
           <div className="flex justify-end">
             <Button
               onClick={saveSettings}
