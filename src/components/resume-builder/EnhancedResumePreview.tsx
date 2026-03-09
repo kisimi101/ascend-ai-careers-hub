@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { ShareResumeDialog } from "./ShareResumeDialog";
 import { AutoFillPanel } from "./AutoFillPanel";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
 import { createCheckout, POLAR_PRODUCTS } from "@/lib/polar";
 import { toast } from "sonner";
 
@@ -45,6 +46,7 @@ export const EnhancedResumePreview = ({
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { isPro } = useSubscription();
 
   const renderTemplate = () => {
     const props = { resumeData, accentColor };
@@ -59,7 +61,11 @@ export const EnhancedResumePreview = ({
   };
 
   const handleDownload = (downloadFn: () => void) => {
-    setShowPaywall(true);
+    if (isPro) {
+      downloadFn();
+    } else {
+      setShowPaywall(true);
+    }
   };
 
   return (
@@ -74,15 +80,15 @@ export const EnhancedResumePreview = ({
                 Share
               </Button>
               <Button onClick={() => handleDownload(onDownloadPDF)} size="sm" variant="default">
-                <Lock className="h-3 w-3 mr-1" />
+                {isPro ? <Download className="h-3 w-3 mr-1" /> : <Lock className="h-3 w-3 mr-1" />}
                 PDF
               </Button>
               <Button onClick={() => handleDownload(onDownloadDOCX)} size="sm" variant="outline">
-                <Lock className="h-3 w-3 mr-1" />
+                {isPro ? <Download className="h-3 w-3 mr-1" /> : <Lock className="h-3 w-3 mr-1" />}
                 DOCX
               </Button>
               <Button onClick={() => handleDownload(onDownloadPNG)} size="sm" variant="outline">
-                <Lock className="h-3 w-3 mr-1" />
+                {isPro ? <Download className="h-3 w-3 mr-1" /> : <Lock className="h-3 w-3 mr-1" />}
                 PNG
               </Button>
             </div>

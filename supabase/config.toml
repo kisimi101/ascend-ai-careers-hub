@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.polar-customer-state]
 verify_jwt = false
+
+[functions.polar-customer-portal]
+verify_jwt = false

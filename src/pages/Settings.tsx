@@ -8,11 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Settings as SettingsIcon, Bell, Mail, Calendar, ArrowLeft, Loader2, Smartphone } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Mail, Calendar, ArrowLeft, Loader2, Smartphone, Crown, ExternalLink } from "lucide-react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface UserSettings {
   email_reminders_enabled: boolean;
@@ -38,7 +40,23 @@ const Settings = () => {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const { isSupported, isEnabled, permission, requestPermission, disable } = usePushNotifications();
+  const { isPro, isLoading: subLoading } = useSubscription();
+
+  const openCustomerPortal = async () => {
+    try {
+      setPortalLoading(true);
+      const { data, error } = await supabase.functions.invoke("polar-customer-portal");
+      if (error) throw error;
+      if (!data?.url) throw new Error("No portal URL returned");
+      window.open(data.url, "_blank");
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message || "Failed to open subscription portal", variant: "destructive" });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -346,7 +364,56 @@ const Settings = () => {
             </Card>
           )}
 
-          {/* Save Button */}
+          {/* Subscription Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="h-5 w-5 text-primary" />
+                Subscription
+              </CardTitle>
+              <CardDescription>Manage your plan and billing</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Current Plan</p>
+                  <p className="text-sm text-muted-foreground">
+                    {subLoading ? "Loading..." : isPro ? "Pro" : "Free"}
+                  </p>
+                </div>
+                {isPro ? (
+                  <Badge className="bg-primary/10 text-primary border-primary/20">Active</Badge>
+                ) : (
+                  <Badge variant="secondary">Free</Badge>
+                )}
+              </div>
+              {isPro ? (
+                <Button
+                  variant="outline"
+                  onClick={openCustomerPortal}
+                  disabled={portalLoading}
+                  className="w-full"
+                >
+                  {portalLoading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                  )}
+                  Manage Subscription
+                </Button>
+              ) : (
+                <Button
+                  className="w-full btn-gradient"
+                  onClick={() => navigate("/#pricing-section")}
+                >
+                  <Crown className="h-4 w-4 mr-2" />
+                  Upgrade to Pro
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+
           <div className="flex justify-end">
             <Button
               onClick={saveSettings}
