@@ -59,7 +59,7 @@ export const Features = () => {
               Accelerate Your Career
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Our comprehensive AI-powered platform provides all the tools you need to land your dream job.
           </p>
         </motion.div>
