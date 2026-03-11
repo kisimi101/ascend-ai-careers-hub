@@ -5,48 +5,48 @@
 
 @layer base {
   :root {
-    /* Core Colors - CareerHub Theme */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Core Colors - CareerHub Theme (warm neutral) */
+    --background: 30 15% 97%;
+    --foreground: 222 47% 11%;
+    --card: 30 10% 99%;
+    --card-foreground: 222 47% 11%;
+    --popover: 30 10% 99%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary - Orange to Red Gradient Theme */
-    --primary: 24 85% 48%;
-    --primary-foreground: 0 0% 98%;
-    --primary-variant: 4 78% 52%;
+    /* Primary - Warm Ember (muted, professional) */
+    --primary: 22 65% 42%;
+    --primary-foreground: 30 20% 98%;
+    --primary-variant: 8 55% 45%;
 
     /* Secondary & Accent */
-    --secondary: 210 40% 98%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 222 47% 11%;
+    --accent: 220 16% 93%;
+    --accent-foreground: 222 47% 11%;
 
     /* Semantic Colors */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 152 55% 33%;
     --success-foreground: 0 0% 98%;
-    --warning: 43 96% 56%;
-    --warning-foreground: 222.2 84% 4.9%;
-    --info: 199 89% 48%;
+    --warning: 40 70% 48%;
+    --warning-foreground: 222 47% 11%;
+    --info: 205 65% 42%;
     --info-foreground: 0 0% 98%;
 
     /* UI Elements */
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 24 95% 53%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --border: 220 18% 88%;
+    --input: 220 18% 88%;
+    --ring: 22 55% 42%;
+    --muted: 220 16% 93%;
+    --muted-foreground: 220 10% 46%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--primary)));
     --gradient-info: linear-gradient(135deg, hsl(var(--info)), hsl(var(--primary)));
     --gradient-warning: linear-gradient(135deg, hsl(var(--warning)), hsl(var(--primary-variant)));
-    --gradient-bg: linear-gradient(135deg, hsl(24 100% 97%), hsl(0 0% 100%), hsl(4 100% 97%));
+    --gradient-bg: linear-gradient(135deg, hsl(30 15% 97%), hsl(30 10% 98%), hsl(220 16% 96%));
 
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -73,32 +73,32 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 24 85% 48%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --primary-variant: 4 78% 52%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 24 95% 53%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --background: 225 30% 7%;
+    --foreground: 220 20% 92%;
+    --card: 225 25% 9%;
+    --card-foreground: 220 20% 92%;
+    --popover: 225 25% 9%;
+    --popover-foreground: 220 20% 92%;
+    --primary: 22 55% 45%;
+    --primary-foreground: 220 20% 92%;
+    --primary-variant: 8 48% 48%;
+    --secondary: 220 20% 16%;
+    --secondary-foreground: 220 20% 92%;
+    --accent: 220 18% 18%;
+    --accent-foreground: 220 20% 92%;
+    --destructive: 0 50% 35%;
+    --destructive-foreground: 220 20% 92%;
+    --border: 220 18% 18%;
+    --input: 220 18% 18%;
+    --ring: 22 50% 45%;
+    --muted: 220 18% 16%;
+    --muted-foreground: 220 12% 60%;
 
-    --success: 142 76% 42%;
-    --warning: 43 96% 60%;
-    --info: 199 89% 54%;
+    --success: 152 50% 38%;
+    --warning: 40 60% 50%;
+    --info: 205 55% 48%;
 
-    --gradient-bg: linear-gradient(135deg, hsl(222 84% 5%), hsl(217 33% 18%));
+    --gradient-bg: linear-gradient(135deg, hsl(225 30% 7%), hsl(220 20% 12%));
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
