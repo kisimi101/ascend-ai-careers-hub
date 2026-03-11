@@ -48,7 +48,7 @@ const pricingPlans = [
       "Priority Support",
     ],
     limitations: [],
-    cta: "Start 7-Day Free Trial"
+    cta: "Get Started"
   },
   {
     name: "Enterprise",
