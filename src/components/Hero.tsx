@@ -49,7 +49,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.16, ease: "easeOut" }}
-            className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl"
+            className="mt-5 text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl"
           >
             Build ATS-friendly resumes, generate tailored cover letters, track applications, and practice interviews — all in one modern platform.
           </motion.p>
