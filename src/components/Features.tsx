@@ -53,7 +53,7 @@ export const Features = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Everything You Need to
             <span className="text-gradient-primary block">
               Accelerate Your Career
