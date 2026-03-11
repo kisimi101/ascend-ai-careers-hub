@@ -8,56 +8,108 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { FileText, Star, Download } from "lucide-react";
+import { Star, Download, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { ModernTemplate } from "@/components/resume-builder/templates/ModernTemplate";
+import { ClassicTemplate } from "@/components/resume-builder/templates/ClassicTemplate";
+import { TechTemplate } from "@/components/resume-builder/templates/TechTemplate";
+import { CreativeTemplate } from "@/components/resume-builder/templates/CreativeTemplate";
+import { ExecutiveTemplate } from "@/components/resume-builder/templates/ExecutiveTemplate";
+import { MinimalistTemplate } from "@/components/resume-builder/templates/MinimalistTemplate";
+import { ResumeData } from "@/components/resume-builder/types";
+
+const sampleData: ResumeData = {
+  personalInfo: {
+    fullName: "Alex Johnson",
+    email: "alex@email.com",
+    phone: "+1 555-0123",
+    location: "San Francisco, CA",
+    summary: "Results-driven professional with 5+ years of experience delivering innovative solutions."
+  },
+  experience: [
+    { company: "Tech Corp", position: "Senior Developer", duration: "2021 - Present", description: "Led a team of 8 engineers building scalable microservices." },
+    { company: "StartupCo", position: "Software Engineer", duration: "2019 - 2021", description: "Built core product features serving 100K+ users." }
+  ],
+  education: [{ institution: "MIT", degree: "B.S. Computer Science", year: "2019" }],
+  skills: ["React", "TypeScript", "Node.js", "Python", "AWS", "Docker"],
+  sectionOrder: ["summary", "experience", "education", "skills"]
+};
 
 const resumeTemplates = [
   {
-    id: 1,
+    id: "modern-professional",
     name: "Modern Professional",
     description: "Clean, ATS-friendly design perfect for corporate roles",
     rating: 4.9,
     downloads: "12K+",
-    color: "from-blue-500 to-indigo-500",
-    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=600&fit=crop"
+    atsScore: 95,
+    accent: "#2563eb",
+    color: "from-blue-600 to-indigo-600",
   },
   {
-    id: 2,
-    name: "Creative Designer",
-    description: "Bold layout ideal for creative and design positions",
+    id: "classic-minimal",
+    name: "Classic Minimal",
+    description: "Traditional layout with modern typography",
     rating: 4.8,
-    downloads: "8K+",
-    color: "from-purple-500 to-pink-500",
-    image: "https://images.unsplash.com/photo-1634128221889-82ed6efebfc3?w=400&h=600&fit=crop"
+    downloads: "18K+",
+    atsScore: 98,
+    accent: "#374151",
+    color: "from-gray-600 to-gray-700",
   },
   {
-    id: 3,
+    id: "tech-specialist",
     name: "Tech Specialist",
     description: "Minimalist template tailored for tech professionals",
     rating: 4.9,
     downloads: "15K+",
-    color: "from-emerald-500 to-teal-500",
-    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=600&fit=crop"
+    atsScore: 97,
+    accent: "#059669",
+    color: "from-emerald-600 to-teal-600",
   },
   {
-    id: 4,
-    name: "Executive Leader",
-    description: "Sophisticated design for senior management roles",
+    id: "creative-designer",
+    name: "Creative Designer",
+    description: "Bold layout ideal for creative and design positions",
     rating: 4.7,
-    downloads: "6K+",
-    color: "from-primary to-primary/80",
-    image: "https://images.unsplash.com/photo-1634128221889-82ed6efebfc3?w=400&h=600&fit=crop"
+    downloads: "8K+",
+    atsScore: 85,
+    accent: "#6d28d9",
+    color: "from-purple-600 to-pink-600",
   },
   {
-    id: 5,
-    name: "Fresh Graduate",
-    description: "Perfect for entry-level positions and internships",
+    id: "executive",
+    name: "Executive",
+    description: "Commanding dark header for senior & leadership roles",
     rating: 4.8,
-    downloads: "10K+",
-    color: "from-cyan-500 to-blue-500",
-    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&h=600&fit=crop"
-  }
+    downloads: "6K+",
+    atsScore: 96,
+    accent: "#1e293b",
+    color: "from-gray-800 to-gray-600",
+  },
+  {
+    id: "minimalist",
+    name: "Minimalist",
+    description: "Maximum whitespace for a calm, elegant impression",
+    rating: 4.6,
+    downloads: "5K+",
+    atsScore: 99,
+    accent: "#737373",
+    color: "from-gray-400 to-gray-300",
+  },
 ];
+
+const renderTemplate = (id: string, accent: string) => {
+  const props = { resumeData: sampleData, accentColor: accent };
+  switch (id) {
+    case "classic-minimal": return <ClassicTemplate {...props} />;
+    case "tech-specialist": return <TechTemplate {...props} />;
+    case "creative-designer": return <CreativeTemplate {...props} />;
+    case "executive": return <ExecutiveTemplate {...props} />;
+    case "minimalist": return <MinimalistTemplate {...props} />;
+    default: return <ModernTemplate {...props} />;
+  }
+};
 
 export const ResumeTemplates = () => {
   const [api, setApi] = useState<any>();
