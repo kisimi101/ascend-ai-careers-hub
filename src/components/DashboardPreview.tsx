@@ -97,7 +97,7 @@ export const DashboardPreview = () => {
             {stats.map((stat) => (
               <motion.div key={stat.label} variants={item}>
                 <Card className="border-border/60 bg-card/70 backdrop-blur-sm hover:shadow-lg transition-all duration-300 group">
-                  <CardContent className="p-5">
+                  <CardContent className="p-3 sm:p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div
                         className={`w-10 h-10 rounded-xl ${stat.gradientClass} flex items-center justify-center group-hover:scale-110 transition-transform`}
