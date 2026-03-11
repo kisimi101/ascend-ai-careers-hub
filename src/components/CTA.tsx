@@ -33,7 +33,7 @@ export const CTA = () => {
         {/* Primary CTA */}
         <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/60 backdrop-blur">
           <div className="absolute inset-0 bg-gradient-primary opacity-30" />
-          <div className="relative p-10 md:p-14">
+          <div className="relative p-6 sm:p-10 md:p-14">
             <div className="max-w-3xl">
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
                 Ready to ship better applications?
