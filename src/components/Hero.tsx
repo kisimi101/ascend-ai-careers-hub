@@ -39,7 +39,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.08, ease: "easeOut" }}
-            className="mt-6 text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight text-foreground"
+            className="mt-6 text-3xl sm:text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-foreground"
           >
             Move faster from
             <span className="text-gradient-primary block">application → offer</span>
