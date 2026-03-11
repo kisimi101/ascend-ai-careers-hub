@@ -120,7 +120,7 @@ export const PricingSection = () => {
               {" "}Success Plan
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Unlock your career potential with our flexible pricing options designed for every stage of your journey
           </p>
           
