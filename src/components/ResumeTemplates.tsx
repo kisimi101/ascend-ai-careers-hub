@@ -156,36 +156,35 @@ export const ResumeTemplates = () => {
                 <CarouselItem key={template.id} className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3">
                   <Card className="group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden">
                     <CardContent className="p-0">
-                      <div className="h-64 relative overflow-hidden bg-muted">
-                        <img 
-                          src={template.image} 
-                          alt={`${template.name} resume template`}
-                          className="w-full h-full object-cover opacity-90"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent"></div>
-                        <div className={`absolute -top-2 -right-2 w-16 h-16 bg-gradient-to-r ${template.color} rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500`}></div>
+                      {/* Live mini template preview */}
+                      <div className="h-64 relative overflow-hidden bg-white rounded-t-lg">
+                        <div
+                          className="origin-top-left pointer-events-none"
+                          style={{ transform: 'scale(0.32)', width: '700px', height: '900px' }}
+                        >
+                          {renderTemplate(template.id, template.accent)}
+                        </div>
+                        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent" />
+                        <Badge variant="secondary" className="absolute top-2 right-2 text-[10px] px-2 py-0.5 bg-background/80 backdrop-blur-sm">
+                          <Shield size={10} className="mr-1" />
+                          ATS {template.atsScore}%
+                        </Badge>
                       </div>
 
-                      <div className="p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h3 className="text-xl font-semibold text-foreground mb-1">
-                              {template.name}
-                            </h3>
-                            <p className="text-muted-foreground text-sm">
-                              {template.description}
-                            </p>
-                          </div>
-                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${template.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                            <FileText className="text-white" size={20} />
-                          </div>
+                      <div className="p-5">
+                        <div className="mb-3">
+                          <h3 className="text-lg font-semibold text-foreground mb-1">
+                            {template.name}
+                          </h3>
+                          <p className="text-muted-foreground text-sm line-clamp-2">
+                            {template.description}
+                          </p>
                         </div>
 
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                             <div className="flex items-center">
-                              <Star className="text-yellow-400 mr-1" size={14} fill="currentColor" />
+                              <Star className="text-yellow-500 mr-1" size={14} fill="currentColor" />
                               <span>{template.rating}</span>
                             </div>
                             <div className="flex items-center">
@@ -196,7 +195,7 @@ export const ResumeTemplates = () => {
                         </div>
 
                         <Button 
-                          className={`w-full bg-gradient-to-r ${template.color} hover:opacity-90 transition-opacity`}
+                          className="w-full bg-primary hover:bg-primary/90 transition-opacity"
                           onClick={() => window.location.href = '/resume-builder'}
                         >
                           Use This Template
