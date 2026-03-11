@@ -47,7 +47,7 @@ export const FloatingSideTools = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40">
+    <div className="fixed right-4 top-1/2 transform -translate-y-1/2 z-40 hidden md:block">
       <div className="flex items-center">
         {/* Expanded tools */}
         <div

@@ -77,11 +77,11 @@ export const DashboardPreview = () => {
           <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-sm font-medium text-primary mb-6">
             📊 Live Dashboard Preview
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-foreground">
             Your Career Command
             <span className="text-gradient-primary block">Center</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Track every aspect of your job search in one powerful, AI-driven dashboard
           </p>
         </div>
@@ -93,11 +93,11 @@ export const DashboardPreview = () => {
           viewport={{ once: true, margin: "-100px" }}
           className="max-w-6xl mx-auto"
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
             {stats.map((stat) => (
               <motion.div key={stat.label} variants={item}>
                 <Card className="border-border/60 bg-card/70 backdrop-blur-sm hover:shadow-lg transition-all duration-300 group">
-                  <CardContent className="p-5">
+                  <CardContent className="p-3 sm:p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div
                         className={`w-10 h-10 rounded-xl ${stat.gradientClass} flex items-center justify-center group-hover:scale-110 transition-transform`}
@@ -109,15 +109,15 @@ export const DashboardPreview = () => {
                         {stat.change}
                       </span>
                     </div>
-                    <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                    <div className="text-lg sm:text-2xl font-bold text-foreground">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-5 gap-6">
+          <div className="grid lg:grid-cols-5 gap-4 sm:gap-6">
             <motion.div variants={item} className="lg:col-span-3">
               <Card className="border-border/60 bg-card/70 backdrop-blur-sm h-full">
                 <CardContent className="p-6">
@@ -186,10 +186,10 @@ export const DashboardPreview = () => {
             <AnnotatedResumePreview />
           </motion.div>
 
-          <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+          <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-10">
             <Button
               size="lg"
-              className="btn-gradient px-8 py-4 text-lg gap-2"
+              className="btn-gradient px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg gap-2 w-full sm:w-auto"
               onClick={() => navigate("/resume-builder")}
             >
               Build Your Resume
@@ -198,7 +198,7 @@ export const DashboardPreview = () => {
             <Button
               size="lg"
               variant="outline"
-              className="px-8 py-4 text-lg gap-2"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg gap-2 w-full sm:w-auto"
               onClick={() => navigate("/dashboard")}
             >
               Open Your Dashboard

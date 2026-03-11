@@ -33,9 +33,9 @@ export const CTA = () => {
         {/* Primary CTA */}
         <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/60 backdrop-blur">
           <div className="absolute inset-0 bg-gradient-primary opacity-30" />
-          <div className="relative p-10 md:p-14">
+          <div className="relative p-6 sm:p-10 md:p-14">
             <div className="max-w-3xl">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
                 Ready to ship better applications?
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
@@ -73,7 +73,7 @@ export const CTA = () => {
         {/* Free tools */}
         <div className="mt-16">
           <div className="text-center mb-10">
-            <h3 className="text-3xl md:text-4xl font-bold text-foreground">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               Free AI career tools
             </h3>
             <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
@@ -81,7 +81,7 @@ export const CTA = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {freeTools.map((tool) => (
               <Card
                 key={tool.name}

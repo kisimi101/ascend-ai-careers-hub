@@ -100,7 +100,7 @@ export const PricingSection = () => {
   };
 
   return (
-    <section id="pricing-section" className="py-20 px-6 bg-muted/30">
+    <section id="pricing-section" className="py-12 sm:py-20 px-4 sm:px-6 bg-muted/30">
       <div className="container mx-auto">
         <motion.div
           className="text-center mb-16"
@@ -114,13 +114,13 @@ export const PricingSection = () => {
               💰 Pricing Plans
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Choose Your
             <span className="text-gradient-primary">
               {" "}Success Plan
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Unlock your career potential with our flexible pricing options designed for every stage of your journey
           </p>
           
@@ -154,7 +154,7 @@ export const PricingSection = () => {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
           {pricingPlans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -165,7 +165,7 @@ export const PricingSection = () => {
             >
             <Card
               className={`relative group hover:shadow-2xl transition-all duration-300 border-border/50 bg-card/80 backdrop-blur-sm overflow-hidden h-full ${
-                plan.popular ? "scale-105 ring-2 ring-primary/30" : ""
+                plan.popular ? "sm:scale-105 ring-2 ring-primary/30" : ""
               }`}
             >
               {plan.popular && (
@@ -220,7 +220,7 @@ export const PricingSection = () => {
           <p className="text-muted-foreground mb-4">
             All plans include our 30-day money-back guarantee
           </p>
-          <div className="flex justify-center space-x-8 text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-8 text-sm text-muted-foreground">
             <span>✓ No setup fees</span>
             <span>✓ Cancel anytime</span>
             <span>✓ 24/7 support</span>

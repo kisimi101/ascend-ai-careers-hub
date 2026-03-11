@@ -44,7 +44,7 @@ const features = [
 
 export const Features = () => {
   return (
-    <section id="features" className="py-20 px-6">
+    <section id="features" className="py-12 sm:py-20 px-4 sm:px-6">
       <div className="container mx-auto">
         <motion.div
           className="text-center mb-16"
@@ -53,13 +53,13 @@ export const Features = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Everything You Need to
             <span className="text-gradient-primary block">
               Accelerate Your Career
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Our comprehensive AI-powered platform provides all the tools you need to land your dream job.
           </p>
         </motion.div>

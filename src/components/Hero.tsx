@@ -39,7 +39,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.08, ease: "easeOut" }}
-            className="mt-6 text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight text-foreground"
+            className="mt-6 text-3xl sm:text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight text-foreground"
           >
             Move faster from
             <span className="text-gradient-primary block">application → offer</span>
@@ -49,7 +49,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.16, ease: "easeOut" }}
-            className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl"
+            className="mt-5 text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl"
           >
             Build ATS-friendly resumes, generate tailored cover letters, track applications, and practice interviews — all in one modern platform.
           </motion.p>
@@ -84,7 +84,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.32, ease: "easeOut" }}
-            className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground"
+            className="mt-6 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-2 text-xs sm:text-sm text-muted-foreground"
           >
             <span className="inline-flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary" />

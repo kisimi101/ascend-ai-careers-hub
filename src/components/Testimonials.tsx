@@ -25,7 +25,7 @@ const testimonials = [
 
 export const Testimonials = () => {
   return (
-    <section className="py-20 px-6 bg-primary/5">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 bg-primary/5">
       <div className="container mx-auto">
         <motion.div
           className="text-center mb-16"
@@ -34,13 +34,13 @@ export const Testimonials = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Trusted by
             <span className="text-gradient-primary">
               {" "}Successful Professionals
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Join thousands of job seekers who have accelerated their careers with our AI-powered platform.
           </p>
         </motion.div>
@@ -55,7 +55,7 @@ export const Testimonials = () => {
               transition={{ duration: 0.5, delay: index * 0.15 }}
             >
             <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow h-full">
-              <CardContent className="p-8">
+              <CardContent className="p-5 sm:p-8">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center text-primary-foreground font-bold mr-4">
                     {testimonial.avatar}
