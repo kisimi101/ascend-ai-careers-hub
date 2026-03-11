@@ -109,8 +109,8 @@ export const DashboardPreview = () => {
                         {stat.change}
                       </span>
                     </div>
-                    <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                    <div className="text-lg sm:text-2xl font-bold text-foreground">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
                   </CardContent>
                 </Card>
               </motion.div>
