@@ -40,7 +40,7 @@ export const Testimonials = () => {
               {" "}Successful Professionals
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Join thousands of job seekers who have accelerated their careers with our AI-powered platform.
           </p>
         </motion.div>
