@@ -5,48 +5,48 @@
 
 @layer base {
   :root {
-    /* Core Colors - CareerHub Theme */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Core Colors - CareerHub Theme (warm neutral) */
+    --background: 30 15% 97%;
+    --foreground: 222 47% 11%;
+    --card: 30 10% 99%;
+    --card-foreground: 222 47% 11%;
+    --popover: 30 10% 99%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary - Orange to Red Gradient Theme */
-    --primary: 24 85% 48%;
-    --primary-foreground: 0 0% 98%;
-    --primary-variant: 4 78% 52%;
+    /* Primary - Warm Ember (muted, professional) */
+    --primary: 22 65% 42%;
+    --primary-foreground: 30 20% 98%;
+    --primary-variant: 8 55% 45%;
 
     /* Secondary & Accent */
-    --secondary: 210 40% 98%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 222 47% 11%;
+    --accent: 220 16% 93%;
+    --accent-foreground: 222 47% 11%;
 
     /* Semantic Colors */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 152 55% 33%;
     --success-foreground: 0 0% 98%;
-    --warning: 43 96% 56%;
-    --warning-foreground: 222.2 84% 4.9%;
-    --info: 199 89% 48%;
+    --warning: 40 70% 48%;
+    --warning-foreground: 222 47% 11%;
+    --info: 205 65% 42%;
     --info-foreground: 0 0% 98%;
 
     /* UI Elements */
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 24 95% 53%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --border: 220 18% 88%;
+    --input: 220 18% 88%;
+    --ring: 22 55% 42%;
+    --muted: 220 16% 93%;
+    --muted-foreground: 220 10% 46%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
     --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(var(--primary)));
     --gradient-info: linear-gradient(135deg, hsl(var(--info)), hsl(var(--primary)));
     --gradient-warning: linear-gradient(135deg, hsl(var(--warning)), hsl(var(--primary-variant)));
-    --gradient-bg: linear-gradient(135deg, hsl(24 100% 97%), hsl(0 0% 100%), hsl(4 100% 97%));
+    --gradient-bg: linear-gradient(135deg, hsl(30 15% 97%), hsl(30 10% 98%), hsl(220 16% 96%));
 
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
