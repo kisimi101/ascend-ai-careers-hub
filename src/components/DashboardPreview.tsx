@@ -77,11 +77,11 @@ export const DashboardPreview = () => {
           <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-sm font-medium text-primary mb-6">
             📊 Live Dashboard Preview
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-foreground">
             Your Career Command
             <span className="text-gradient-primary block">Center</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Track every aspect of your job search in one powerful, AI-driven dashboard
           </p>
         </div>
