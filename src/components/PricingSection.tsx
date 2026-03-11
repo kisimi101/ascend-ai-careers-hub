@@ -114,7 +114,7 @@ export const PricingSection = () => {
               💰 Pricing Plans
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Choose Your
             <span className="text-gradient-primary">
               {" "}Success Plan
