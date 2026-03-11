@@ -35,7 +35,7 @@ export const CTA = () => {
           <div className="absolute inset-0 bg-gradient-primary opacity-30" />
           <div className="relative p-6 sm:p-10 md:p-14">
             <div className="max-w-3xl">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground">
                 Ready to ship better applications?
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
