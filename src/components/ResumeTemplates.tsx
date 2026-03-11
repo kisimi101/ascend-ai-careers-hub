@@ -131,16 +131,16 @@ export const ResumeTemplates = () => {
   }, [api]);
 
   return (
-    <section className="py-20 px-6 bg-muted/30">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 bg-muted/30">
       <div className="container mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+        <div className="text-center mb-10 sm:mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-foreground">
             Choose Your Perfect
             <span className="text-gradient-primary block">
               Resume Template
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Professional, ATS-friendly templates designed by experts to help you stand out
           </p>
         </div>
