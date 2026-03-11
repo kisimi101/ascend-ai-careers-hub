@@ -55,7 +55,7 @@ export const Testimonials = () => {
               transition={{ duration: 0.5, delay: index * 0.15 }}
             >
             <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow h-full">
-              <CardContent className="p-8">
+              <CardContent className="p-5 sm:p-8">
                 <div className="flex items-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center text-primary-foreground font-bold mr-4">
                     {testimonial.avatar}

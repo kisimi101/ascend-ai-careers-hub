@@ -84,7 +84,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.32, ease: "easeOut" }}
-            className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground"
+            className="mt-6 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-2 text-xs sm:text-sm text-muted-foreground"
           >
             <span className="inline-flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary" />

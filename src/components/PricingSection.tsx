@@ -220,7 +220,7 @@ export const PricingSection = () => {
           <p className="text-muted-foreground mb-4">
             All plans include our 30-day money-back guarantee
           </p>
-          <div className="flex justify-center space-x-8 text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-8 text-sm text-muted-foreground">
             <span>✓ No setup fees</span>
             <span>✓ Cancel anytime</span>
             <span>✓ 24/7 support</span>

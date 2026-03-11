@@ -44,7 +44,7 @@ const features = [
 
 export const Features = () => {
   return (
-    <section id="features" className="py-20 px-6">
+    <section id="features" className="py-12 sm:py-20 px-4 sm:px-6">
       <div className="container mx-auto">
         <motion.div
           className="text-center mb-16"

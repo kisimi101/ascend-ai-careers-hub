@@ -117,7 +117,7 @@ export const DashboardPreview = () => {
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-5 gap-6">
+          <div className="grid lg:grid-cols-5 gap-4 sm:gap-6">
             <motion.div variants={item} className="lg:col-span-3">
               <Card className="border-border/60 bg-card/70 backdrop-blur-sm h-full">
                 <CardContent className="p-6">
