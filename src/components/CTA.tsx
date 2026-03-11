@@ -73,7 +73,7 @@ export const CTA = () => {
         {/* Free tools */}
         <div className="mt-16">
           <div className="text-center mb-10">
-            <h3 className="text-3xl md:text-4xl font-bold text-foreground">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               Free AI career tools
             </h3>
             <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
