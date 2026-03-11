@@ -100,7 +100,7 @@ export const PricingSection = () => {
   };
 
   return (
-    <section id="pricing-section" className="py-20 px-6 bg-muted/30">
+    <section id="pricing-section" className="py-12 sm:py-20 px-4 sm:px-6 bg-muted/30">
       <div className="container mx-auto">
         <motion.div
           className="text-center mb-16"
