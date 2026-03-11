@@ -93,7 +93,7 @@ export const DashboardPreview = () => {
           viewport={{ once: true, margin: "-100px" }}
           className="max-w-6xl mx-auto"
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
             {stats.map((stat) => (
               <motion.div key={stat.label} variants={item}>
                 <Card className="border-border/60 bg-card/70 backdrop-blur-sm hover:shadow-lg transition-all duration-300 group">
