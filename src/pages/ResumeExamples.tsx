@@ -188,41 +188,69 @@ const resumeExamples: ResumeExample[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Mini Resume Preview Card                                           */
+/*  Helper: convert example data → ResumeData for templates            */
 /* ------------------------------------------------------------------ */
 
-const MiniResume = ({ example, accent }: { example: ResumeExample; accent: string }) => (
-  <div className="h-full w-full bg-white text-gray-800 p-5 flex flex-col text-[9px] leading-[1.45] font-[system-ui] overflow-hidden select-none">
-    {/* Header */}
-    <div className="mb-3 pb-2" style={{ borderBottom: `2px solid hsl(${accent})` }}>
-      <div className="text-[13px] font-bold tracking-tight" style={{ color: `hsl(${accent})` }}>{example.content.name}</div>
-      <div className="text-[10px] text-gray-500 mt-0.5">{example.title} · {example.experience}</div>
-    </div>
-    {/* Summary */}
-    <p className="text-gray-600 mb-2 line-clamp-2">{example.content.summary}</p>
-    {/* Experience */}
-    <div className="mb-2">
-      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: `hsl(${accent})` }}>Experience</div>
-      {example.content.experience.slice(0, 1).map((exp, i) => (
-        <div key={i}>
-          <div className="font-semibold">{exp.title}</div>
-          <div className="text-gray-500">{exp.company} · {exp.duration}</div>
-          <ul className="mt-0.5 space-y-0.5 list-none">
-            {exp.bullets.slice(0, 2).map((b, j) => (
-              <li key={j} className="flex gap-1"><span className="shrink-0" style={{ color: `hsl(${accent})` }}>▸</span><span className="line-clamp-1">{b}</span></li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-    {/* Skills */}
-    <div className="mt-auto">
-      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: `hsl(${accent})` }}>Skills</div>
-      <div className="flex flex-wrap gap-1">
-        {example.content.skills.slice(0, 5).map((s, i) => (
-          <span key={i} className="px-1.5 py-0.5 rounded text-[8px] font-medium" style={{ backgroundColor: `hsl(${accent} / 0.1)`, color: `hsl(${accent})` }}>{s}</span>
-        ))}
-      </div>
+const toResumeData = (ex: ResumeExample): ResumeData => ({
+  personalInfo: {
+    fullName: ex.content.name,
+    email: '',
+    phone: '',
+    location: '',
+    summary: ex.content.summary,
+  },
+  experience: ex.content.experience.map(e => ({
+    company: e.company,
+    position: e.title,
+    duration: e.duration,
+    description: e.bullets.join('. '),
+  })),
+  education: ex.content.education.map(e => ({
+    institution: e.school,
+    degree: e.degree,
+    year: e.year,
+  })),
+  skills: ex.content.skills,
+  sectionOrder: ['summary', 'experience', 'education', 'skills'],
+});
+
+const hslToHex = (hslStr: string): string => {
+  const parts = hslStr.split(/\s+/).map(s => parseFloat(s));
+  if (parts.length < 3) return '#2563eb';
+  const [h, s, l] = parts;
+  const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l / 100 - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+};
+
+const renderExampleTemplate = (ex: ResumeExample) => {
+  const data = toResumeData(ex);
+  const hex = hslToHex(ex.accent);
+  switch (ex.templateStyle) {
+    case 'classic': return <ClassicTemplate resumeData={data} accentColor={hex} />;
+    case 'tech': return <TechTemplate resumeData={data} accentColor={hex} />;
+    case 'creative': return <CreativeTemplate resumeData={data} accentColor={hex} />;
+    case 'executive': return <ExecutiveTemplate resumeData={data} accentColor={hex} />;
+    case 'minimalist': return <MinimalistTemplate resumeData={data} accentColor={hex} />;
+    default: return <ModernTemplate resumeData={data} accentColor={hex} />;
+  }
+};
+
+/* ------------------------------------------------------------------ */
+/*  Mini Resume Preview — uses actual builder templates                 */
+/* ------------------------------------------------------------------ */
+
+const MiniResume = ({ example }: { example: ResumeExample }) => (
+  <div className="h-full w-full relative overflow-hidden bg-white">
+    <div
+      className="origin-top-left pointer-events-none"
+      style={{ transform: 'scale(0.28)', width: '700px', height: '960px' }}
+    >
+      {renderExampleTemplate(example)}
     </div>
   </div>
 );
