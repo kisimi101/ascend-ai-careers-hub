@@ -34,8 +34,9 @@ interface ResumeExample {
   downloads: number;
   description: string;
   tags: string[];
-  accent: string;          // HSL accent for the card header
+  accent: string;
   icon: React.ElementType;
+  templateStyle: 'modern' | 'classic' | 'tech' | 'creative' | 'executive' | 'minimalist';
   content: {
     name: string;
     summary: string;
