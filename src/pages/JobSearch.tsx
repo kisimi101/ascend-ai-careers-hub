@@ -36,6 +36,7 @@ const JobSearch = () => {
   const [jobs, setJobs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchUsage, setSearchUsage] = useState<{ used: number; limit: number; tier: string } | null>(null);
   const [filters, setFilters] = useState({
     jobType: [],
     experience: [],
