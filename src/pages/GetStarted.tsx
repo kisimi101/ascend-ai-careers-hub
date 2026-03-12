@@ -215,13 +215,24 @@ const GetStarted = () => {
 
   const methods = [
     {
+      id: "smart",
+      icon: Sparkles,
+      title: "Smart Apply (Recommended)",
+      description:
+        "Upload your resume → AI optimizes it → finds matching jobs → generates cover letters → one-click batch apply.",
+      badge: "New ✨",
+      badgeVariant: "default" as const,
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+    },
+    {
       id: "scratch",
       icon: FileText,
       title: "Start from Scratch",
       description:
         "Build your resume step-by-step with our guided builder and AI suggestions.",
       badge: "Most Popular",
-      badgeVariant: "default" as const,
+      badgeVariant: "secondary" as const,
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
@@ -246,17 +257,6 @@ const GetStarted = () => {
       badgeVariant: "outline" as const,
       color: "text-blue-600 dark:text-blue-400",
       bgColor: "bg-blue-500/10",
-    },
-    {
-      id: "ai",
-      icon: Sparkles,
-      title: "AI Resume Assistant",
-      description:
-        "Tell our AI about your career goals and it will generate a tailored resume draft for you.",
-      badge: "New",
-      badgeVariant: "default" as const,
-      color: "text-primary",
-      bgColor: "bg-primary/10",
     },
   ];
 
