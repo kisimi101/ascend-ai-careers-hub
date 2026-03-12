@@ -92,7 +92,7 @@ const resumeExamples: ResumeExample[] = [
     id: 3, title: 'Financial Analyst', category: 'finance', experience: 'Entry · 0-2 yrs',
     rating: 4.7, downloads: 6432, description: 'Recent Ivy League graduate with investment banking internship experience and advanced financial modeling skills.',
     tags: ['Excel', 'Financial Modeling', 'SQL', 'Bloomberg', 'Valuation'],
-    accent: '142 71% 45%', icon: DollarSign,
+    accent: '142 71% 45%', icon: DollarSign, templateStyle: 'classic',
     content: {
       name: 'James Park',
       summary: 'Detail-oriented Financial Analyst with strong foundation in financial modeling and data analysis. Goldman Sachs internship experience; proven ability to deliver actionable insights under pressure.',
