@@ -361,7 +361,7 @@ const ResumeExamples = () => {
                   <Card className="group overflow-hidden border-border/50 bg-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                     {/* Mini preview */}
                     <div className="aspect-[3/4] relative overflow-hidden border-b border-border/30">
-                      <MiniResume example={ex} accent={ex.accent} />
+                      <MiniResume example={ex} />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <Button
                           size="sm"
