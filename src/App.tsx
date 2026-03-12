@@ -46,6 +46,11 @@ import SharedResume from "./pages/SharedResume";
 import ResumeAnalytics from "./pages/ResumeAnalytics";
 import GetStarted from "./pages/GetStarted";
 import SmartApply from "./pages/SmartApply";
+import AutoFollowUp from "./pages/AutoFollowUp";
+import JobMarketHeatmap from "./pages/JobMarketHeatmap";
+import InterviewQuestionBank from "./pages/InterviewQuestionBank";
+import CareerTimeline from "./pages/CareerTimeline";
+import ReferralMapper from "./pages/ReferralMapper";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -108,6 +113,11 @@ const App = () => (
                   <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
                   <Route path="/smart-apply" element={<ProtectedRoute><SmartApply /></ProtectedRoute>} />
+                  <Route path="/auto-follow-up" element={<ProtectedRoute><AutoFollowUp /></ProtectedRoute>} />
+                  <Route path="/job-market-heatmap" element={<ProtectedRoute><JobMarketHeatmap /></ProtectedRoute>} />
+                  <Route path="/interview-question-bank" element={<ProtectedRoute><InterviewQuestionBank /></ProtectedRoute>} />
+                  <Route path="/career-timeline" element={<ProtectedRoute><CareerTimeline /></ProtectedRoute>} />
+                  <Route path="/referral-mapper" element={<ProtectedRoute><ReferralMapper /></ProtectedRoute>} />
                   
                   {/* Public shared resume view */}
                   <Route path="/shared-resume/:token" element={<SharedResume />} />
