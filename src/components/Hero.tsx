@@ -63,9 +63,9 @@ export const Hero = () => {
             <Button
               size="lg"
               className="btn-gradient h-12 px-7 text-base"
-              onClick={() => navigate("/tools")}
+              onClick={() => navigate("/get-started")}
             >
-              Start free
+              Build your resume
               <ArrowRight className="ml-1" />
             </Button>
             <Button

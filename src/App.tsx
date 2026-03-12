@@ -67,8 +67,9 @@ const App = () => (
               <BrowserRouter>
                 <ScrollToTop />
                 <Routes>
-                  {/* Public route - Landing page */}
+                  {/* Public routes */}
                   <Route path="/" element={<Index />} />
+                  <Route path="/get-started" element={<ProtectedRoute><GetStarted /></ProtectedRoute>} />
                   
                   {/* Protected routes - All tools require authentication */}
                   <Route path="/tools" element={<ProtectedRoute><ToolsDashboard /></ProtectedRoute>} />
