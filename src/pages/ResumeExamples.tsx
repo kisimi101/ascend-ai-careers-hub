@@ -140,7 +140,7 @@ const resumeExamples: ResumeExample[] = [
     id: 6, title: 'UX / UI Designer', category: 'design', experience: 'Mid · 4+ yrs',
     rating: 4.8, downloads: 7243, description: 'User-centered designer who increased conversion by 45% through research-driven redesigns and scalable design systems.',
     tags: ['Figma', 'User Research', 'Prototyping', 'Design Systems', 'Interaction Design'],
-    accent: '292 84% 51%', icon: Palette,
+    accent: '292 84% 51%', icon: Palette, templateStyle: 'creative',
     content: {
       name: 'Jordan Lee',
       summary: 'Innovative UX/UI Designer with 4+ years crafting user-centered digital products. Built design systems used across 12 products; increased e-commerce conversion by 45%.',
