@@ -45,6 +45,7 @@ import CompanyResearch from "./pages/CompanyResearch";
 import SharedResume from "./pages/SharedResume";
 import ResumeAnalytics from "./pages/ResumeAnalytics";
 import GetStarted from "./pages/GetStarted";
+import SmartApply from "./pages/SmartApply";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -106,6 +107,7 @@ const App = () => (
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
+                  <Route path="/smart-apply" element={<ProtectedRoute><SmartApply /></ProtectedRoute>} />
                   
                   {/* Public shared resume view */}
                   <Route path="/shared-resume/:token" element={<SharedResume />} />
