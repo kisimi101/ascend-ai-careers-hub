@@ -13,6 +13,13 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ModernTemplate } from '@/components/resume-builder/templates/ModernTemplate';
+import { ClassicTemplate } from '@/components/resume-builder/templates/ClassicTemplate';
+import { TechTemplate } from '@/components/resume-builder/templates/TechTemplate';
+import { CreativeTemplate } from '@/components/resume-builder/templates/CreativeTemplate';
+import { ExecutiveTemplate } from '@/components/resume-builder/templates/ExecutiveTemplate';
+import { MinimalistTemplate } from '@/components/resume-builder/templates/MinimalistTemplate';
+import { ResumeData } from '@/components/resume-builder/types';
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
