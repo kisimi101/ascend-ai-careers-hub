@@ -108,7 +108,7 @@ const resumeExamples: ResumeExample[] = [
     id: 4, title: 'Registered Nurse (ICU)', category: 'healthcare', experience: 'Mid · 5 yrs',
     rating: 4.9, downloads: 4987, description: 'Critical-care RN with 98% patient satisfaction scores, BLS/ACLS certified, and quality improvement leadership.',
     tags: ['Critical Care', 'Patient Assessment', 'EMR', 'BLS/ACLS', 'IV Therapy'],
-    accent: '0 84% 60%', icon: HeartPulse,
+    accent: '0 84% 60%', icon: HeartPulse, templateStyle: 'executive',
     content: {
       name: 'Maria Gonzalez',
       summary: 'Dedicated Registered Nurse with 5 years of critical-care experience. Known for exceptional patient outcomes (98% satisfaction), emergency leadership, and mentoring new hires.',
