@@ -113,6 +113,11 @@ const App = () => (
                   <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
                   <Route path="/smart-apply" element={<ProtectedRoute><SmartApply /></ProtectedRoute>} />
+                  <Route path="/auto-follow-up" element={<ProtectedRoute><AutoFollowUp /></ProtectedRoute>} />
+                  <Route path="/job-market-heatmap" element={<ProtectedRoute><JobMarketHeatmap /></ProtectedRoute>} />
+                  <Route path="/interview-question-bank" element={<ProtectedRoute><InterviewQuestionBank /></ProtectedRoute>} />
+                  <Route path="/career-timeline" element={<ProtectedRoute><CareerTimeline /></ProtectedRoute>} />
+                  <Route path="/referral-mapper" element={<ProtectedRoute><ReferralMapper /></ProtectedRoute>} />
                   
                   {/* Public shared resume view */}
                   <Route path="/shared-resume/:token" element={<SharedResume />} />
