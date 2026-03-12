@@ -34,6 +34,7 @@ export const Navigation = () => {
   };
 
   const mobileNavLinks = [
+    { label: "Get Started", path: "/get-started" },
     { label: "Dashboard", path: "/dashboard" },
     { label: "AI Resume Builder", path: "/resume-builder" },
     { label: "Resume Checker", path: "/resume-checker" },
