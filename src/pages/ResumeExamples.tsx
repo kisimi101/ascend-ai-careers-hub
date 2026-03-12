@@ -156,7 +156,7 @@ const resumeExamples: ResumeExample[] = [
     id: 7, title: 'Data Scientist', category: 'technology', experience: 'Mid · 4 yrs',
     rating: 4.8, downloads: 9120, description: 'ML-focused data scientist with experience deploying production models, driving $3M+ annual revenue impact.',
     tags: ['Python', 'Machine Learning', 'SQL', 'TensorFlow', 'Spark'],
-    accent: '199 89% 48%', icon: TrendingUp,
+    accent: '199 89% 48%', icon: TrendingUp, templateStyle: 'tech',
     content: {
       name: 'Priya Sharma',
       summary: 'Data Scientist with 4 years of experience building and deploying machine-learning models at scale. Delivered $3M+ annual revenue impact through predictive analytics and recommendation engines.',
