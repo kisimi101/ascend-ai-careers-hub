@@ -172,7 +172,7 @@ const resumeExamples: ResumeExample[] = [
     id: 8, title: 'Product Manager', category: 'technology', experience: 'Senior · 7 yrs',
     rating: 4.9, downloads: 10340, description: 'Strategic PM who launched 5 products from 0→1 and grew ARR from $2M to $15M across B2B SaaS.',
     tags: ['Roadmapping', 'Agile', 'Analytics', 'User Stories', 'Go-To-Market'],
-    accent: '340 82% 52%', icon: Users,
+    accent: '340 82% 52%', icon: Users, templateStyle: 'executive',
     content: {
       name: 'Michael Chen',
       summary: 'Strategic Product Manager with 7 years launching B2B SaaS products. Grew ARR from $2M to $15M, launched 5 products from 0→1, and led cross-functional teams of 20+.',
