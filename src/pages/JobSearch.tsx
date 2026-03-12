@@ -77,6 +77,9 @@ const JobSearch = () => {
       });
       if (error) throw error;
       setJobs(data?.jobs || []);
+      if (data?.used !== undefined) {
+        setSearchUsage({ used: data.used, limit: data.limit, tier: data.tier });
+      }
       if ((data?.jobs || []).length === 0) {
         toast({ title: "No jobs found", description: "Try different keywords or location." });
       }
