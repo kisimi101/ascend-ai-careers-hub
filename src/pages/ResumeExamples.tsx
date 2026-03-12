@@ -124,7 +124,7 @@ const resumeExamples: ResumeExample[] = [
     id: 5, title: 'Elementary School Teacher', category: 'education', experience: 'Mid · 6 yrs',
     rating: 4.6, downloads: 3756, description: 'Passionate educator specializing in differentiated instruction and STEM enrichment with measurable student growth.',
     tags: ['Curriculum Design', 'Classroom Management', 'STEM', 'Google Classroom'],
-    accent: '35 92% 50%', icon: GraduationCap,
+    accent: '35 92% 50%', icon: GraduationCap, templateStyle: 'minimalist',
     content: {
       name: 'Emily Turner',
       summary: 'Passionate Elementary Teacher with 6 years creating engaging learning environments. Expertise in differentiated instruction and STEM enrichment; achieved 35% reading proficiency improvement.',
