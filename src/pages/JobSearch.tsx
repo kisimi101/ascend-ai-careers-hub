@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Search, MapPin, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 
 const jobSearchTourSteps = [
   { title: "Search Jobs", description: "Enter a job title and location to find matching positions across multiple sources." },
@@ -35,6 +36,7 @@ const JobSearch = () => {
   const [jobs, setJobs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchUsage, setSearchUsage] = useState<{ used: number; limit: number; tier: string } | null>(null);
   const [filters, setFilters] = useState({
     jobType: [],
     experience: [],
@@ -75,6 +77,9 @@ const JobSearch = () => {
       });
       if (error) throw error;
       setJobs(data?.jobs || []);
+      if (data?.used !== undefined) {
+        setSearchUsage({ used: data.used, limit: data.limit, tier: data.tier });
+      }
       if ((data?.jobs || []).length === 0) {
         toast({ title: "No jobs found", description: "Try different keywords or location." });
       }
@@ -95,6 +100,11 @@ const JobSearch = () => {
       <div className="pt-20">
         <JobSearchHeader />
         
+        {/* Search Usage Badge */}
+        <div className="container mx-auto px-4 sm:px-6 pt-4">
+          <SearchUsageBadge used={searchUsage?.used} limit={searchUsage?.limit} tier={searchUsage?.tier} />
+        </div>
+
         {/* Main Search Bar */}
         <div className="bg-card shadow-sm border-b">
           <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">

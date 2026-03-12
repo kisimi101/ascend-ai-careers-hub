@@ -395,6 +395,33 @@ export type Database = {
         }
         Relationships: []
       }
+      search_usage: {
+        Row: {
+          created_at: string
+          id: string
+          search_count: number
+          search_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          search_count?: number
+          search_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          search_count?: number
+          search_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shared_resumes: {
         Row: {
           created_at: string
