@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Search, MapPin, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 
 const jobSearchTourSteps = [
   { title: "Search Jobs", description: "Enter a job title and location to find matching positions across multiple sources." },
