@@ -6,26 +6,83 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Simple in-memory rate limiting (per function instance)
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 5; // max 5 searches per window
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const TIER_LIMITS: Record<string, number> = {
+  free: 5,
+  pro: 50,
+  enterprise: 999999, // unlimited
+};
 
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(userId);
-  
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
+async function getUserTier(supabaseAdmin: any, userId: string): Promise<string> {
+  try {
+    const polarAccessToken = Deno.env.get('POLAR_ACCESS_TOKEN');
+    if (!polarAccessToken) return 'free';
+
+    // Check if user has active subscription via Polar
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get user email
+    const { data: profile } = await adminClient.from('profiles').select('email').eq('id', userId).single();
+    if (!profile?.email) return 'free';
+
+    // Check Polar for subscription
+    const response = await fetch(`https://api.polar.sh/v1/subscriptions/search?email=${encodeURIComponent(profile.email)}&active=true`, {
+      headers: { 'Authorization': `Bearer ${polarAccessToken}` },
+    });
+
+    if (!response.ok) return 'free';
+    const data = await response.json();
+    const subs = data.items || data.result?.items || [];
+
+    if (subs.length === 0) return 'free';
+
+    // Check tier based on price
+    for (const sub of subs) {
+      const amount = sub.price?.price_amount || sub.amount || 0;
+      if (amount >= 3900) return 'enterprise';
+      if (amount >= 1200) return 'pro';
+    }
+    return 'pro';
+  } catch (e) {
+    console.error('Error checking tier:', e);
+    return 'free';
   }
-  
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return false;
+}
+
+async function getDailySearchCount(userId: string): Promise<{ count: number; id: string | null }> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await adminClient
+    .from('search_usage')
+    .select('id, search_count')
+    .eq('user_id', userId)
+    .eq('search_date', today)
+    .single();
+
+  return { count: data?.search_count || 0, id: data?.id || null };
+}
+
+async function incrementSearchCount(userId: string, existingId: string | null, currentCount: number) {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+
+  const today = new Date().toISOString().split('T')[0];
+
+  if (existingId) {
+    await adminClient
+      .from('search_usage')
+      .update({ search_count: currentCount + 1, updated_at: new Date().toISOString() })
+      .eq('id', existingId);
+  } else {
+    await adminClient
+      .from('search_usage')
+      .insert({ user_id: userId, search_date: today, search_count: 1 });
   }
-  
-  entry.count++;
-  return true;
 }
 
 serve(async (req) => {
@@ -47,16 +104,42 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized', jobs: [] }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // Rate limit check
-    if (!checkRateLimit(user.id)) {
+    // Check if this is a usage query only
+    const body = await req.json();
+    if (body.checkUsageOnly) {
+      const { count } = await getDailySearchCount(user.id);
+      const tier = await getUserTier(null, user.id);
+      const limit = TIER_LIMITS[tier] || 5;
+      return new Response(JSON.stringify({ used: count, limit, tier }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { skills, jobTitle, location, experience } = body;
+
+    // Server-side rate limit check based on subscription tier
+    const tier = await getUserTier(null, user.id);
+    const limit = TIER_LIMITS[tier] || 5;
+    const { count: dailyCount, id: usageId } = await getDailySearchCount(user.id);
+
+    if (dailyCount >= limit) {
+      const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
       return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. You can perform up to 5 job searches per hour. Please try again later.', jobs: [] }),
+        JSON.stringify({ 
+          error: `Daily search limit reached (${limit}/${limit}). ${tier === 'free' ? 'Upgrade to Pro for 50 searches/day.' : tier === 'pro' ? 'Upgrade to Enterprise for unlimited searches.' : ''}`,
+          jobs: [],
+          used: dailyCount,
+          limit,
+          tier,
+        }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { skills, jobTitle, location, experience } = await req.json();
-    console.log("Searching jobs for user:", user.id, { skills, jobTitle, location });
+    // Increment search count
+    await incrementSearchCount(user.id, usageId, dailyCount);
+
+    console.log("Searching jobs for user:", user.id, { skills, jobTitle, location, tier, dailyCount: dailyCount + 1 });
 
     const apifyApiKey = Deno.env.get('APIFY_API_KEY');
     if (!apifyApiKey) {
@@ -138,7 +221,7 @@ serve(async (req) => {
         };
       });
 
-    return new Response(JSON.stringify({ jobs }), {
+    return new Response(JSON.stringify({ jobs, used: dailyCount + 1, limit, tier }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
