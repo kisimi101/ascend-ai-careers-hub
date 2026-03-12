@@ -300,7 +300,9 @@ const GetStarted = () => {
                       : ""
                   }`}
                   onClick={() => {
-                    if (method.id === "scratch") {
+                    if (method.id === "smart") {
+                      navigate("/smart-apply");
+                    } else if (method.id === "scratch") {
                       handleStartFromScratch();
                     } else {
                       setActiveMethod(
