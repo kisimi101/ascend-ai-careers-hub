@@ -61,6 +61,7 @@ const pricingPlans = [
     gradient: "from-purple-500 to-indigo-500",
     features: [
       "Everything in Pro",
+      "Unlimited Job Searches",
       "Up to 25 Team Members",
       "Team Analytics Dashboard",
       "Custom Resume Branding",
