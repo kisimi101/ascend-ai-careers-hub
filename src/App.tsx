@@ -44,6 +44,7 @@ import Settings from "./pages/Settings";
 import CompanyResearch from "./pages/CompanyResearch";
 import SharedResume from "./pages/SharedResume";
 import ResumeAnalytics from "./pages/ResumeAnalytics";
+import GetStarted from "./pages/GetStarted";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 
@@ -66,8 +67,9 @@ const App = () => (
               <BrowserRouter>
                 <ScrollToTop />
                 <Routes>
-                  {/* Public route - Landing page */}
+                  {/* Public routes */}
                   <Route path="/" element={<Index />} />
+                  <Route path="/get-started" element={<ProtectedRoute><GetStarted /></ProtectedRoute>} />
                   
                   {/* Protected routes - All tools require authentication */}
                   <Route path="/tools" element={<ProtectedRoute><ToolsDashboard /></ProtectedRoute>} />
