@@ -21,10 +21,10 @@ const pricingPlans = [
       "AI Resume Builder (preview only)",
       "Resume Checker & Grader",
       "Cover Letter Generator (1/day)",
-      "Job Search Engine",
+      "5 Job Searches / day",
       "Skills Assessment Quiz",
     ],
-    limitations: ["No resume downloads", "Limited AI generations", "No priority support"],
+    limitations: ["No resume downloads", "Limited AI generations", "5 daily job searches", "No priority support"],
     cta: "Get Started Free"
   },
   {
@@ -42,6 +42,8 @@ const pricingPlans = [
       "ATS Score Analysis",
       "AI Interview Practice",
       "Unlimited Cover Letters",
+      "50 Job Searches / day",
+      "Smart Apply Pipeline",
       "LinkedIn Profile Optimizer",
       "Company Research Tool",
       "Job Alerts & Tracking",
@@ -59,6 +61,7 @@ const pricingPlans = [
     gradient: "from-purple-500 to-indigo-500",
     features: [
       "Everything in Pro",
+      "Unlimited Job Searches",
       "Up to 25 Team Members",
       "Team Analytics Dashboard",
       "Custom Resume Branding",

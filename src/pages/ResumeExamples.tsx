@@ -13,6 +13,13 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ModernTemplate } from '@/components/resume-builder/templates/ModernTemplate';
+import { ClassicTemplate } from '@/components/resume-builder/templates/ClassicTemplate';
+import { TechTemplate } from '@/components/resume-builder/templates/TechTemplate';
+import { CreativeTemplate } from '@/components/resume-builder/templates/CreativeTemplate';
+import { ExecutiveTemplate } from '@/components/resume-builder/templates/ExecutiveTemplate';
+import { MinimalistTemplate } from '@/components/resume-builder/templates/MinimalistTemplate';
+import { ResumeData } from '@/components/resume-builder/types';
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -27,8 +34,9 @@ interface ResumeExample {
   downloads: number;
   description: string;
   tags: string[];
-  accent: string;          // HSL accent for the card header
+  accent: string;
   icon: React.ElementType;
+  templateStyle: 'modern' | 'classic' | 'tech' | 'creative' | 'executive' | 'minimalist';
   content: {
     name: string;
     summary: string;
@@ -51,9 +59,9 @@ const categories = [
 const resumeExamples: ResumeExample[] = [
   {
     id: 1, title: 'Senior Software Engineer', category: 'technology', experience: 'Senior · 8+ yrs',
-    rating: 4.9, downloads: 12543, description: 'Full-stack developer with deep React, Node.js, and cloud expertise. Scalable architectures & team leadership.',
+    rating: 4.9, downloads: 12543, description: 'Full-stack developer with deep React, Node.js, and cloud expertise.',
     tags: ['React', 'Node.js', 'AWS', 'Python', 'TypeScript', 'Docker'],
-    accent: '221 83% 53%', icon: Code,
+    accent: '221 83% 53%', icon: Code, templateStyle: 'modern',
     content: {
       name: 'Alex Johnson',
       summary: 'Results-driven Senior Software Engineer with 8+ years building scalable web apps. Expert in React, Node.js & cloud architecture. Led teams delivering high-impact products to 2M+ users.',
@@ -69,7 +77,7 @@ const resumeExamples: ResumeExample[] = [
     id: 2, title: 'Digital Marketing Manager', category: 'marketing', experience: 'Mid · 5+ yrs',
     rating: 4.8, downloads: 8876, description: 'Data-driven marketer with SEO, PPC, and content strategy wins across SaaS and e-commerce.',
     tags: ['SEO', 'Google Ads', 'Analytics', 'Content Strategy', 'Email Marketing'],
-    accent: '262 83% 58%', icon: Briefcase,
+    accent: '262 83% 58%', icon: Briefcase, templateStyle: 'creative',
     content: {
       name: 'Sarah Mitchell',
       summary: 'Creative Digital Marketing Manager with 5+ years driving brand growth through data-driven strategies. Grew organic traffic 150% and managed $500K annual ad budgets at 3.5× ROAS.',
@@ -85,7 +93,7 @@ const resumeExamples: ResumeExample[] = [
     id: 3, title: 'Financial Analyst', category: 'finance', experience: 'Entry · 0-2 yrs',
     rating: 4.7, downloads: 6432, description: 'Recent Ivy League graduate with investment banking internship experience and advanced financial modeling skills.',
     tags: ['Excel', 'Financial Modeling', 'SQL', 'Bloomberg', 'Valuation'],
-    accent: '142 71% 45%', icon: DollarSign,
+    accent: '142 71% 45%', icon: DollarSign, templateStyle: 'classic',
     content: {
       name: 'James Park',
       summary: 'Detail-oriented Financial Analyst with strong foundation in financial modeling and data analysis. Goldman Sachs internship experience; proven ability to deliver actionable insights under pressure.',
@@ -101,7 +109,7 @@ const resumeExamples: ResumeExample[] = [
     id: 4, title: 'Registered Nurse (ICU)', category: 'healthcare', experience: 'Mid · 5 yrs',
     rating: 4.9, downloads: 4987, description: 'Critical-care RN with 98% patient satisfaction scores, BLS/ACLS certified, and quality improvement leadership.',
     tags: ['Critical Care', 'Patient Assessment', 'EMR', 'BLS/ACLS', 'IV Therapy'],
-    accent: '0 84% 60%', icon: HeartPulse,
+    accent: '0 84% 60%', icon: HeartPulse, templateStyle: 'executive',
     content: {
       name: 'Maria Gonzalez',
       summary: 'Dedicated Registered Nurse with 5 years of critical-care experience. Known for exceptional patient outcomes (98% satisfaction), emergency leadership, and mentoring new hires.',
@@ -117,7 +125,7 @@ const resumeExamples: ResumeExample[] = [
     id: 5, title: 'Elementary School Teacher', category: 'education', experience: 'Mid · 6 yrs',
     rating: 4.6, downloads: 3756, description: 'Passionate educator specializing in differentiated instruction and STEM enrichment with measurable student growth.',
     tags: ['Curriculum Design', 'Classroom Management', 'STEM', 'Google Classroom'],
-    accent: '35 92% 50%', icon: GraduationCap,
+    accent: '35 92% 50%', icon: GraduationCap, templateStyle: 'minimalist',
     content: {
       name: 'Emily Turner',
       summary: 'Passionate Elementary Teacher with 6 years creating engaging learning environments. Expertise in differentiated instruction and STEM enrichment; achieved 35% reading proficiency improvement.',
@@ -133,7 +141,7 @@ const resumeExamples: ResumeExample[] = [
     id: 6, title: 'UX / UI Designer', category: 'design', experience: 'Mid · 4+ yrs',
     rating: 4.8, downloads: 7243, description: 'User-centered designer who increased conversion by 45% through research-driven redesigns and scalable design systems.',
     tags: ['Figma', 'User Research', 'Prototyping', 'Design Systems', 'Interaction Design'],
-    accent: '292 84% 51%', icon: Palette,
+    accent: '292 84% 51%', icon: Palette, templateStyle: 'creative',
     content: {
       name: 'Jordan Lee',
       summary: 'Innovative UX/UI Designer with 4+ years crafting user-centered digital products. Built design systems used across 12 products; increased e-commerce conversion by 45%.',
@@ -149,7 +157,7 @@ const resumeExamples: ResumeExample[] = [
     id: 7, title: 'Data Scientist', category: 'technology', experience: 'Mid · 4 yrs',
     rating: 4.8, downloads: 9120, description: 'ML-focused data scientist with experience deploying production models, driving $3M+ annual revenue impact.',
     tags: ['Python', 'Machine Learning', 'SQL', 'TensorFlow', 'Spark'],
-    accent: '199 89% 48%', icon: TrendingUp,
+    accent: '199 89% 48%', icon: TrendingUp, templateStyle: 'tech',
     content: {
       name: 'Priya Sharma',
       summary: 'Data Scientist with 4 years of experience building and deploying machine-learning models at scale. Delivered $3M+ annual revenue impact through predictive analytics and recommendation engines.',
@@ -165,7 +173,7 @@ const resumeExamples: ResumeExample[] = [
     id: 8, title: 'Product Manager', category: 'technology', experience: 'Senior · 7 yrs',
     rating: 4.9, downloads: 10340, description: 'Strategic PM who launched 5 products from 0→1 and grew ARR from $2M to $15M across B2B SaaS.',
     tags: ['Roadmapping', 'Agile', 'Analytics', 'User Stories', 'Go-To-Market'],
-    accent: '340 82% 52%', icon: Users,
+    accent: '340 82% 52%', icon: Users, templateStyle: 'executive',
     content: {
       name: 'Michael Chen',
       summary: 'Strategic Product Manager with 7 years launching B2B SaaS products. Grew ARR from $2M to $15M, launched 5 products from 0→1, and led cross-functional teams of 20+.',
@@ -180,41 +188,69 @@ const resumeExamples: ResumeExample[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Mini Resume Preview Card                                           */
+/*  Helper: convert example data → ResumeData for templates            */
 /* ------------------------------------------------------------------ */
 
-const MiniResume = ({ example, accent }: { example: ResumeExample; accent: string }) => (
-  <div className="h-full w-full bg-white text-gray-800 p-5 flex flex-col text-[9px] leading-[1.45] font-[system-ui] overflow-hidden select-none">
-    {/* Header */}
-    <div className="mb-3 pb-2" style={{ borderBottom: `2px solid hsl(${accent})` }}>
-      <div className="text-[13px] font-bold tracking-tight" style={{ color: `hsl(${accent})` }}>{example.content.name}</div>
-      <div className="text-[10px] text-gray-500 mt-0.5">{example.title} · {example.experience}</div>
-    </div>
-    {/* Summary */}
-    <p className="text-gray-600 mb-2 line-clamp-2">{example.content.summary}</p>
-    {/* Experience */}
-    <div className="mb-2">
-      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: `hsl(${accent})` }}>Experience</div>
-      {example.content.experience.slice(0, 1).map((exp, i) => (
-        <div key={i}>
-          <div className="font-semibold">{exp.title}</div>
-          <div className="text-gray-500">{exp.company} · {exp.duration}</div>
-          <ul className="mt-0.5 space-y-0.5 list-none">
-            {exp.bullets.slice(0, 2).map((b, j) => (
-              <li key={j} className="flex gap-1"><span className="shrink-0" style={{ color: `hsl(${accent})` }}>▸</span><span className="line-clamp-1">{b}</span></li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-    {/* Skills */}
-    <div className="mt-auto">
-      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: `hsl(${accent})` }}>Skills</div>
-      <div className="flex flex-wrap gap-1">
-        {example.content.skills.slice(0, 5).map((s, i) => (
-          <span key={i} className="px-1.5 py-0.5 rounded text-[8px] font-medium" style={{ backgroundColor: `hsl(${accent} / 0.1)`, color: `hsl(${accent})` }}>{s}</span>
-        ))}
-      </div>
+const toResumeData = (ex: ResumeExample): ResumeData => ({
+  personalInfo: {
+    fullName: ex.content.name,
+    email: '',
+    phone: '',
+    location: '',
+    summary: ex.content.summary,
+  },
+  experience: ex.content.experience.map(e => ({
+    company: e.company,
+    position: e.title,
+    duration: e.duration,
+    description: e.bullets.join('. '),
+  })),
+  education: ex.content.education.map(e => ({
+    institution: e.school,
+    degree: e.degree,
+    year: e.year,
+  })),
+  skills: ex.content.skills,
+  sectionOrder: ['summary', 'experience', 'education', 'skills'],
+});
+
+const hslToHex = (hslStr: string): string => {
+  const parts = hslStr.split(/\s+/).map(s => parseFloat(s));
+  if (parts.length < 3) return '#2563eb';
+  const [h, s, l] = parts;
+  const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l / 100 - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+};
+
+const renderExampleTemplate = (ex: ResumeExample) => {
+  const data = toResumeData(ex);
+  const hex = hslToHex(ex.accent);
+  switch (ex.templateStyle) {
+    case 'classic': return <ClassicTemplate resumeData={data} accentColor={hex} />;
+    case 'tech': return <TechTemplate resumeData={data} accentColor={hex} />;
+    case 'creative': return <CreativeTemplate resumeData={data} accentColor={hex} />;
+    case 'executive': return <ExecutiveTemplate resumeData={data} accentColor={hex} />;
+    case 'minimalist': return <MinimalistTemplate resumeData={data} accentColor={hex} />;
+    default: return <ModernTemplate resumeData={data} accentColor={hex} />;
+  }
+};
+
+/* ------------------------------------------------------------------ */
+/*  Mini Resume Preview — uses actual builder templates                 */
+/* ------------------------------------------------------------------ */
+
+const MiniResume = ({ example }: { example: ResumeExample }) => (
+  <div className="h-full w-full relative overflow-hidden bg-white">
+    <div
+      className="origin-top-left pointer-events-none"
+      style={{ transform: 'scale(0.28)', width: '700px', height: '960px' }}
+    >
+      {renderExampleTemplate(example)}
     </div>
   </div>
 );
@@ -325,7 +361,7 @@ const ResumeExamples = () => {
                   <Card className="group overflow-hidden border-border/50 bg-card hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                     {/* Mini preview */}
                     <div className="aspect-[3/4] relative overflow-hidden border-b border-border/30">
-                      <MiniResume example={ex} accent={ex.accent} />
+                      <MiniResume example={ex} />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                         <Button
                           size="sm"

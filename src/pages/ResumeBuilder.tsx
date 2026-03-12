@@ -424,13 +424,27 @@ const ResumeBuilder = () => {
                           Next
                         </Button>
                       ) : (
-                        <Button 
-                          onClick={generateResume} 
-                          className="bg-orange-600 hover:bg-orange-700"
-                          disabled={isOptimizing}
-                        >
-                          {isOptimizing ? "Optimizing..." : "Optimize Resume"}
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            onClick={generateResume} 
+                            className="bg-orange-600 hover:bg-orange-700"
+                            disabled={isOptimizing}
+                          >
+                            {isOptimizing ? "Optimizing..." : "Optimize Resume"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="border-primary text-primary hover:bg-primary/10"
+                            onClick={() => {
+                              // Save resume data to localStorage for SmartApply to pick up
+                              localStorage.setItem('resume-data', JSON.stringify(resumeData));
+                              navigate('/smart-apply?source=builder');
+                            }}
+                          >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Find Jobs & Apply
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </CardContent>
