@@ -100,6 +100,11 @@ const JobSearch = () => {
       <div className="pt-20">
         <JobSearchHeader />
         
+        {/* Search Usage Badge */}
+        <div className="container mx-auto px-4 sm:px-6 pt-4">
+          <SearchUsageBadge used={searchUsage?.used} limit={searchUsage?.limit} tier={searchUsage?.tier} />
+        </div>
+
         {/* Main Search Bar */}
         <div className="bg-card shadow-sm border-b">
           <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
