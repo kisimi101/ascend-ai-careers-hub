@@ -58,9 +58,9 @@ const categories = [
 const resumeExamples: ResumeExample[] = [
   {
     id: 1, title: 'Senior Software Engineer', category: 'technology', experience: 'Senior · 8+ yrs',
-    rating: 4.9, downloads: 12543, description: 'Full-stack developer with deep React, Node.js, and cloud expertise. Scalable architectures & team leadership.',
+    rating: 4.9, downloads: 12543, description: 'Full-stack developer with deep React, Node.js, and cloud expertise.',
     tags: ['React', 'Node.js', 'AWS', 'Python', 'TypeScript', 'Docker'],
-    accent: '221 83% 53%', icon: Code,
+    accent: '221 83% 53%', icon: Code, templateStyle: 'modern',
     content: {
       name: 'Alex Johnson',
       summary: 'Results-driven Senior Software Engineer with 8+ years building scalable web apps. Expert in React, Node.js & cloud architecture. Led teams delivering high-impact products to 2M+ users.',
