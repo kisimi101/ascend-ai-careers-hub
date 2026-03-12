@@ -76,7 +76,7 @@ const resumeExamples: ResumeExample[] = [
     id: 2, title: 'Digital Marketing Manager', category: 'marketing', experience: 'Mid · 5+ yrs',
     rating: 4.8, downloads: 8876, description: 'Data-driven marketer with SEO, PPC, and content strategy wins across SaaS and e-commerce.',
     tags: ['SEO', 'Google Ads', 'Analytics', 'Content Strategy', 'Email Marketing'],
-    accent: '262 83% 58%', icon: Briefcase,
+    accent: '262 83% 58%', icon: Briefcase, templateStyle: 'creative',
     content: {
       name: 'Sarah Mitchell',
       summary: 'Creative Digital Marketing Manager with 5+ years driving brand growth through data-driven strategies. Grew organic traffic 150% and managed $500K annual ad budgets at 3.5× ROAS.',
