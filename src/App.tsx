@@ -107,6 +107,7 @@ const App = () => (
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
+                  <Route path="/smart-apply" element={<ProtectedRoute><SmartApply /></ProtectedRoute>} />
                   
                   {/* Public shared resume view */}
                   <Route path="/shared-resume/:token" element={<SharedResume />} />
