@@ -73,7 +73,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defa
     if (result.success) {
       toast({
         title: "Success!",
-        description: `Welcome ${activeTab === 'login' ? 'back' : 'to CareerHub'}!`,
+        description: `Welcome ${activeTab === 'login' ? 'back' : 'to CareerNow'}!`,
       });
       onOpenChange(false);
       setFormData({ email: '', password: '', name: '' });
