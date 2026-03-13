@@ -305,15 +305,17 @@ const SmartApply = () => {
   };
 
   const handleBatchApply = () => {
-    const selected = matchedJobs.filter(j => j.selected);
-    selected.forEach((job, i) => {
-      setTimeout(() => {
-        window.open(job.url, "_blank");
-      }, i * 500);
-    });
-    toast({
-      title: `Opening ${selected.length} job${selected.length > 1 ? "s" : ""}`,
-      description: "Each job page will open in a new tab. Use your cover letter from below!",
+    requirePro(() => {
+      const selected = matchedJobs.filter(j => j.selected);
+      selected.forEach((job, i) => {
+        setTimeout(() => {
+          window.open(job.url, "_blank");
+        }, i * 500);
+      });
+      toast({
+        title: `Opening ${selected.length} job${selected.length > 1 ? "s" : ""}`,
+        description: "Each job page will open in a new tab. Use your cover letter from below!",
+      });
     });
   };
 
