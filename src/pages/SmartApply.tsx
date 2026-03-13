@@ -619,13 +619,18 @@ const SmartApply = () => {
                                 )}
                                 {job.coverLetter && (
                                   <div className="bg-muted/30 rounded-lg p-3">
-                                    <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
                                       <span className="text-xs font-medium text-primary flex items-center gap-1">
-                                        <Sparkles className="h-3 w-3" /> AI Cover Letter Intro
+                                        <Sparkles className="h-3 w-3" /> AI Cover Letter
                                       </span>
-                                      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => copyToClipboard(job.coverLetter!)}>
-                                        <Copy className="h-3 w-3 mr-1" /> Copy
-                                      </Button>
+                                      <div className="flex gap-1">
+                                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => copyToClipboard(job.coverLetter!)}>
+                                          <Copy className="h-3 w-3 mr-1" /> Copy
+                                        </Button>
+                                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => downloadCoverLetterPDF(job)}>
+                                          <Download className="h-3 w-3 mr-1" /> PDF
+                                        </Button>
+                                      </div>
                                     </div>
                                     <p className="text-sm text-foreground">{job.coverLetter}</p>
                                   </div>
