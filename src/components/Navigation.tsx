@@ -125,7 +125,7 @@ export const Navigation = () => {
                     />
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Network">
+                <MenuItem setActive={setActive} active={active} item="Network 👑">
                   <div className="flex flex-col space-y-4 text-sm">
                     <HoveredLink to="/network">Find Recruiters & Contacts</HoveredLink>
                     <HoveredLink to="/linkedin-optimizer">LinkedIn Optimizer</HoveredLink>
