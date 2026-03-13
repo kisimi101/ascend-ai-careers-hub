@@ -64,7 +64,7 @@ const ReferralMapper = () => {
             company: c.company || targetCompany,
             connectionStrength: i < 2 ? 'strong' : i < 5 ? 'medium' : 'weak',
             mutualConnections: Math.floor(3 + Math.random() * 20),
-            linkedinUrl: c.linkedin,
+            linkedinUrl: c.linkedin || c.linkedinUrl || c.profileUrl,
             email: c.email,
             introPath: generateIntroPath(c.name),
             lastInteraction: getRandomDate(),
