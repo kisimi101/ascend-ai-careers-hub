@@ -518,11 +518,16 @@ const SmartApply = () => {
             {/* Optimization Summary */}
             {optimizationResult && (
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Resume Optimization Results
-                  </CardTitle>
+                 <CardHeader className="pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      Resume Optimization Results
+                    </CardTitle>
+                    <Button size="sm" variant="outline" onClick={downloadResumePDF} className="w-fit">
+                      <Download className="h-4 w-4 mr-1" /> Download Resume PDF
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-3">
