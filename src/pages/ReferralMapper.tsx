@@ -328,16 +328,7 @@ Best regards`;
                               <Mail className="w-3 h-3 mr-1" /> {conn.email}
                             </Button>
                           )}
-                          <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={() => {
-                            const body = `Hi ${conn.name.split(' ')[0]},
-
-I noticed we have ${conn.mutualConnections} mutual connections. I'm exploring opportunities at ${conn.company} and would love to learn about your experience there.
-
-Would you be open to a brief chat?
-
-Best regards`;
-                            window.open(`mailto:${conn.email || ''}?subject=Connecting about ${conn.company}&body=${encodeURIComponent(body)}`);
-                          }}>
+                          <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={() => handleDraftIntro(conn)}>
                             <Sparkles className="w-3 h-3 mr-1" /> Draft Intro
                           </Button>
                         </div>
