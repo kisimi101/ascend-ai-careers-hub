@@ -22,7 +22,7 @@ const ProRoute: React.FC<ProRouteProps> = ({ children, featureName = "this featu
       const { createCheckout, POLAR_PRODUCTS } = await import("@/lib/polar");
       const url = await createCheckout(POLAR_PRODUCTS.pro);
 
-      window.location.href = data.url;
+      window.location.href = url;
     } catch (error: any) {
       toast({
         title: "Unable to start checkout",
