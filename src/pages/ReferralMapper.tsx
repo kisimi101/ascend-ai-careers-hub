@@ -109,6 +109,49 @@ const ReferralMapper = () => {
     return d.toISOString().split('T')[0];
   };
 
+  const normalizeExternalUrl = (url?: string) => {
+    if (!url?.trim()) return '';
+    if (/^https?:\/\//i.test(url)) return url;
+    return `https://${url.replace(/^\/+/, '')}`;
+  };
+
+  const buildIntroDraft = (conn: ReferralConnection) => `Hi ${conn.name.split(' ')[0]},
+
+I noticed we have ${conn.mutualConnections} mutual connections. I'm exploring opportunities at ${conn.company} and would love to learn about your experience there.
+
+Would you be open to a brief chat?
+
+Best regards`;
+
+  const handleDraftIntro = async (conn: ReferralConnection) => {
+    const draft = buildIntroDraft(conn);
+
+    if (conn.email) {
+      const subject = `Connecting about ${conn.company}`;
+      window.open(`mailto:${conn.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(draft)}`);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(draft);
+      toast({
+        title: 'Draft copied',
+        description: 'No email found. Paste this draft into LinkedIn or another contact channel.',
+      });
+
+      const linkedInUrl = normalizeExternalUrl(conn.linkedinUrl);
+      if (linkedInUrl) {
+        window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+      }
+    } catch {
+      toast({
+        title: 'Unable to create draft',
+        description: 'Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const generateFallbackCompany = (name: string): TargetCompany => {
     const people = [
       { name: 'Alex Chen', title: 'Senior Engineer' },
