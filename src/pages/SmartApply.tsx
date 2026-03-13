@@ -415,6 +415,7 @@ const SmartApply = () => {
 
     doc.save(`${resumeData.personalInfo.fullName || "resume"}-optimized.pdf`);
     toast({ title: "Downloaded!", description: "Optimized resume saved as PDF." });
+    });
   };
 
   const downloadCoverLetterPDF = (job: MatchedJob) => {
