@@ -590,16 +590,16 @@ const SmartApply = () => {
                         className="mt-1.5 h-4 w-4 rounded border-border"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h3 className="font-semibold text-foreground">{job.title}</h3>
-                            <p className="text-sm text-muted-foreground">{job.company} • {job.location}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-foreground text-sm sm:text-base">{job.title}</h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{job.company} • {job.location}</p>
                           </div>
-                          <div className="flex gap-2 shrink-0">
-                            <Button size="sm" variant="outline" onClick={() => setExpandedJob(expandedJob === index ? null : index)}>
+                          <div className="flex gap-1.5 shrink-0">
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => setExpandedJob(expandedJob === index ? null : index)}>
                               {expandedJob === index ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => window.open(job.url, "_blank")}>
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => window.open(job.url, "_blank")}>
                               <ExternalLink className="h-4 w-4" />
                             </Button>
                           </div>
