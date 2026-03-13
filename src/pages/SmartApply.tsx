@@ -582,7 +582,7 @@ const SmartApply = () => {
               {matchedJobs.map((job, index) => (
                 <Card key={index} className={`transition-all ${job.selected ? "ring-1 ring-primary/30" : "opacity-60"}`}>
                   <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 sm:gap-3">
                       <input
                         type="checkbox"
                         checked={job.selected}
