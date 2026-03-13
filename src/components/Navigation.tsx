@@ -65,9 +65,9 @@ export const Navigation = () => {
       <div className="fixed top-0 w-full z-50 glass border-b border-border/50">
         <div className="container mx-auto container-padding py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <img src={logo} alt="CareerHub AI Logo" className="w-10 h-10 rounded-lg" />
+            <img src={logo} alt="CareerNow AI Logo" className="w-10 h-10 rounded-lg" />
             <span className="text-xl font-bold text-gradient-primary">
-              CareerHub
+              CareerNow
             </span>
           </Link>
           
