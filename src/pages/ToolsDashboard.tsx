@@ -171,23 +171,22 @@ const ToolsDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-6">
+      <section className="pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6">
         <div className="container mx-auto text-center">
-          <div className="inline-flex items-center px-4 py-2 bg-orange-100 rounded-full text-orange-800 text-sm font-medium mb-6">
+          <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
             <Rocket className="w-4 h-4 mr-2" />
             Free AI Career Tools
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-foreground mb-4 sm:mb-6">
             Choose Your
-            <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"> AI Tool</span>
+            <span className="text-gradient-primary"> AI Tool</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto">
             Access our complete suite of AI-powered career tools. All free, no signup required.
-            Start with any tool below to accelerate your career journey.
           </p>
         </div>
       </section>
