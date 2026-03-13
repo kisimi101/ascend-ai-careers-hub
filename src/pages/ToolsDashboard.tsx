@@ -117,14 +117,9 @@ const ToolsDashboard = () => {
   const startUpgradeCheckout = async () => {
     try {
       setCheckoutLoading(true);
-      const { data, error } = await supabase.functions.invoke("polar-checkout", {
-        body: { tier: "pro" },
-      });
-
-      if (error) throw error;
-      if (!data?.url) throw new Error("No checkout URL returned");
-
-      window.location.href = data.url;
+      const { createCheckout, POLAR_PRODUCTS } = await import("@/lib/polar");
+      const url = await createCheckout(POLAR_PRODUCTS.pro);
+      window.location.href = url;
     } catch (error: any) {
       toast({
         title: "Could not start checkout",
