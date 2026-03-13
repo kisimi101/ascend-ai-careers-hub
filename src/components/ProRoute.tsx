@@ -19,12 +19,8 @@ const ProRoute: React.FC<ProRouteProps> = ({ children, featureName = "this featu
   const handleUpgrade = async () => {
     try {
       setIsCheckoutLoading(true);
-      const { data, error } = await supabase.functions.invoke("polar-checkout", {
-        body: { tier: "pro" },
-      });
-
-      if (error) throw error;
-      if (!data?.url) throw new Error("No checkout URL returned");
+      const { createCheckout, POLAR_PRODUCTS } = await import("@/lib/polar");
+      const url = await createCheckout(POLAR_PRODUCTS.pro);
 
       window.location.href = data.url;
     } catch (error: any) {
