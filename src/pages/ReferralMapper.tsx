@@ -309,7 +309,14 @@ Best regards`;
                         {/* Actions */}
                         <div className="flex items-center gap-2 mt-3">
                           {conn.linkedinUrl && (
-                            <Button variant="outline" size="sm" className="text-xs" onClick={() => window.open(conn.linkedinUrl, '_blank')}>
+                            <Button variant="outline" size="sm" className="text-xs" onClick={() => {
+                              const linkedInUrl = normalizeExternalUrl(conn.linkedinUrl);
+                              if (!linkedInUrl) {
+                                toast({ title: 'Invalid LinkedIn URL', variant: 'destructive' });
+                                return;
+                              }
+                              window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+                            }}>
                               <Linkedin className="w-3 h-3 mr-1" /> Profile
                             </Button>
                           )}
