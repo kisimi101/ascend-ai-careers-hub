@@ -22,11 +22,16 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
+  Crown,
+  Lock,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
@@ -48,9 +53,32 @@ interface MatchedJob {
 
 type PipelineStep = "upload" | "optimizing" | "searching" | "matching" | "ready";
 
+const REMOTE_JOB_BOARDS = [
+  { name: "We Work Remotely", buildUrl: (q: string) => `https://weworkremotely.com/remote-jobs/search?term=${q}` },
+  { name: "Remote.co", buildUrl: (q: string) => `https://remote.co/remote-jobs/search/?search_keywords=${q}` },
+  { name: "FlexJobs", buildUrl: (q: string) => `https://www.flexjobs.com/search?search=${q}` },
+  { name: "RemoteOK", buildUrl: (q: string) => `https://remoteok.com/remote-${q.replace(/\s+/g, "-").toLowerCase()}-jobs` },
+  { name: "AngelList", buildUrl: (q: string) => `https://wellfound.com/jobs?query=${q}` },
+  { name: "Hired", buildUrl: (q: string) => `https://hired.com/jobs?q=${q}` },
+];
+
+const GENERAL_JOB_BOARDS = [
+  { name: "Indeed", buildUrl: (q: string, l: string) => `https://www.indeed.com/jobs?q=${q}&l=${l}` },
+  { name: "LinkedIn", buildUrl: (q: string, l: string) => `https://www.linkedin.com/jobs/search/?keywords=${q}&location=${l}` },
+  { name: "Glassdoor", buildUrl: (q: string, l: string) => `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${q}&locKeyword=${l}` },
+  { name: "ZipRecruiter", buildUrl: (q: string, l: string) => `https://www.ziprecruiter.com/jobs-search?search=${q}&location=${l}` },
+  { name: "Monster", buildUrl: (q: string, l: string) => `https://www.monster.com/jobs/search?q=${q}&where=${l}` },
+  { name: "SimplyHired", buildUrl: (q: string, l: string) => `https://www.simplyhired.com/search?q=${q}&l=${l}` },
+  { name: "CareerBuilder", buildUrl: (q: string, l: string) => `https://www.careerbuilder.com/jobs?keywords=${q}&location=${l}` },
+  { name: "Dice", buildUrl: (q: string, l: string) => `https://www.dice.com/jobs?q=${q}&location=${l}` },
+];
+
 const SmartApply = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isPro, isLoading: subLoading } = useSubscription();
+  const { isAuthenticated } = useAuth();
 
   const [step, setStep] = useState<PipelineStep>("upload");
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
@@ -59,6 +87,15 @@ const SmartApply = () => {
   const [matchedJobs, setMatchedJobs] = useState<MatchedJob[]>([]);
   const [expandedJob, setExpandedJob] = useState<number | null>(null);
   const [progressPercent, setProgressPercent] = useState(0);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  const requirePro = (action: () => void) => {
+    if (isPro) {
+      action();
+    } else {
+      setShowUpgradeModal(true);
+    }
+  };
 
   const stepLabels: Record<PipelineStep, string> = {
     upload: "Upload Resume",
