@@ -138,7 +138,7 @@ export const Navigation = () => {
                     <HoveredLink to="/referral-mapper">Referral Mapper ✨</HoveredLink>
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Pro Tools">
+                <MenuItem setActive={setActive} active={active} item="Pro Tools 👑">
                   <div className="flex flex-col space-y-4 text-sm">
                     <HoveredLink to="/smart-apply">Smart Apply Pipeline</HoveredLink>
                     <HoveredLink to="/auto-follow-up">Auto Follow-Up</HoveredLink>
