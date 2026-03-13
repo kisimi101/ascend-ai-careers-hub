@@ -700,6 +700,59 @@ const SmartApply = () => {
               )}
             </div>
 
+            {/* Apply on More Job Boards */}
+            {matchedJobs.length > 0 && resumeData && (
+              <div className="space-y-4">
+                <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
+                  <ExternalLink className="h-5 w-5 text-primary" />
+                  Apply on More Job Boards
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm">General Job Boards</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-2">
+                        {GENERAL_JOB_BOARDS.map((board) => {
+                          const query = encodeURIComponent(optimizationResult?.suggestedJobTitles?.[0] || resumeData.experience?.[0]?.position || "");
+                          const loc = encodeURIComponent(resumeData.personalInfo?.location || "");
+                          return (
+                            <Button key={board.name} size="sm" variant="outline" className="text-xs h-8 justify-start"
+                              onClick={() => window.open(board.buildUrl(query, loc), "_blank")}>
+                              {board.name}
+                              <ExternalLink className="h-3 w-3 ml-auto shrink-0" />
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        🌍 Remote Job Sites
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-2">
+                        {REMOTE_JOB_BOARDS.map((board) => {
+                          const query = encodeURIComponent(optimizationResult?.suggestedJobTitles?.[0] || resumeData.experience?.[0]?.position || "");
+                          return (
+                            <Button key={board.name} size="sm" variant="outline" className="text-xs h-8 justify-start"
+                              onClick={() => window.open(board.buildUrl(query), "_blank")}>
+                              {board.name}
+                              <ExternalLink className="h-3 w-3 ml-auto shrink-0" />
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+
             {/* Start Over */}
             <div className="text-center pt-4">
               <Button variant="outline" onClick={() => { setStep("upload"); setMatchedJobs([]); setOptimizationResult(null); setProgressPercent(0); }}>
@@ -708,6 +761,70 @@ const SmartApply = () => {
             </div>
           </motion.div>
         )}
+
+        {/* Upgrade Modal */}
+        <AnimatePresence>
+          {showUpgradeModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
+              onClick={() => setShowUpgradeModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-card border border-border rounded-xl p-6 sm:p-8 max-w-md w-full shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="text-center">
+                  <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                    <Crown className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Upgrade to Pro</h3>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Download optimized resumes, cover letters as PDF, and batch apply to jobs with one click. Unlock all premium features.
+                  </p>
+                  <div className="space-y-3 text-left mb-6">
+                    {[
+                      "Download optimized resume as PDF",
+                      "Download tailored cover letters",
+                      "Batch apply to multiple jobs",
+                      "50 daily job searches",
+                      "Smart Apply pipeline",
+                      "Auto follow-up emails",
+                    ].map((f) => (
+                      <div key={f} className="flex items-center gap-2 text-sm">
+                        <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                        <span className="text-foreground">{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button className="btn-gradient w-full" onClick={async () => {
+                      try {
+                        const { data, error } = await supabase.functions.invoke("polar-checkout", {
+                          body: { tier: "pro" },
+                        });
+                        if (error) throw error;
+                        if (data?.url) window.location.href = data.url;
+                      } catch {
+                        toast({ title: "Error", description: "Could not start checkout. Please try again.", variant: "destructive" });
+                      }
+                    }}>
+                      <Crown className="h-4 w-4 mr-2" /> Upgrade to Pro — $12/mo
+                    </Button>
+                    <Button variant="ghost" onClick={() => setShowUpgradeModal(false)} className="text-sm">
+                      Maybe later
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <Footer />
