@@ -21,10 +21,12 @@ import {
   Zap,
   ChevronDown,
   ChevronUp,
+  Download,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import jsPDF from "jspdf";
 
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
