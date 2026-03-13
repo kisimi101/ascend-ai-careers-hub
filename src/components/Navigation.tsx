@@ -35,6 +35,7 @@ export const Navigation = () => {
 
   const mobileNavLinks = [
     { label: "Get Started", path: "/get-started" },
+    { label: "Smart Apply ✨", path: "/smart-apply" },
     { label: "Dashboard", path: "/dashboard" },
     { label: "AI Resume Builder", path: "/resume-builder" },
     { label: "Resume Checker", path: "/resume-checker" },
@@ -43,8 +44,13 @@ export const Navigation = () => {
     { label: "Job Search", path: "/job-search" },
     { label: "Cover Letter Generator", path: "/cover-letter-generator" },
     { label: "Interview Practice", path: "/interview-practice" },
+    { label: "Interview Question Bank", path: "/interview-question-bank" },
     { label: "Job Tracker", path: "/job-tracker" },
     { label: "Salary Estimator", path: "/salary-estimator" },
+    { label: "Auto Follow-Up", path: "/auto-follow-up" },
+    { label: "Job Market Heatmap", path: "/job-market-heatmap" },
+    { label: "Career Timeline", path: "/career-timeline" },
+    { label: "Referral Mapper", path: "/referral-mapper" },
     { label: "LinkedIn Optimizer", path: "/linkedin-optimizer" },
     { label: "LinkedIn Import", path: "/linkedin-import" },
     { label: "Skills Gap Analyzer", path: "/skills-gap-analyzer" },
@@ -129,6 +135,16 @@ export const Navigation = () => {
                     <HoveredLink to="/career-path-planner">Career Path Planner</HoveredLink>
                     <HoveredLink to="/industry-insights">Industry Insights</HoveredLink>
                     <HoveredLink to="/portfolio-builder">Portfolio Builder</HoveredLink>
+                    <HoveredLink to="/referral-mapper">Referral Mapper ✨</HoveredLink>
+                  </div>
+                </MenuItem>
+                <MenuItem setActive={setActive} active={active} item="Pro Tools">
+                  <div className="flex flex-col space-y-4 text-sm">
+                    <HoveredLink to="/smart-apply">Smart Apply Pipeline</HoveredLink>
+                    <HoveredLink to="/auto-follow-up">Auto Follow-Up</HoveredLink>
+                    <HoveredLink to="/job-market-heatmap">Job Market Heatmap</HoveredLink>
+                    <HoveredLink to="/interview-question-bank">Interview Question Bank</HoveredLink>
+                    <HoveredLink to="/career-timeline">Career Timeline</HoveredLink>
                   </div>
                 </MenuItem>
               </Menu>
