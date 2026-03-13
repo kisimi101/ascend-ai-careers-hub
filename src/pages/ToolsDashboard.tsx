@@ -192,20 +192,20 @@ const ToolsDashboard = () => {
       </section>
 
       {/* Tools Categories */}
-      <section className="pb-20 px-6">
+      <section className="pb-20 px-4 sm:px-6">
         <div className="container mx-auto">
           {toolCategories.map((category, categoryIndex) => (
-            <div key={category.title} className="mb-16">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">{category.title}</h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">{category.description}</p>
+            <div key={category.title} className="mb-10 sm:mb-16">
+              <div className="text-center mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">{category.title}</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">{category.description}</p>
               </div>
               
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {category.tools.map((tool, toolIndex) => (
                   <Card 
                     key={tool.name}
-                    className="group hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-orange-300 hover:scale-105 relative overflow-hidden"
+                    className="group hover:shadow-2xl transition-all duration-300 border border-border hover:border-primary/30 hover:scale-[1.02] sm:hover:scale-105 relative overflow-hidden"
                   >
                     {tool.popular && (
                       <div className="absolute top-4 right-4 z-10">
