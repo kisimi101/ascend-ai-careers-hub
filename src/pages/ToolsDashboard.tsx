@@ -21,7 +21,13 @@ import {
   Eye, 
   User,
   Rocket,
-  Star
+  Star,
+  Mail,
+  Map,
+  BookOpen,
+  TrendingUp,
+  Users,
+  Crown
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -33,139 +39,46 @@ const ToolsDashboard = () => {
       title: "Resume Tools",
       description: "Perfect your resume with AI assistance",
       tools: [
-        {
-          name: "AI Resume Builder",
-          description: "Build ATS-friendly resumes with AI guidance",
-          icon: User,
-          path: "/resume-builder",
-          color: "from-blue-500 to-blue-600",
-          popular: true
-        },
-        {
-          name: "Resume Checker",
-          description: "Get instant feedback and improvement suggestions",
-          icon: Search,
-          path: "/resume-checker",
-          color: "from-green-500 to-green-600",
-          popular: true
-        },
-        {
-          name: "Resume Summary Generator",
-          description: "Create compelling professional summaries",
-          icon: Edit,
-          path: "/resume-summary-generator",
-          color: "from-purple-500 to-purple-600"
-        },
-        {
-          name: "Resume Bullet Generator",
-          description: "Generate impactful bullet points",
-          icon: Target,
-          path: "/resume-bullet-generator",
-          color: "from-orange-500 to-orange-600"
-        },
-        {
-          name: "Skills Generator",
-          description: "Optimize your skills section",
-          icon: Settings,
-          path: "/resume-skills-generator",
-          color: "from-teal-500 to-teal-600"
-        },
-        {
-          name: "AI Resume Enhancer",
-          description: "AI-powered resume optimization",
-          icon: Sparkles,
-          path: "/resume-enhancer",
-          color: "from-pink-500 to-pink-600"
-        }
+        { name: "AI Resume Builder", description: "Build ATS-friendly resumes with AI guidance", icon: User, path: "/resume-builder", color: "from-blue-500 to-blue-600", popular: true },
+        { name: "Resume Checker", description: "Get instant feedback and improvement suggestions", icon: Search, path: "/resume-checker", color: "from-green-500 to-green-600", popular: true },
+        { name: "Resume Summary Generator", description: "Create compelling professional summaries", icon: Edit, path: "/resume-summary-generator", color: "from-purple-500 to-purple-600" },
+        { name: "Resume Bullet Generator", description: "Generate impactful bullet points", icon: Target, path: "/resume-bullet-generator", color: "from-orange-500 to-orange-600" },
+        { name: "Skills Generator", description: "Optimize your skills section", icon: Settings, path: "/resume-skills-generator", color: "from-teal-500 to-teal-600" },
+        { name: "AI Resume Enhancer", description: "AI-powered resume optimization", icon: Sparkles, path: "/resume-enhancer", color: "from-pink-500 to-pink-600" },
       ]
     },
     {
       title: "Job Search Tools",
       description: "Accelerate your job search process",
       tools: [
-        {
-          name: "Cover Letter Generator",
-          description: "Create tailored cover letters in minutes",
-          icon: FileText,
-          path: "/cover-letter-generator",
-          color: "from-indigo-500 to-indigo-600",
-          popular: true
-        },
-        {
-          name: "Keyword Scanner",
-          description: "Optimize for ATS systems",
-          icon: Scan,
-          path: "/resume-keyword-scanner",
-          color: "from-yellow-500 to-yellow-600"
-        },
-        {
-          name: "Job Tracker",
-          description: "Track your job applications",
-          icon: Clipboard,
-          path: "/job-tracker",
-          color: "from-red-500 to-red-600"
-        },
-        {
-          name: "Salary Estimator",
-          description: "Know your market value",
-          icon: DollarSign,
-          path: "/salary-estimator",
-          color: "from-emerald-500 to-emerald-600"
-        }
+        { name: "Smart Apply", description: "Upload → AI optimize → batch apply to matching jobs", icon: Rocket, path: "/smart-apply", color: "from-primary to-primary/80", popular: true, premium: true },
+        { name: "Cover Letter Generator", description: "Create tailored cover letters in minutes", icon: FileText, path: "/cover-letter-generator", color: "from-indigo-500 to-indigo-600", popular: true },
+        { name: "Keyword Scanner", description: "Optimize for ATS systems", icon: Scan, path: "/resume-keyword-scanner", color: "from-yellow-500 to-yellow-600" },
+        { name: "Job Tracker", description: "Track your job applications", icon: Clipboard, path: "/job-tracker", color: "from-red-500 to-red-600" },
+        { name: "Salary Estimator", description: "Know your market value", icon: DollarSign, path: "/salary-estimator", color: "from-emerald-500 to-emerald-600" },
       ]
     },
     {
       title: "Career Development",
       description: "Advance your professional growth",
       tools: [
-        {
-          name: "Interview Practice",
-          description: "Practice with AI-powered mock interviews",
-          icon: MessageCircle,
-          path: "/interview-practice",
-          color: "from-cyan-500 to-cyan-600"
-        },
-        {
-          name: "Resignation Letter",
-          description: "Professional resignation letters",
-          icon: FileX,
-          path: "/resignation-letter-generator",
-          color: "from-gray-500 to-gray-600"
-        },
-        {
-          name: "Resume Examples",
-          description: "Industry-specific resume templates",
-          icon: User,
-          path: "/resume-examples",
-          color: "from-violet-500 to-violet-600"
-        }
+        { name: "Interview Practice", description: "Practice with AI-powered mock interviews", icon: MessageCircle, path: "/interview-practice", color: "from-cyan-500 to-cyan-600" },
+        { name: "Career Timeline", description: "AI-predicted career path with milestones", icon: TrendingUp, path: "/career-timeline", color: "from-violet-500 to-violet-600", premium: true },
+        { name: "Interview Question Bank", description: "Company-specific AI questions", icon: BookOpen, path: "/interview-question-bank", color: "from-sky-500 to-sky-600", premium: true },
+        { name: "Resignation Letter", description: "Professional resignation letters", icon: FileX, path: "/resignation-letter-generator", color: "from-gray-500 to-gray-600" },
+        { name: "Resume Examples", description: "Industry-specific resume templates", icon: User, path: "/resume-examples", color: "from-violet-500 to-violet-600" },
       ]
     },
     {
       title: "Advanced Tools",
-      description: "Professional enhancement features",
+      description: "Premium AI-powered career intelligence",
       tools: [
-        {
-          name: "Resume Translator",
-          description: "Translate resumes to any language",
-          icon: Globe,
-          path: "/resume-translator",
-          color: "from-rose-500 to-rose-600"
-        },
-        {
-          name: "Video Resume Maker",
-          description: "Create engaging video resumes",
-          icon: Video,
-          path: "/video-resume",
-          color: "from-amber-500 to-amber-600"
-        },
-        {
-          name: "Social Media Preview",
-          description: "Optimize your professional presence",
-          icon: Eye,
-          path: "/social-preview",
-          color: "from-lime-500 to-lime-600"
-        }
+        { name: "Auto Follow-Up", description: "AI-generated follow-up emails at optimal timing", icon: Mail, path: "/auto-follow-up", color: "from-rose-500 to-rose-600", premium: true },
+        { name: "Job Market Heatmap", description: "Demand, salary & growth by role and location", icon: Map, path: "/job-market-heatmap", color: "from-amber-500 to-amber-600", premium: true },
+        { name: "Referral Mapper", description: "Find warm intros at target companies", icon: Users, path: "/referral-mapper", color: "from-fuchsia-500 to-fuchsia-600", premium: true },
+        { name: "Resume Translator", description: "Translate resumes to any language", icon: Globe, path: "/resume-translator", color: "from-rose-500 to-rose-600" },
+        { name: "Video Resume Maker", description: "Create engaging video resumes", icon: Video, path: "/video-resume", color: "from-amber-500 to-amber-600" },
+        { name: "Social Media Preview", description: "Optimize your professional presence", icon: Eye, path: "/social-preview", color: "from-lime-500 to-lime-600" },
       ]
     }
   ];
@@ -174,7 +87,6 @@ const ToolsDashboard = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      {/* Hero Section */}
       <section className="pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6">
         <div className="container mx-auto text-center">
           <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
@@ -191,10 +103,9 @@ const ToolsDashboard = () => {
         </div>
       </section>
 
-      {/* Tools Categories */}
       <section className="pb-20 px-4 sm:px-6">
         <div className="container mx-auto">
-          {toolCategories.map((category, categoryIndex) => (
+          {toolCategories.map((category) => (
             <div key={category.title} className="mb-10 sm:mb-16">
               <div className="text-center mb-8 sm:mb-12">
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">{category.title}</h2>
@@ -202,17 +113,23 @@ const ToolsDashboard = () => {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {category.tools.map((tool, toolIndex) => (
+                {category.tools.map((tool: any) => (
                   <Card 
                     key={tool.name}
                     className="group hover:shadow-2xl transition-all duration-300 border border-border hover:border-primary/30 hover:scale-[1.02] sm:hover:scale-105 relative overflow-hidden"
                   >
-                    {tool.popular && (
-                      <div className="absolute top-4 right-4 z-10">
-                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
-                          <Star className="w-3 h-3 mr-1" />
-                          Popular
-                        </Badge>
+                    {(tool.popular || tool.premium) && (
+                      <div className="absolute top-4 right-4 z-10 flex gap-1.5">
+                        {tool.premium && (
+                          <Badge className="bg-gradient-primary text-primary-foreground text-[10px]">
+                            <Crown className="w-3 h-3 mr-0.5" /> Pro
+                          </Badge>
+                        )}
+                        {tool.popular && (
+                          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px]">
+                            <Star className="w-3 h-3 mr-0.5" /> Popular
+                          </Badge>
+                        )}
                       </div>
                     )}
                     
@@ -233,7 +150,7 @@ const ToolsDashboard = () => {
                         onClick={() => navigate(tool.path)}
                         className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90 transition-all`}
                       >
-                        Try Now - Free
+                        {tool.premium ? "Try Pro Feature" : "Try Now - Free"}
                       </Button>
                     </CardContent>
                   </Card>
