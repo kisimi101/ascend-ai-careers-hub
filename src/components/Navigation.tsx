@@ -35,6 +35,7 @@ export const Navigation = () => {
 
   const mobileNavLinks = [
     { label: "Get Started", path: "/get-started" },
+    { label: "Smart Apply ✨", path: "/smart-apply" },
     { label: "Dashboard", path: "/dashboard" },
     { label: "AI Resume Builder", path: "/resume-builder" },
     { label: "Resume Checker", path: "/resume-checker" },
@@ -43,8 +44,13 @@ export const Navigation = () => {
     { label: "Job Search", path: "/job-search" },
     { label: "Cover Letter Generator", path: "/cover-letter-generator" },
     { label: "Interview Practice", path: "/interview-practice" },
+    { label: "Interview Question Bank", path: "/interview-question-bank" },
     { label: "Job Tracker", path: "/job-tracker" },
     { label: "Salary Estimator", path: "/salary-estimator" },
+    { label: "Auto Follow-Up", path: "/auto-follow-up" },
+    { label: "Job Market Heatmap", path: "/job-market-heatmap" },
+    { label: "Career Timeline", path: "/career-timeline" },
+    { label: "Referral Mapper", path: "/referral-mapper" },
     { label: "LinkedIn Optimizer", path: "/linkedin-optimizer" },
     { label: "LinkedIn Import", path: "/linkedin-import" },
     { label: "Skills Gap Analyzer", path: "/skills-gap-analyzer" },
