@@ -451,10 +451,10 @@ const SmartApply = () => {
             <Zap className="h-4 w-4" />
             Smart Apply Pipeline
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground mb-3">
             Upload → Optimize → <span className="text-primary">Apply</span>
           </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
             Upload your resume and our AI will optimize it, find matching jobs, generate tailored cover letters, and queue everything for one-click batch apply.
           </p>
         </motion.div>
