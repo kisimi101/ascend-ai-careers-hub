@@ -562,15 +562,20 @@ const SmartApply = () => {
             )}
 
             {/* Matched Jobs */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
                 <Briefcase className="h-5 w-5" />
                 Matched Jobs ({matchedJobs.length})
               </h2>
-              <Button onClick={handleBatchApply} disabled={!matchedJobs.some(j => j.selected)}>
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Apply to Selected ({matchedJobs.filter(j => j.selected).length})
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={downloadAllCoverLetters} disabled={!matchedJobs.some(j => j.coverLetter)}>
+                  <Download className="h-4 w-4 mr-1" /> All Cover Letters
+                </Button>
+                <Button size="sm" onClick={handleBatchApply} disabled={!matchedJobs.some(j => j.selected)}>
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  Apply ({matchedJobs.filter(j => j.selected).length})
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-3">
