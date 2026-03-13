@@ -325,6 +325,7 @@ const SmartApply = () => {
   };
 
   const downloadResumePDF = () => {
+    requirePro(() => {
     if (!resumeData) return;
     const doc = new jsPDF();
     const margin = 20;
