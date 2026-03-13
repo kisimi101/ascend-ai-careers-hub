@@ -456,29 +456,31 @@ const SmartApply = () => {
   };
 
   const downloadAllCoverLetters = () => {
-    const jobsWithLetters = matchedJobs.filter(j => j.coverLetter);
-    if (!jobsWithLetters.length) {
-      toast({ title: "No cover letters", description: "No cover letters to download.", variant: "destructive" });
-      return;
-    }
-    const doc = new jsPDF();
-    jobsWithLetters.forEach((job, idx) => {
-      if (idx > 0) doc.addPage();
-      const margin = 20;
-      let y = margin;
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text(`${job.title} — ${job.company}`, margin, y);
-      y += 6;
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text(job.location, margin, y);
-      y += 10;
-      const lines = doc.splitTextToSize(job.coverLetter!, 170);
-      doc.text(lines, margin, y);
+    requirePro(() => {
+      const jobsWithLetters = matchedJobs.filter(j => j.coverLetter);
+      if (!jobsWithLetters.length) {
+        toast({ title: "No cover letters", description: "No cover letters to download.", variant: "destructive" });
+        return;
+      }
+      const doc = new jsPDF();
+      jobsWithLetters.forEach((job, idx) => {
+        if (idx > 0) doc.addPage();
+        const margin = 20;
+        let y = margin;
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${job.title} — ${job.company}`, margin, y);
+        y += 6;
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(job.location, margin, y);
+        y += 10;
+        const lines = doc.splitTextToSize(job.coverLetter!, 170);
+        doc.text(lines, margin, y);
+      });
+      doc.save("all-cover-letters.pdf");
+      toast({ title: "Downloaded!", description: `${jobsWithLetters.length} cover letters saved as PDF.` });
     });
-    doc.save("all-cover-letters.pdf");
-    toast({ title: "Downloaded!", description: `${jobsWithLetters.length} cover letters saved as PDF.` });
   };
 
   const steps = ["Upload", "Optimize", "Search", "Match", "Apply"];
