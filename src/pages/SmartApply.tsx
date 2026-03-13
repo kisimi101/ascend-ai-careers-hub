@@ -285,6 +285,159 @@ const SmartApply = () => {
     toast({ title: "Copied!", description: "Cover letter copied to clipboard." });
   };
 
+  const downloadResumePDF = () => {
+    if (!resumeData) return;
+    const doc = new jsPDF();
+    const margin = 20;
+    let y = margin;
+    
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text(resumeData.personalInfo.fullName || "Resume", margin, y);
+    y += 8;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const contactParts = [resumeData.personalInfo.email, resumeData.personalInfo.phone, resumeData.personalInfo.location].filter(Boolean);
+    doc.text(contactParts.join(" • "), margin, y);
+    y += 10;
+
+    if (optimizationResult?.atsScore) {
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`ATS Score: ${optimizationResult.atsScore}%`, margin, y);
+      doc.setTextColor(0, 0, 0);
+      y += 8;
+    }
+
+    if (resumeData.personalInfo.summary) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("SUMMARY", margin, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const summaryLines = doc.splitTextToSize(resumeData.personalInfo.summary, 170);
+      doc.text(summaryLines, margin, y);
+      y += summaryLines.length * 5 + 6;
+    }
+
+    if (resumeData.experience?.length) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("EXPERIENCE", margin, y);
+      y += 6;
+      resumeData.experience.forEach(exp => {
+        if (y > 270) { doc.addPage(); y = margin; }
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${exp.position} — ${exp.company}`, margin, y);
+        y += 5;
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(9);
+        doc.text(exp.duration, margin, y);
+        y += 5;
+        if (exp.description) {
+          doc.setFont("helvetica", "normal");
+          const lines = doc.splitTextToSize(exp.description, 170);
+          doc.text(lines, margin, y);
+          y += lines.length * 4.5 + 4;
+        }
+      });
+      y += 4;
+    }
+
+    if (resumeData.education?.length) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("EDUCATION", margin, y);
+      y += 6;
+      resumeData.education.forEach(edu => {
+        if (y > 270) { doc.addPage(); y = margin; }
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${edu.degree} — ${edu.institution} (${edu.year})`, margin, y);
+        y += 6;
+      });
+      y += 4;
+    }
+
+    if (resumeData.skills?.length) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("SKILLS", margin, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const skillsText = doc.splitTextToSize(resumeData.skills.join(", "), 170);
+      doc.text(skillsText, margin, y);
+    }
+
+    doc.save(`${resumeData.personalInfo.fullName || "resume"}-optimized.pdf`);
+    toast({ title: "Downloaded!", description: "Optimized resume saved as PDF." });
+  };
+
+  const downloadCoverLetterPDF = (job: MatchedJob) => {
+    if (!job.coverLetter) return;
+    const doc = new jsPDF();
+    const margin = 20;
+    let y = margin;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }), margin, y);
+    y += 12;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Application: ${job.title}`, margin, y);
+    y += 6;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${job.company} — ${job.location}`, margin, y);
+    y += 12;
+
+    if (resumeData?.personalInfo) {
+      doc.text(`From: ${resumeData.personalInfo.fullName}`, margin, y);
+      y += 5;
+      doc.text(resumeData.personalInfo.email, margin, y);
+      y += 10;
+    }
+
+    doc.setFontSize(11);
+    const bodyLines = doc.splitTextToSize(job.coverLetter, 170);
+    doc.text(bodyLines, margin, y);
+
+    doc.save(`cover-letter-${job.company.replace(/\s+/g, "-").toLowerCase()}.pdf`);
+    toast({ title: "Downloaded!", description: `Cover letter for ${job.company} saved as PDF.` });
+  };
+
+  const downloadAllCoverLetters = () => {
+    const jobsWithLetters = matchedJobs.filter(j => j.coverLetter);
+    if (!jobsWithLetters.length) {
+      toast({ title: "No cover letters", description: "No cover letters to download.", variant: "destructive" });
+      return;
+    }
+    const doc = new jsPDF();
+    jobsWithLetters.forEach((job, idx) => {
+      if (idx > 0) doc.addPage();
+      const margin = 20;
+      let y = margin;
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${job.title} — ${job.company}`, margin, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(job.location, margin, y);
+      y += 10;
+      const lines = doc.splitTextToSize(job.coverLetter!, 170);
+      doc.text(lines, margin, y);
+    });
+    doc.save("all-cover-letters.pdf");
+    toast({ title: "Downloaded!", description: `${jobsWithLetters.length} cover letters saved as PDF.` });
+  };
+
   const steps = ["Upload", "Optimize", "Search", "Match", "Apply"];
 
   return (
