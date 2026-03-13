@@ -220,10 +220,10 @@ const ToolsDashboard = () => {
                       <div className={`w-12 h-12 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                         <tool.icon className="h-6 w-6 text-white" />
                       </div>
-                      <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
+                      <CardTitle className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                         {tool.name}
                       </CardTitle>
-                      <CardDescription className="text-gray-600">
+                      <CardDescription className="text-muted-foreground text-sm">
                         {tool.description}
                       </CardDescription>
                     </CardHeader>
