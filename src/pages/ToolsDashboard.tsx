@@ -171,42 +171,41 @@ const ToolsDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-6">
+      <section className="pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6">
         <div className="container mx-auto text-center">
-          <div className="inline-flex items-center px-4 py-2 bg-orange-100 rounded-full text-orange-800 text-sm font-medium mb-6">
+          <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
             <Rocket className="w-4 h-4 mr-2" />
             Free AI Career Tools
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-foreground mb-4 sm:mb-6">
             Choose Your
-            <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent"> AI Tool</span>
+            <span className="text-gradient-primary"> AI Tool</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto">
             Access our complete suite of AI-powered career tools. All free, no signup required.
-            Start with any tool below to accelerate your career journey.
           </p>
         </div>
       </section>
 
       {/* Tools Categories */}
-      <section className="pb-20 px-6">
+      <section className="pb-20 px-4 sm:px-6">
         <div className="container mx-auto">
           {toolCategories.map((category, categoryIndex) => (
-            <div key={category.title} className="mb-16">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">{category.title}</h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">{category.description}</p>
+            <div key={category.title} className="mb-10 sm:mb-16">
+              <div className="text-center mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">{category.title}</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">{category.description}</p>
               </div>
               
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {category.tools.map((tool, toolIndex) => (
                   <Card 
                     key={tool.name}
-                    className="group hover:shadow-2xl transition-all duration-300 border border-gray-200 hover:border-orange-300 hover:scale-105 relative overflow-hidden"
+                    className="group hover:shadow-2xl transition-all duration-300 border border-border hover:border-primary/30 hover:scale-[1.02] sm:hover:scale-105 relative overflow-hidden"
                   >
                     {tool.popular && (
                       <div className="absolute top-4 right-4 z-10">
@@ -221,10 +220,10 @@ const ToolsDashboard = () => {
                       <div className={`w-12 h-12 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                         <tool.icon className="h-6 w-6 text-white" />
                       </div>
-                      <CardTitle className="text-xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
+                      <CardTitle className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                         {tool.name}
                       </CardTitle>
-                      <CardDescription className="text-gray-600">
+                      <CardDescription className="text-muted-foreground text-sm">
                         {tool.description}
                       </CardDescription>
                     </CardHeader>

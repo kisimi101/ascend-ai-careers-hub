@@ -21,10 +21,12 @@ import {
   Zap,
   ChevronDown,
   ChevronUp,
+  Download,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import jsPDF from "jspdf";
 
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
@@ -283,6 +285,159 @@ const SmartApply = () => {
     toast({ title: "Copied!", description: "Cover letter copied to clipboard." });
   };
 
+  const downloadResumePDF = () => {
+    if (!resumeData) return;
+    const doc = new jsPDF();
+    const margin = 20;
+    let y = margin;
+    
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text(resumeData.personalInfo.fullName || "Resume", margin, y);
+    y += 8;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const contactParts = [resumeData.personalInfo.email, resumeData.personalInfo.phone, resumeData.personalInfo.location].filter(Boolean);
+    doc.text(contactParts.join(" • "), margin, y);
+    y += 10;
+
+    if (optimizationResult?.atsScore) {
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`ATS Score: ${optimizationResult.atsScore}%`, margin, y);
+      doc.setTextColor(0, 0, 0);
+      y += 8;
+    }
+
+    if (resumeData.personalInfo.summary) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("SUMMARY", margin, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const summaryLines = doc.splitTextToSize(resumeData.personalInfo.summary, 170);
+      doc.text(summaryLines, margin, y);
+      y += summaryLines.length * 5 + 6;
+    }
+
+    if (resumeData.experience?.length) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("EXPERIENCE", margin, y);
+      y += 6;
+      resumeData.experience.forEach(exp => {
+        if (y > 270) { doc.addPage(); y = margin; }
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${exp.position} — ${exp.company}`, margin, y);
+        y += 5;
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(9);
+        doc.text(exp.duration, margin, y);
+        y += 5;
+        if (exp.description) {
+          doc.setFont("helvetica", "normal");
+          const lines = doc.splitTextToSize(exp.description, 170);
+          doc.text(lines, margin, y);
+          y += lines.length * 4.5 + 4;
+        }
+      });
+      y += 4;
+    }
+
+    if (resumeData.education?.length) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("EDUCATION", margin, y);
+      y += 6;
+      resumeData.education.forEach(edu => {
+        if (y > 270) { doc.addPage(); y = margin; }
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`${edu.degree} — ${edu.institution} (${edu.year})`, margin, y);
+        y += 6;
+      });
+      y += 4;
+    }
+
+    if (resumeData.skills?.length) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("SKILLS", margin, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      const skillsText = doc.splitTextToSize(resumeData.skills.join(", "), 170);
+      doc.text(skillsText, margin, y);
+    }
+
+    doc.save(`${resumeData.personalInfo.fullName || "resume"}-optimized.pdf`);
+    toast({ title: "Downloaded!", description: "Optimized resume saved as PDF." });
+  };
+
+  const downloadCoverLetterPDF = (job: MatchedJob) => {
+    if (!job.coverLetter) return;
+    const doc = new jsPDF();
+    const margin = 20;
+    let y = margin;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }), margin, y);
+    y += 12;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Application: ${job.title}`, margin, y);
+    y += 6;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${job.company} — ${job.location}`, margin, y);
+    y += 12;
+
+    if (resumeData?.personalInfo) {
+      doc.text(`From: ${resumeData.personalInfo.fullName}`, margin, y);
+      y += 5;
+      doc.text(resumeData.personalInfo.email, margin, y);
+      y += 10;
+    }
+
+    doc.setFontSize(11);
+    const bodyLines = doc.splitTextToSize(job.coverLetter, 170);
+    doc.text(bodyLines, margin, y);
+
+    doc.save(`cover-letter-${job.company.replace(/\s+/g, "-").toLowerCase()}.pdf`);
+    toast({ title: "Downloaded!", description: `Cover letter for ${job.company} saved as PDF.` });
+  };
+
+  const downloadAllCoverLetters = () => {
+    const jobsWithLetters = matchedJobs.filter(j => j.coverLetter);
+    if (!jobsWithLetters.length) {
+      toast({ title: "No cover letters", description: "No cover letters to download.", variant: "destructive" });
+      return;
+    }
+    const doc = new jsPDF();
+    jobsWithLetters.forEach((job, idx) => {
+      if (idx > 0) doc.addPage();
+      const margin = 20;
+      let y = margin;
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${job.title} — ${job.company}`, margin, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(job.location, margin, y);
+      y += 10;
+      const lines = doc.splitTextToSize(job.coverLetter!, 170);
+      doc.text(lines, margin, y);
+    });
+    doc.save("all-cover-letters.pdf");
+    toast({ title: "Downloaded!", description: `${jobsWithLetters.length} cover letters saved as PDF.` });
+  };
+
   const steps = ["Upload", "Optimize", "Search", "Match", "Apply"];
 
   return (
@@ -296,10 +451,10 @@ const SmartApply = () => {
             <Zap className="h-4 w-4" />
             Smart Apply Pipeline
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-foreground mb-3">
             Upload → Optimize → <span className="text-primary">Apply</span>
           </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
             Upload your resume and our AI will optimize it, find matching jobs, generate tailored cover letters, and queue everything for one-click batch apply.
           </p>
         </motion.div>
@@ -363,11 +518,16 @@ const SmartApply = () => {
             {/* Optimization Summary */}
             {optimizationResult && (
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Resume Optimization Results
-                  </CardTitle>
+                 <CardHeader className="pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      Resume Optimization Results
+                    </CardTitle>
+                    <Button size="sm" variant="outline" onClick={downloadResumePDF} className="w-fit">
+                      <Download className="h-4 w-4 mr-1" /> Download Resume PDF
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-3">
@@ -402,22 +562,27 @@ const SmartApply = () => {
             )}
 
             {/* Matched Jobs */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
                 <Briefcase className="h-5 w-5" />
                 Matched Jobs ({matchedJobs.length})
               </h2>
-              <Button onClick={handleBatchApply} disabled={!matchedJobs.some(j => j.selected)}>
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Apply to Selected ({matchedJobs.filter(j => j.selected).length})
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={downloadAllCoverLetters} disabled={!matchedJobs.some(j => j.coverLetter)}>
+                  <Download className="h-4 w-4 mr-1" /> All Cover Letters
+                </Button>
+                <Button size="sm" onClick={handleBatchApply} disabled={!matchedJobs.some(j => j.selected)}>
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  Apply ({matchedJobs.filter(j => j.selected).length})
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-3">
               {matchedJobs.map((job, index) => (
                 <Card key={index} className={`transition-all ${job.selected ? "ring-1 ring-primary/30" : "opacity-60"}`}>
                   <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2 sm:gap-3">
                       <input
                         type="checkbox"
                         checked={job.selected}
@@ -425,16 +590,16 @@ const SmartApply = () => {
                         className="mt-1.5 h-4 w-4 rounded border-border"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <h3 className="font-semibold text-foreground">{job.title}</h3>
-                            <p className="text-sm text-muted-foreground">{job.company} • {job.location}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-foreground text-sm sm:text-base">{job.title}</h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground">{job.company} • {job.location}</p>
                           </div>
-                          <div className="flex gap-2 shrink-0">
-                            <Button size="sm" variant="outline" onClick={() => setExpandedJob(expandedJob === index ? null : index)}>
+                          <div className="flex gap-1.5 shrink-0">
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => setExpandedJob(expandedJob === index ? null : index)}>
                               {expandedJob === index ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => window.open(job.url, "_blank")}>
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => window.open(job.url, "_blank")}>
                               <ExternalLink className="h-4 w-4" />
                             </Button>
                           </div>
@@ -454,13 +619,18 @@ const SmartApply = () => {
                                 )}
                                 {job.coverLetter && (
                                   <div className="bg-muted/30 rounded-lg p-3">
-                                    <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
                                       <span className="text-xs font-medium text-primary flex items-center gap-1">
-                                        <Sparkles className="h-3 w-3" /> AI Cover Letter Intro
+                                        <Sparkles className="h-3 w-3" /> AI Cover Letter
                                       </span>
-                                      <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => copyToClipboard(job.coverLetter!)}>
-                                        <Copy className="h-3 w-3 mr-1" /> Copy
-                                      </Button>
+                                      <div className="flex gap-1">
+                                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => copyToClipboard(job.coverLetter!)}>
+                                          <Copy className="h-3 w-3 mr-1" /> Copy
+                                        </Button>
+                                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => downloadCoverLetterPDF(job)}>
+                                          <Download className="h-3 w-3 mr-1" /> PDF
+                                        </Button>
+                                      </div>
                                     </div>
                                     <p className="text-sm text-foreground">{job.coverLetter}</p>
                                   </div>

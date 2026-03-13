@@ -190,18 +190,18 @@ Best regards`,
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-center justify-between mb-8">
+      <div className="container mx-auto px-4 pt-24 sm:pt-28 pb-20 max-w-7xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Mail className="w-8 h-8 text-primary" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
+              <Mail className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
               Auto Follow-Up
             </h1>
-            <p className="text-muted-foreground mt-1">AI-generated follow-up emails sent at optimal timing after applying</p>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">AI-generated follow-up emails sent at optimal timing</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Select value={tone} onValueChange={setTone}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-32 sm:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -211,15 +211,15 @@ Best regards`,
                 <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={generateDrafts} disabled={isGenerating}>
+            <Button onClick={generateDrafts} disabled={isGenerating} size="sm">
               {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-              Regenerate
+              <span className="hidden sm:inline">Regenerate</span>
             </Button>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <Card>
             <CardContent className="pt-6 flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10"><Mail className="w-5 h-5 text-primary" /></div>

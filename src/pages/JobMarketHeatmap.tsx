@@ -145,15 +145,13 @@ const JobMarketHeatmap = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Map className="w-8 h-8 text-primary" />
-              Job Market Heatmap
-            </h1>
-            <p className="text-muted-foreground mt-1">Visual demand map by role and location with salary data</p>
-          </div>
+      <div className="container mx-auto px-4 pt-24 sm:pt-28 pb-20 max-w-7xl">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
+            <Map className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
+            Job Market Heatmap
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Visual demand map by role and location with salary data</p>
         </div>
 
         {/* Controls */}
