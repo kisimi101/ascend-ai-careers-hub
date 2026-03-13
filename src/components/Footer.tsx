@@ -92,13 +92,13 @@ const Footer = () => {
                 <span className="font-bold text-foreground">AI</span>
               </div>
               <div>
-                <div className="text-lg font-bold text-gradient-primary">CareerHub</div>
+                <div className="text-lg font-bold text-gradient-primary">CareerNow</div>
                 <div className="text-xs text-muted-foreground">A modern career platform</div>
               </div>
             </div>
 
             <div className="text-center md:text-right">
-              <p className="text-sm text-muted-foreground">© 2026 CareerHub. All rights reserved.</p>
+              <p className="text-sm text-muted-foreground">© 2026 CareerNow. All rights reserved.</p>
               <p className="text-xs text-muted-foreground/80 mt-1">Built for job seekers, by job seekers</p>
             </div>
           </div>

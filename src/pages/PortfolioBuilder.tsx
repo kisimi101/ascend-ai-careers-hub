@@ -244,7 +244,7 @@ const PortfolioBuilder = () => {
 
   const generateShareableLink = () => {
     // In a real app, this would save to a database and generate a unique URL
-    const mockUrl = `https://careerhub.dev/portfolio/${portfolioData.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now().toString(36)}`;
+    const mockUrl = `https://careernow.dev/portfolio/${portfolioData.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now().toString(36)}`;
     setShareUrl(mockUrl);
     toast({
       title: "Link generated!",

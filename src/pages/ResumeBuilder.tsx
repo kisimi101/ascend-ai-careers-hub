@@ -365,7 +365,7 @@ const ResumeBuilder = () => {
                 <span className="text-white font-bold text-sm">AI</span>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                CareerHub
+                CareerNow
               </span>
             </div>
             <Button onClick={() => navigate('/')} variant="outline">

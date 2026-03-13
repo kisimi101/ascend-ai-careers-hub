@@ -6,7 +6,7 @@ const testimonials = [
   {
     name: "Sarah Chen",
     role: "Software Engineer at Google",
-    content: "CareerHub's AI resume builder helped me land my dream job at Google. The interview prep was incredible!",
+    content: "CareerNow's AI resume builder helped me land my dream job at Google. The interview prep was incredible!",
     avatar: "SC"
   },
   {

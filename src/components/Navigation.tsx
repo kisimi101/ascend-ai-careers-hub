@@ -35,29 +35,29 @@ export const Navigation = () => {
 
   const mobileNavLinks = [
     { label: "Get Started", path: "/get-started" },
-    { label: "Smart Apply ✨", path: "/smart-apply" },
+    { label: "Smart Apply ✨ (Pro)", path: "/smart-apply" },
     { label: "Dashboard", path: "/dashboard" },
     { label: "AI Resume Builder", path: "/resume-builder" },
     { label: "Resume Checker", path: "/resume-checker" },
     { label: "Keyword Scanner", path: "/resume-keyword-scanner" },
     { label: "Resume Comparison", path: "/resume-comparison" },
-    { label: "Job Search", path: "/job-search" },
+    { label: "Job Search (Pro)", path: "/job-search" },
     { label: "Cover Letter Generator", path: "/cover-letter-generator" },
     { label: "Interview Practice", path: "/interview-practice" },
-    { label: "Interview Question Bank", path: "/interview-question-bank" },
+    { label: "Interview Question Bank (Pro)", path: "/interview-question-bank" },
     { label: "Job Tracker", path: "/job-tracker" },
     { label: "Salary Estimator", path: "/salary-estimator" },
-    { label: "Auto Follow-Up", path: "/auto-follow-up" },
-    { label: "Job Market Heatmap", path: "/job-market-heatmap" },
-    { label: "Career Timeline", path: "/career-timeline" },
-    { label: "Referral Mapper", path: "/referral-mapper" },
+    { label: "Auto Follow-Up (Pro)", path: "/auto-follow-up" },
+    { label: "Job Market Heatmap (Pro)", path: "/job-market-heatmap" },
+    { label: "Career Timeline (Pro)", path: "/career-timeline" },
+    { label: "Referral Mapper (Pro)", path: "/referral-mapper" },
     { label: "LinkedIn Optimizer", path: "/linkedin-optimizer" },
     { label: "LinkedIn Import", path: "/linkedin-import" },
     { label: "Skills Gap Analyzer", path: "/skills-gap-analyzer" },
     { label: "Career Path Planner", path: "/career-path-planner" },
     { label: "Portfolio Builder", path: "/portfolio-builder" },
     { label: "Company Research", path: "/company-research" },
-    { label: "Network", path: "/network" },
+    { label: "Network (Pro)", path: "/network" },
   ];
   
   return (
@@ -65,9 +65,9 @@ export const Navigation = () => {
       <div className="fixed top-0 w-full z-50 glass border-b border-border/50">
         <div className="container mx-auto container-padding py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <img src={logo} alt="CareerHub AI Logo" className="w-10 h-10 rounded-lg" />
+            <img src={logo} alt="CareerNow AI Logo" className="w-10 h-10 rounded-lg" />
             <span className="text-xl font-bold text-gradient-primary">
-              CareerHub
+              CareerNow
             </span>
           </Link>
           
@@ -85,7 +85,7 @@ export const Navigation = () => {
                     <HoveredLink to="/resume-examples">Resume Examples</HoveredLink>
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Job Search">
+                <MenuItem setActive={setActive} active={active} item="Job Search 👑">
                   <div className="text-sm grid grid-cols-2 gap-6 p-4 min-w-[520px]">
                     <ProductItem
                       title="Job Search"
@@ -125,7 +125,7 @@ export const Navigation = () => {
                     />
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Network">
+                <MenuItem setActive={setActive} active={active} item="Network 👑">
                   <div className="flex flex-col space-y-4 text-sm">
                     <HoveredLink to="/network">Find Recruiters & Contacts</HoveredLink>
                     <HoveredLink to="/linkedin-optimizer">LinkedIn Optimizer</HoveredLink>
@@ -138,7 +138,7 @@ export const Navigation = () => {
                     <HoveredLink to="/referral-mapper">Referral Mapper ✨</HoveredLink>
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Pro Tools">
+                <MenuItem setActive={setActive} active={active} item="Pro Tools 👑">
                   <div className="flex flex-col space-y-4 text-sm">
                     <HoveredLink to="/smart-apply">Smart Apply Pipeline</HoveredLink>
                     <HoveredLink to="/auto-follow-up">Auto Follow-Up</HoveredLink>

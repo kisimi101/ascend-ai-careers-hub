@@ -1,24 +1,24 @@
-
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { 
-  FileText, 
-  Search, 
-  Edit, 
-  Target, 
-  Settings, 
-  Scan, 
-  FileX, 
-  MessageCircle, 
-  DollarSign, 
-  Clipboard, 
-  Sparkles, 
-  Globe, 
-  Video, 
-  Eye, 
+import {
+  FileText,
+  Search,
+  Edit,
+  Target,
+  Settings,
+  Scan,
+  FileX,
+  MessageCircle,
+  DollarSign,
+  Clipboard,
+  Sparkles,
+  Globe,
+  Video,
+  Eye,
   User,
   Rocket,
   Star,
@@ -27,14 +27,34 @@ import {
   BookOpen,
   TrendingUp,
   Users,
-  Crown
+  Crown,
+  Loader2,
+  Briefcase,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSubscription } from "@/hooks/useSubscription";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+interface ToolItem {
+  name: string;
+  description: string;
+  icon: any;
+  path: string;
+  color: string;
+  popular?: boolean;
+  premium?: boolean;
+}
 
 const ToolsDashboard = () => {
   const navigate = useNavigate();
+  const { isPro } = useSubscription();
+  const { toast } = useToast();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-  const toolCategories = [
+  const toolCategories: { title: string; description: string; tools: ToolItem[] }[] = [
     {
       title: "Resume Tools",
       description: "Perfect your resume with AI assistance",
@@ -45,29 +65,31 @@ const ToolsDashboard = () => {
         { name: "Resume Bullet Generator", description: "Generate impactful bullet points", icon: Target, path: "/resume-bullet-generator", color: "from-orange-500 to-orange-600" },
         { name: "Skills Generator", description: "Optimize your skills section", icon: Settings, path: "/resume-skills-generator", color: "from-teal-500 to-teal-600" },
         { name: "AI Resume Enhancer", description: "AI-powered resume optimization", icon: Sparkles, path: "/resume-enhancer", color: "from-pink-500 to-pink-600" },
-      ]
+      ],
     },
     {
       title: "Job Search Tools",
       description: "Accelerate your job search process",
       tools: [
+        { name: "Job Search", description: "Search thousands of jobs across major boards", icon: Briefcase, path: "/job-search", color: "from-primary to-primary/80", premium: true },
         { name: "Smart Apply", description: "Upload → AI optimize → batch apply to matching jobs", icon: Rocket, path: "/smart-apply", color: "from-primary to-primary/80", popular: true, premium: true },
         { name: "Cover Letter Generator", description: "Create tailored cover letters in minutes", icon: FileText, path: "/cover-letter-generator", color: "from-indigo-500 to-indigo-600", popular: true },
         { name: "Keyword Scanner", description: "Optimize for ATS systems", icon: Scan, path: "/resume-keyword-scanner", color: "from-yellow-500 to-yellow-600" },
         { name: "Job Tracker", description: "Track your job applications", icon: Clipboard, path: "/job-tracker", color: "from-red-500 to-red-600" },
         { name: "Salary Estimator", description: "Know your market value", icon: DollarSign, path: "/salary-estimator", color: "from-emerald-500 to-emerald-600" },
-      ]
+      ],
     },
     {
       title: "Career Development",
       description: "Advance your professional growth",
       tools: [
+        { name: "Recruiters & Contacts", description: "Find and connect with recruiters and hiring managers", icon: Users, path: "/network", color: "from-primary to-primary/80", premium: true },
         { name: "Interview Practice", description: "Practice with AI-powered mock interviews", icon: MessageCircle, path: "/interview-practice", color: "from-cyan-500 to-cyan-600" },
         { name: "Career Timeline", description: "AI-predicted career path with milestones", icon: TrendingUp, path: "/career-timeline", color: "from-violet-500 to-violet-600", premium: true },
         { name: "Interview Question Bank", description: "Company-specific AI questions", icon: BookOpen, path: "/interview-question-bank", color: "from-sky-500 to-sky-600", premium: true },
         { name: "Resignation Letter", description: "Professional resignation letters", icon: FileX, path: "/resignation-letter-generator", color: "from-gray-500 to-gray-600" },
         { name: "Resume Examples", description: "Industry-specific resume templates", icon: User, path: "/resume-examples", color: "from-violet-500 to-violet-600" },
-      ]
+      ],
     },
     {
       title: "Advanced Tools",
@@ -79,26 +101,57 @@ const ToolsDashboard = () => {
         { name: "Resume Translator", description: "Translate resumes to any language", icon: Globe, path: "/resume-translator", color: "from-rose-500 to-rose-600" },
         { name: "Video Resume Maker", description: "Create engaging video resumes", icon: Video, path: "/video-resume", color: "from-amber-500 to-amber-600" },
         { name: "Social Media Preview", description: "Optimize your professional presence", icon: Eye, path: "/social-preview", color: "from-lime-500 to-lime-600" },
-      ]
-    }
+      ],
+    },
   ];
+
+  const handleToolAccess = (tool: ToolItem) => {
+    if (tool.premium && !isPro) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    navigate(tool.path);
+  };
+
+  const startUpgradeCheckout = async () => {
+    try {
+      setCheckoutLoading(true);
+      const { data, error } = await supabase.functions.invoke("polar-checkout", {
+        body: { tier: "pro" },
+      });
+
+      if (error) throw error;
+      if (!data?.url) throw new Error("No checkout URL returned");
+
+      window.location.href = data.url;
+    } catch (error: any) {
+      toast({
+        title: "Could not start checkout",
+        description: error?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <section className="pt-24 sm:pt-32 pb-10 sm:pb-16 px-4 sm:px-6">
         <div className="container mx-auto text-center">
           <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
             <Rocket className="w-4 h-4 mr-2" />
-            Free AI Career Tools
+            Free + Pro AI Career Tools
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-foreground mb-4 sm:mb-6">
             Choose Your
             <span className="text-gradient-primary"> AI Tool</span>
           </h1>
           <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto">
-            Access our complete suite of AI-powered career tools. All free, no signup required.
+            Start with free tools, then upgrade for premium job search, networking, and automation workflows.
           </p>
         </div>
       </section>
@@ -111,10 +164,10 @@ const ToolsDashboard = () => {
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">{category.title}</h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">{category.description}</p>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {category.tools.map((tool: any) => (
-                  <Card 
+                {category.tools.map((tool) => (
+                  <Card
                     key={tool.name}
                     className="group hover:shadow-2xl transition-all duration-300 border border-border hover:border-primary/30 hover:scale-[1.02] sm:hover:scale-105 relative overflow-hidden"
                   >
@@ -132,7 +185,7 @@ const ToolsDashboard = () => {
                         )}
                       </div>
                     )}
-                    
+
                     <CardHeader className="pb-4">
                       <div className={`w-12 h-12 bg-gradient-to-r ${tool.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                         <tool.icon className="h-6 w-6 text-white" />
@@ -144,13 +197,13 @@ const ToolsDashboard = () => {
                         {tool.description}
                       </CardDescription>
                     </CardHeader>
-                    
+
                     <CardContent className="pt-0">
-                      <Button 
-                        onClick={() => navigate(tool.path)}
+                      <Button
+                        onClick={() => handleToolAccess(tool)}
                         className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90 transition-all`}
                       >
-                        {tool.premium ? "Try Pro Feature" : "Try Now - Free"}
+                        {tool.premium ? (isPro ? "Open Pro Feature" : "Upgrade to Access") : "Try Now"}
                       </Button>
                     </CardContent>
                   </Card>
@@ -160,6 +213,48 @@ const ToolsDashboard = () => {
           ))}
         </div>
       </section>
+
+      <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+              <Crown className="h-7 w-7 text-primary" />
+            </div>
+            <DialogTitle className="text-center text-2xl">Upgrade to Pro</DialogTitle>
+            <DialogDescription className="text-center">
+              Unlock Job Search, Recruiters & Contacts, and all Pro tools in one plan.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 text-sm">
+            {[
+              "Full Job Search access",
+              "Recruiters & Contacts network tools",
+              "Referral Mapper + advanced Pro tools",
+              "Smart Apply downloads and batch apply",
+            ].map((feature) => (
+              <div key={feature} className="flex items-center gap-2 text-foreground">
+                <Crown className="h-4 w-4 text-primary" />
+                <span>{feature}</span>
+              </div>
+            ))}
+          </div>
+
+          <Button className="btn-gradient w-full" onClick={startUpgradeCheckout} disabled={checkoutLoading}>
+            {checkoutLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Redirecting...
+              </>
+            ) : (
+              <>
+                <Crown className="h-4 w-4 mr-2" />
+                Upgrade to Pro
+              </>
+            )}
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

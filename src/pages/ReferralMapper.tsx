@@ -64,7 +64,7 @@ const ReferralMapper = () => {
             company: c.company || targetCompany,
             connectionStrength: i < 2 ? 'strong' : i < 5 ? 'medium' : 'weak',
             mutualConnections: Math.floor(3 + Math.random() * 20),
-            linkedinUrl: c.linkedin,
+            linkedinUrl: c.linkedin || c.linkedinUrl || c.profileUrl,
             email: c.email,
             introPath: generateIntroPath(c.name),
             lastInteraction: getRandomDate(),
@@ -107,6 +107,49 @@ const ReferralMapper = () => {
     const d = new Date();
     d.setDate(d.getDate() - days);
     return d.toISOString().split('T')[0];
+  };
+
+  const normalizeExternalUrl = (url?: string) => {
+    if (!url?.trim()) return '';
+    if (/^https?:\/\//i.test(url)) return url;
+    return `https://${url.replace(/^\/+/, '')}`;
+  };
+
+  const buildIntroDraft = (conn: ReferralConnection) => `Hi ${conn.name.split(' ')[0]},
+
+I noticed we have ${conn.mutualConnections} mutual connections. I'm exploring opportunities at ${conn.company} and would love to learn about your experience there.
+
+Would you be open to a brief chat?
+
+Best regards`;
+
+  const handleDraftIntro = async (conn: ReferralConnection) => {
+    const draft = buildIntroDraft(conn);
+
+    if (conn.email) {
+      const subject = `Connecting about ${conn.company}`;
+      window.open(`mailto:${conn.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(draft)}`);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(draft);
+      toast({
+        title: 'Draft copied',
+        description: 'No email found. Paste this draft into LinkedIn or another contact channel.',
+      });
+
+      const linkedInUrl = normalizeExternalUrl(conn.linkedinUrl);
+      if (linkedInUrl) {
+        window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+      }
+    } catch {
+      toast({
+        title: 'Unable to create draft',
+        description: 'Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const generateFallbackCompany = (name: string): TargetCompany => {
@@ -266,7 +309,14 @@ const ReferralMapper = () => {
                         {/* Actions */}
                         <div className="flex items-center gap-2 mt-3">
                           {conn.linkedinUrl && (
-                            <Button variant="outline" size="sm" className="text-xs" onClick={() => window.open(conn.linkedinUrl, '_blank')}>
+                            <Button variant="outline" size="sm" className="text-xs" onClick={() => {
+                              const linkedInUrl = normalizeExternalUrl(conn.linkedinUrl);
+                              if (!linkedInUrl) {
+                                toast({ title: 'Invalid LinkedIn URL', variant: 'destructive' });
+                                return;
+                              }
+                              window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+                            }}>
                               <Linkedin className="w-3 h-3 mr-1" /> Profile
                             </Button>
                           )}
@@ -278,16 +328,7 @@ const ReferralMapper = () => {
                               <Mail className="w-3 h-3 mr-1" /> {conn.email}
                             </Button>
                           )}
-                          <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={() => {
-                            const body = `Hi ${conn.name.split(' ')[0]},
-
-I noticed we have ${conn.mutualConnections} mutual connections. I'm exploring opportunities at ${conn.company} and would love to learn about your experience there.
-
-Would you be open to a brief chat?
-
-Best regards`;
-                            window.open(`mailto:${conn.email || ''}?subject=Connecting about ${conn.company}&body=${encodeURIComponent(body)}`);
-                          }}>
+                          <Button variant="ghost" size="sm" className="text-xs text-primary" onClick={() => handleDraftIntro(conn)}>
                             <Sparkles className="w-3 h-3 mr-1" /> Draft Intro
                           </Button>
                         </div>

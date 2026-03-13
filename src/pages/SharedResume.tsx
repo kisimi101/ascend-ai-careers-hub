@@ -78,7 +78,7 @@ const SharedResume = () => {
             <Eye className="h-4 w-4" />
             <span>{viewCount} views</span>
           </div>
-          <p className="text-xs text-muted-foreground">Powered by CareerHub AI</p>
+          <p className="text-xs text-muted-foreground">Powered by CareerNow AI</p>
         </div>
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {renderTemplate()}

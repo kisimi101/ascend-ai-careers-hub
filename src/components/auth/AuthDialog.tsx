@@ -73,7 +73,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defa
     if (result.success) {
       toast({
         title: "Success!",
-        description: `Welcome ${activeTab === 'login' ? 'back' : 'to CareerHub'}!`,
+        description: `Welcome ${activeTab === 'login' ? 'back' : 'to CareerNow'}!`,
       });
       onOpenChange(false);
       setFormData({ email: '', password: '', name: '' });
@@ -90,7 +90,7 @@ export const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange, defa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
-          <DialogTitle className="text-2xl text-gradient-primary">Welcome to CareerHub</DialogTitle>
+          <DialogTitle className="text-2xl text-gradient-primary">Welcome to CareerNow</DialogTitle>
           <DialogDescription>
             Join thousands of professionals advancing their careers with AI
           </DialogDescription>
