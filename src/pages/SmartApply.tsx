@@ -419,38 +419,40 @@ const SmartApply = () => {
   };
 
   const downloadCoverLetterPDF = (job: MatchedJob) => {
-    if (!job.coverLetter) return;
-    const doc = new jsPDF();
-    const margin = 20;
-    let y = margin;
+    requirePro(() => {
+      if (!job.coverLetter) return;
+      const doc = new jsPDF();
+      const margin = 20;
+      let y = margin;
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }), margin, y);
-    y += 12;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }), margin, y);
+      y += 12;
 
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text(`Application: ${job.title}`, margin, y);
-    y += 6;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(`${job.company} — ${job.location}`, margin, y);
-    y += 12;
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Application: ${job.title}`, margin, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${job.company} — ${job.location}`, margin, y);
+      y += 12;
 
-    if (resumeData?.personalInfo) {
-      doc.text(`From: ${resumeData.personalInfo.fullName}`, margin, y);
-      y += 5;
-      doc.text(resumeData.personalInfo.email, margin, y);
-      y += 10;
-    }
+      if (resumeData?.personalInfo) {
+        doc.text(`From: ${resumeData.personalInfo.fullName}`, margin, y);
+        y += 5;
+        doc.text(resumeData.personalInfo.email, margin, y);
+        y += 10;
+      }
 
-    doc.setFontSize(11);
-    const bodyLines = doc.splitTextToSize(job.coverLetter, 170);
-    doc.text(bodyLines, margin, y);
+      doc.setFontSize(11);
+      const bodyLines = doc.splitTextToSize(job.coverLetter, 170);
+      doc.text(bodyLines, margin, y);
 
-    doc.save(`cover-letter-${job.company.replace(/\s+/g, "-").toLowerCase()}.pdf`);
-    toast({ title: "Downloaded!", description: `Cover letter for ${job.company} saved as PDF.` });
+      doc.save(`cover-letter-${job.company.replace(/\s+/g, "-").toLowerCase()}.pdf`);
+      toast({ title: "Downloaded!", description: `Cover letter for ${job.company} saved as PDF.` });
+    });
   };
 
   const downloadAllCoverLetters = () => {
