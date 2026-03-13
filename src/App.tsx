@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ThemeProvider } from "./components/ThemeProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProRoute from "./components/ProRoute";
 import Index from "./pages/Index";
 import ToolsDashboard from "./pages/ToolsDashboard";
 import ResumeBuilder from "./pages/ResumeBuilder";
