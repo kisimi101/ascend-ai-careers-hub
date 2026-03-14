@@ -1,70 +1,102 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Briefcase,
-  TrendingUp,
-  FileText,
-  Users,
-  ArrowUpRight,
-  Calendar,
-  Target,
-  BarChart3,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { AnnotatedResumePreview } from "./AnnotatedResumePreview";
+import {
+  PieChart, Pie, Cell, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+} from "recharts";
 
-const stats = [
-  {
-    label: "Jobs Tracked",
-    value: "2,847",
-    change: "+12%",
-    icon: Briefcase,
-    gradientClass: "bg-gradient-primary",
-  },
-  {
-    label: "Resumes Built",
-    value: "1,253",
-    change: "+8%",
-    icon: FileText,
-    gradientClass: "bg-gradient-success",
-  },
-  {
-    label: "Interviews Scheduled",
-    value: "489",
-    change: "+24%",
-    icon: Calendar,
-    gradientClass: "bg-gradient-info",
-  },
-  {
-    label: "Offer Rate",
-    value: "73%",
-    change: "+5%",
-    icon: Target,
-    gradientClass: "bg-gradient-warning",
-  },
+/* ── data ── */
+const pieData = [
+  { name: "Applied", value: 42, color: "hsl(22, 65%, 42%)" },
+  { name: "Interview", value: 18, color: "hsl(152, 55%, 33%)" },
+  { name: "Offer", value: 7, color: "hsl(205, 65%, 42%)" },
+  { name: "Rejected", value: 12, color: "hsl(220, 10%, 46%)" },
 ];
 
-const recentActivity = [
-  { action: "Resume optimized", tool: "AI Resume Builder", time: "2 min ago", icon: FileText },
-  { action: "Interview scheduled", tool: "Job Tracker", time: "1 hr ago", icon: Calendar },
-  { action: "Skills assessed", tool: "Skills Gap Analyzer", time: "3 hrs ago", icon: BarChart3 },
-  { action: "Company saved", tool: "Company Research", time: "5 hrs ago", icon: Users },
+const trendData = [
+  { week: "W1", applications: 8, interviews: 2 },
+  { week: "W2", applications: 12, interviews: 3 },
+  { week: "W3", applications: 10, interviews: 5 },
+  { week: "W4", applications: 18, interviews: 4 },
+  { week: "W5", applications: 15, interviews: 7 },
+  { week: "W6", applications: 22, interviews: 9 },
+  { week: "W7", applications: 20, interviews: 11 },
+];
+
+const upcomingInterviews = [
+  { company: "Stripe", role: "Senior Engineer", date: "Mar 17", status: "Confirmed" },
+  { company: "Vercel", role: "Frontend Lead", date: "Mar 19", status: "Pending" },
+  { company: "Linear", role: "Full Stack Dev", date: "Mar 22", status: "Confirmed" },
+];
+
+const careerGoals = [
+  { label: "Resume Score", value: 88, target: 100 },
+  { label: "Applications Sent", value: 42, target: 50 },
+  { label: "Interviews Booked", value: 11, target: 15 },
+  { label: "Network Outreach", value: 23, target: 40 },
 ];
 
 const container = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
-
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
+/* ── Gauge Component ── */
+const CareerHealthGauge = ({ score }: { score: number }) => {
+  const angle = (score / 100) * 180;
+  const r = 80;
+  const cx = 100;
+  const cy = 95;
+  const rad = (a: number) => ((180 - a) * Math.PI) / 180;
+  const arcPath = (startAngle: number, endAngle: number) => {
+    const x1 = cx + r * Math.cos(rad(startAngle));
+    const y1 = cy - r * Math.sin(rad(startAngle));
+    const x2 = cx + r * Math.cos(rad(endAngle));
+    const y2 = cy - r * Math.sin(rad(endAngle));
+    const large = endAngle - startAngle > 180 ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 0 ${x2} ${y2}`;
+  };
+
+  const grade = score >= 80 ? "A" : score >= 60 ? "B" : score >= 40 ? "C" : "D";
+
+  return (
+    <div className="flex flex-col items-center">
+      <svg viewBox="0 0 200 120" className="w-full max-w-[220px]">
+        {/* Background arc */}
+        <path d={arcPath(0, 180)} fill="none" stroke="hsl(var(--muted))" strokeWidth="14" strokeLinecap="round" />
+        {/* Score arc */}
+        <motion.path
+          d={arcPath(0, angle)}
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth="14"
+          strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          whileInView={{ pathLength: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        />
+        {/* Score text */}
+        <text x={cx} y={cy - 10} textAnchor="middle" className="fill-foreground text-[11px] font-medium">
+          Grade {grade}
+        </text>
+        <text x={cx} y={cy + 20} textAnchor="middle" className="fill-foreground text-[32px] font-bold" style={{ fontFamily: "Space Grotesk" }}>
+          {score}
+        </text>
+      </svg>
+      <span className="text-sm text-muted-foreground -mt-1">Points</span>
+    </div>
+  );
+};
+
+/* ── Main Component ── */
 export const DashboardPreview = () => {
   const navigate = useNavigate();
 
@@ -93,53 +125,67 @@ export const DashboardPreview = () => {
           viewport={{ once: true, margin: "-100px" }}
           className="max-w-6xl mx-auto"
         >
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
-            {stats.map((stat) => (
-              <motion.div key={stat.label} variants={item}>
-                <Card className="border-border/60 bg-card/70 backdrop-blur-sm hover:shadow-lg transition-all duration-300 group">
-                  <CardContent className="p-3 sm:p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div
-                        className={`w-10 h-10 rounded-xl ${stat.gradientClass} flex items-center justify-center group-hover:scale-110 transition-transform`}
-                      >
-                        <stat.icon className="text-primary-foreground" size={20} />
-                      </div>
-                      <span className="text-xs font-semibold text-success flex items-center gap-0.5">
-                        <TrendingUp size={12} />
-                        {stat.change}
-                      </span>
+          {/* Row 1 — 4 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            {/* Career Health Score */}
+            <motion.div variants={item}>
+              <Card className="border-border/60 bg-card/80 backdrop-blur-sm h-full">
+                <CardContent className="p-5">
+                  <h3 className="text-base font-semibold text-foreground mb-2">Career Health Score</h3>
+                  <CareerHealthGauge score={85} />
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Application Categories */}
+            <motion.div variants={item}>
+              <Card className="border-border/60 bg-card/80 backdrop-blur-sm h-full">
+                <CardContent className="p-5">
+                  <h3 className="text-base font-semibold text-foreground mb-2">Application Status</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="w-28 h-28 flex-shrink-0">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie data={pieData} cx="50%" cy="50%" innerRadius={28} outerRadius={48} dataKey="value" strokeWidth={0}>
+                            {pieData.map((entry, i) => (
+                              <Cell key={i} fill={entry.color} />
+                            ))}
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
                     </div>
-                    <div className="text-lg sm:text-2xl font-bold text-foreground">{stat.value}</div>
-                    <div className="text-xs sm:text-sm text-muted-foreground">{stat.label}</div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          <div className="grid lg:grid-cols-5 gap-4 sm:gap-6">
-            <motion.div variants={item} className="lg:col-span-3">
-              <Card className="border-border/60 bg-card/70 backdrop-blur-sm h-full">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-foreground">Application Trends</h3>
-                    <span className="text-xs text-muted-foreground bg-muted/60 px-3 py-1 rounded-full">
-                      Last 7 days
-                    </span>
+                    <div className="space-y-1.5 text-xs">
+                      {pieData.map((d) => (
+                        <div key={d.name} className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
+                          <span className="text-muted-foreground">{d.name}</span>
+                          <span className="text-foreground font-semibold ml-auto">{d.value}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex items-end gap-3 h-40">
-                    {[40, 65, 45, 80, 55, 90, 70].map((height, i) => (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                        <motion.div
-                          className="w-full rounded-t-lg bg-gradient-to-t from-primary/80 to-primary/30"
-                          initial={{ height: 0 }}
-                          whileInView={{ height: `${height}%` }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.3 + i * 0.08, duration: 0.5, ease: "easeOut" }}
-                        />
-                        <span className="text-[10px] text-muted-foreground">
-                          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
-                        </span>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Upcoming Interviews */}
+            <motion.div variants={item}>
+              <Card className="border-border/60 bg-card/80 backdrop-blur-sm h-full">
+                <CardContent className="p-5">
+                  <h3 className="text-base font-semibold text-foreground mb-3">Upcoming Interviews</h3>
+                  <div className="space-y-3">
+                    {upcomingInterviews.map((iv) => (
+                      <div key={iv.company} className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{iv.company}</p>
+                          <p className="text-xs text-muted-foreground">{iv.role}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-foreground">{iv.date}</p>
+                          <p className={`text-[10px] font-medium ${iv.status === "Confirmed" ? "text-success" : "text-warning"}`}>
+                            {iv.status}
+                          </p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -147,23 +193,71 @@ export const DashboardPreview = () => {
               </Card>
             </motion.div>
 
+            {/* Career Goals */}
+            <motion.div variants={item}>
+              <Card className="border-border/60 bg-card/80 backdrop-blur-sm h-full">
+                <CardContent className="p-5">
+                  <h3 className="text-base font-semibold text-foreground mb-3">Career Goals</h3>
+                  <div className="space-y-3">
+                    {careerGoals.slice(0, 3).map((goal) => (
+                      <div key={goal.label}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-muted-foreground">{goal.label}</span>
+                          <span className="text-xs font-semibold text-foreground">{goal.value}/{goal.target}</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-muted overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{
+                              background: goal.value / goal.target >= 0.8
+                                ? "hsl(var(--success))"
+                                : goal.value / goal.target >= 0.5
+                                  ? "hsl(var(--primary))"
+                                  : "hsl(var(--warning))",
+                            }}
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${(goal.value / goal.target) * 100}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Row 2 — Goals detail + Trend chart */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            {/* Extended Goals */}
             <motion.div variants={item} className="lg:col-span-2">
-              <Card className="border-border/60 bg-card/70 backdrop-blur-sm h-full">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
+              <Card className="border-border/60 bg-card/80 backdrop-blur-sm h-full">
+                <CardContent className="p-5">
+                  <h3 className="text-base font-semibold text-foreground mb-4">Weekly Targets</h3>
                   <div className="space-y-4">
-                    {recentActivity.map((activity, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <activity.icon className="text-primary" size={14} />
+                    {careerGoals.map((goal) => (
+                      <div key={goal.label}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm text-foreground">{goal.label}</span>
+                          <span className="text-sm font-bold text-foreground">{Math.round((goal.value / goal.target) * 100)}%</span>
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">
-                            {activity.action}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {activity.tool} · {activity.time}
-                          </p>
+                        <div className="h-2.5 rounded-full bg-muted overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{
+                              background: goal.value / goal.target >= 0.8
+                                ? "hsl(var(--success))"
+                                : goal.value / goal.target >= 0.5
+                                  ? "hsl(var(--primary))"
+                                  : "hsl(var(--warning))",
+                            }}
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${(goal.value / goal.target) * 100}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1, ease: "easeOut" }}
+                          />
                         </div>
                       </div>
                     ))}
@@ -171,21 +265,45 @@ export const DashboardPreview = () => {
                 </CardContent>
               </Card>
             </motion.div>
+
+            {/* Application Trend */}
+            <motion.div variants={item} className="lg:col-span-3">
+              <Card className="border-border/60 bg-card/80 backdrop-blur-sm h-full">
+                <CardContent className="p-5">
+                  <h3 className="text-base font-semibold text-foreground mb-4">Application Trend</h3>
+                  <div className="h-52">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={trendData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="week" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: 8,
+                            fontSize: 12,
+                          }}
+                        />
+                        <Line type="monotone" dataKey="applications" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(var(--primary))" }} />
+                        <Line type="monotone" dataKey="interviews" stroke="hsl(var(--success))" strokeWidth={2.5} dot={{ r: 4, fill: "hsl(var(--success))" }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex items-center gap-6 mt-3">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="w-3 h-0.5 rounded bg-primary" /> Applications
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="w-3 h-0.5 rounded bg-success" /> Interviews
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
 
-          {/* Annotated Sample Resume */}
-          <motion.div variants={item}>
-            <div className="text-center mt-10 mb-4">
-              <h3 className="text-2xl font-bold text-foreground mb-2">
-                See What Your Resume Could Look Like
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Every section annotated — built to pass ATS systems and impress recruiters
-              </p>
-            </div>
-            <AnnotatedResumePreview />
-          </motion.div>
-
+          {/* CTAs */}
           <motion.div variants={item} className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-10">
             <Button
               size="lg"
