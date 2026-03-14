@@ -1,4 +1,5 @@
 import { ResumeData } from "../types";
+import { BulletList } from "./BulletList";
 
 interface TemplateProps {
   resumeData: ResumeData;
