@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
+import { AnnotatedResumePreview } from "@/components/AnnotatedResumePreview";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { FloatingSideTools } from "@/components/FloatingSideTools";
 
