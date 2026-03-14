@@ -62,7 +62,7 @@ Skills: ${resumeData.skills.join(', ')}
         messages: [
           {
             role: 'system',
-            content: 'You are an expert resume writer and career coach. Your task is to enhance resume content to be more impactful, ATS-friendly, and professionally written. Provide specific improvements while maintaining accuracy.'
+            content: 'You are an expert resume writer and career coach. Your task is to enhance resume content to be more impactful, ATS-friendly, and professionally written. IMPORTANT: For each experience description, write 3-5 bullet points as separate lines (one achievement per line). Each bullet should start with a strong action verb and include quantified results where possible. Do NOT use bullet characters like "•" or "-" — just write each achievement on its own line separated by newlines.'
           },
           {
             role: 'user',
