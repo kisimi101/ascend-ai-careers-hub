@@ -1,4 +1,5 @@
 import { ResumeData } from "../types";
+import { BulletList } from "./BulletList";
 
 interface TemplateProps {
   resumeData: ResumeData;
@@ -46,7 +47,7 @@ export const TechTemplate = ({ resumeData, accentColor = "#059669" }: TemplatePr
                   <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded font-medium">{exp.duration}</span>
                 </div>
                 <p className="font-semibold text-[12px] mb-1" style={{ color: accentColor }}>{exp.company}</p>
-                {exp.description && <p className="text-gray-600 leading-[1.7]">{exp.description}</p>}
+                {exp.description && <BulletList description={exp.description} bulletColor={accentColor} textClassName="text-gray-600 text-[12px] leading-[1.7]" />}
               </div>
             )
           ))}

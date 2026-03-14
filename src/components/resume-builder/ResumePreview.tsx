@@ -65,7 +65,16 @@ export const ResumePreview = ({ resumeData, onDownloadPDF }: ResumePreviewProps)
                     <span className="text-gray-600">{exp.duration}</span>
                   </div>
                   <p className="text-gray-700">{exp.company}</p>
-                  <p className="text-sm mt-1">{exp.description}</p>
+                  {exp.description && (
+                    <ul className="text-sm mt-1 list-none space-y-0.5">
+                      {exp.description.split('\n').filter(l => l.trim()).map((line, i) => (
+                        <li key={i} className="flex gap-1.5">
+                          <span className="text-orange-600 mt-0.5">▸</span>
+                          <span>{line.replace(/^[-•▸*]\s*/, '').trim()}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               ))}
             </div>
