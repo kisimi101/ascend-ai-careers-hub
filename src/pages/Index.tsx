@@ -4,7 +4,6 @@ import { Hero } from "@/components/Hero";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { FloatingSideTools } from "@/components/FloatingSideTools";
 
-const DashboardPreview = lazy(() => import("@/components/DashboardPreview").then(m => ({ default: m.DashboardPreview })));
 const ResumeTemplates = lazy(() => import("@/components/ResumeTemplates").then(m => ({ default: m.ResumeTemplates })));
 const JobShowcase = lazy(() => import("@/components/JobShowcase").then(m => ({ default: m.JobShowcase })));
 const Features = lazy(() => import("@/components/Features").then(m => ({ default: m.Features })));
@@ -27,9 +26,6 @@ const Index = () => {
       <FloatingCTA />
       <FloatingSideTools />
       <Hero />
-      <Suspense fallback={<SectionFallback />}>
-        <DashboardPreview />
-      </Suspense>
       <Suspense fallback={<SectionFallback />}>
         <ResumeTemplates />
       </Suspense>
