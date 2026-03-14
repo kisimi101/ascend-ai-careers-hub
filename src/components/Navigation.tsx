@@ -85,7 +85,7 @@ export const Navigation = () => {
                     <HoveredLink to="/resume-examples">Resume Examples</HoveredLink>
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Job Search 👑">
+                <MenuItem setActive={setActive} active={active} item="Job Search">
                   <div className="text-sm grid grid-cols-2 gap-6 p-4 min-w-[520px]">
                     <ProductItem
                       title="Job Search"
