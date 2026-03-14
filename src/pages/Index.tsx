@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
+import { AnnotatedResumePreview } from "@/components/AnnotatedResumePreview";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { FloatingSideTools } from "@/components/FloatingSideTools";
 
@@ -27,6 +28,17 @@ const Index = () => {
       <FloatingCTA />
       <FloatingSideTools />
       <Hero />
+      <section className="py-16 sm:py-24 px-4">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>
+            See What Your Resume Could Look Like
+          </h2>
+          <p className="text-muted-foreground text-base sm:text-lg">
+            Every section annotated — built to pass ATS systems and impress recruiters
+          </p>
+        </div>
+        <AnnotatedResumePreview />
+      </section>
       <Suspense fallback={<SectionFallback />}>
         <DashboardPreview />
       </Suspense>
