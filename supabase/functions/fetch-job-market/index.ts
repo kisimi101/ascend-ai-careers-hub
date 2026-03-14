@@ -7,55 +7,42 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    // Auth check
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (!authHeader) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const authClient = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
     const { data: { user }, error: authError } = await authClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (authError || !user) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const apiKey = Deno.env.get('APIFY_API_KEY');
-    if (!apiKey) {
-      throw new Error('APIFY_API_KEY not configured');
-    }
+    if (!apiKey) throw new Error('APIFY_API_KEY not configured');
 
-    const { industry, location = 'United States' } = await req.json();
+    const { industry, location = 'Worldwide', country = 'US' } = await req.json();
 
     const actorId = 'misceres/indeed-scraper';
     const runInput = {
       position: industry,
-      country: 'US',
-      location: location,
+      country,
+      location,
       maxItems: 50,
       parseCompanyDetails: true,
       saveOnlyUniqueItems: true,
     };
 
-    const runResponse = await fetch(
-      `https://api.apify.com/v2/acts/${actorId}/runs?token=${apiKey}`,
-      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(runInput) }
-    );
+    const runResponse = await fetch(`https://api.apify.com/v2/acts/${actorId}/runs?token=${apiKey}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(runInput)
+    });
 
-    if (!runResponse.ok) {
-      return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (!runResponse.ok) return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const runData = await runResponse.json();
     const runId = runData.data?.id;
-    if (!runId) {
-      return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (!runId) return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     let status = 'RUNNING';
     let attempts = 0;
@@ -67,9 +54,7 @@ serve(async (req) => {
       attempts++;
     }
 
-    if (status !== 'SUCCEEDED') {
-      return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
+    if (status !== 'SUCCEEDED') return new Response(JSON.stringify(generateMockData(industry)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
     const resultsResponse = await fetch(`https://api.apify.com/v2/actor-runs/${runId}/dataset/items?token=${apiKey}`);
     const jobs = await resultsResponse.json();
@@ -107,14 +92,21 @@ function processJobData(jobs: any[], industry: string) {
       }
     }
     const description = (job.description || '').toLowerCase();
-    const commonSkills = ['python', 'javascript', 'react', 'node.js', 'sql', 'aws', 'docker', 'kubernetes', 'machine learning', 'ai', 'data analysis', 'excel', 'communication', 'leadership', 'project management', 'agile', 'scrum'];
+    const commonSkills = [
+      'python', 'javascript', 'react', 'node.js', 'sql', 'aws', 'docker', 'kubernetes',
+      'machine learning', 'ai', 'data analysis', 'excel', 'communication', 'leadership',
+      'project management', 'agile', 'scrum', 'java', 'c++', 'typescript', 'angular', 'vue',
+      'accounting', 'nursing', 'legal compliance', 'supply chain', 'digital marketing',
+      'content creation', 'salesforce', 'sap', 'tableau', 'power bi', 'figma', 'adobe',
+      'cybersecurity', 'blockchain', 'devops', 'cloud computing', 'networking',
+    ];
     commonSkills.forEach(skill => { if (description.includes(skill.toLowerCase())) skillsCount[skill] = (skillsCount[skill] || 0) + 1; });
   });
 
   const topLocations = Object.entries(locationData).map(([city, data]) => ({
     city, jobs: data.count,
     avgSalary: data.salaries.length > 0 ? Math.round(data.salaries.reduce((a, b) => a + b, 0) / data.salaries.length) : 100000
-  })).sort((a, b) => b.jobs - a.jobs).slice(0, 6);
+  })).sort((a, b) => b.jobs - a.jobs).slice(0, 8);
 
   const inDemandSkills = Object.entries(skillsCount).map(([name, count]) => ({
     name: name.charAt(0).toUpperCase() + name.slice(1),
@@ -141,8 +133,8 @@ function processJobData(jobs: any[], industry: string) {
       topCompanies: Array.from(companySet).slice(0, 8),
       topLocations: topLocations.length > 0 ? topLocations : generateMockData(industry).marketAnalysis.topLocations
     },
-    outlook: `The ${industry} sector shows strong growth potential with increasing demand for skilled professionals.`,
-    predictions: [`${industry} roles will continue to see steady growth`, 'Remote work opportunities expanding', 'Technical skills increasingly valued', 'Salary growth expected to continue', 'New specializations emerging in the field'],
+    outlook: `The ${industry} sector shows strong growth potential with increasing demand for skilled professionals worldwide.`,
+    predictions: [`${industry} roles will continue to see steady growth globally`, 'Remote work opportunities expanding across all regions', 'Technical skills increasingly valued', 'Emerging markets showing fastest growth', 'New specializations emerging in the field'],
     isLiveData: jobs.length > 0
   };
 }
@@ -170,18 +162,20 @@ function generateMockData(industry: string) {
     ],
     marketAnalysis: {
       totalJobs: 2500000, jobGrowth: 15.3, averageSalary: 118000, salaryGrowth: 7.8,
-      topCompanies: ['Google', 'Microsoft', 'Amazon', 'Apple', 'Meta', 'Netflix', 'Salesforce', 'Adobe'],
+      topCompanies: ['Google', 'Microsoft', 'Amazon', 'Samsung', 'Tata', 'Siemens', 'SAP', 'Accenture'],
       topLocations: [
-        { city: 'San Francisco, CA', jobs: 185000, avgSalary: 165000 },
-        { city: 'Seattle, WA', jobs: 120000, avgSalary: 155000 },
-        { city: 'New York, NY', jobs: 145000, avgSalary: 145000 },
-        { city: 'Austin, TX', jobs: 85000, avgSalary: 130000 },
-        { city: 'Boston, MA', jobs: 72000, avgSalary: 140000 },
+        { city: 'San Francisco, USA', jobs: 185000, avgSalary: 165000 },
+        { city: 'London, UK', jobs: 145000, avgSalary: 140000 },
+        { city: 'New York, USA', jobs: 140000, avgSalary: 145000 },
+        { city: 'Bangalore, India', jobs: 120000, avgSalary: 35000 },
+        { city: 'Singapore', jobs: 85000, avgSalary: 110000 },
+        { city: 'Toronto, Canada', jobs: 80000, avgSalary: 105000 },
+        { city: 'Dubai, UAE', jobs: 60000, avgSalary: 95000 },
         { city: 'Remote', jobs: 350000, avgSalary: 125000 },
       ]
     },
-    outlook: `Strong growth expected in ${industry} with continued digital transformation.`,
-    predictions: [`${industry} roles will see continued growth`, 'Remote work opportunities will stabilize', 'Entry-level salaries expected to increase', 'Demand will outpace supply', 'New specializations will emerge'],
+    outlook: `Strong growth expected in ${industry} with continued digital transformation worldwide.`,
+    predictions: [`${industry} roles will see continued growth globally`, 'Remote work opportunities will stabilize', 'Entry-level salaries expected to increase', 'Demand will outpace supply', 'Emerging markets will see fastest growth'],
     isLiveData: false
   };
 }

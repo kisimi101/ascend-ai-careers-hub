@@ -113,6 +113,48 @@ export type Database = {
         }
         Relationships: []
       }
+      interview_questions: {
+        Row: {
+          category: string
+          company: string
+          created_at: string | null
+          difficulty: string
+          id: string
+          question: string
+          role: string
+          sample_answer: string | null
+          source: string | null
+          tips: Json | null
+          upvotes: number | null
+        }
+        Insert: {
+          category: string
+          company: string
+          created_at?: string | null
+          difficulty: string
+          id?: string
+          question: string
+          role: string
+          sample_answer?: string | null
+          source?: string | null
+          tips?: Json | null
+          upvotes?: number | null
+        }
+        Update: {
+          category?: string
+          company?: string
+          created_at?: string | null
+          difficulty?: string
+          id?: string
+          question?: string
+          role?: string
+          sample_answer?: string | null
+          source?: string | null
+          tips?: Json | null
+          upvotes?: number | null
+        }
+        Relationships: []
+      }
       job_alerts: {
         Row: {
           created_at: string

@@ -5,35 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import {
-  FileText,
-  Search,
-  Edit,
-  Target,
-  Settings,
-  Scan,
-  FileX,
-  MessageCircle,
-  DollarSign,
-  Clipboard,
-  Sparkles,
-  Globe,
-  Video,
-  Eye,
-  User,
-  Rocket,
-  Star,
-  Mail,
-  Map,
-  BookOpen,
-  TrendingUp,
-  Users,
-  Crown,
-  Loader2,
-  Briefcase,
+  FileText, Search, Edit, Target, Settings, Scan, FileX, MessageCircle,
+  DollarSign, Clipboard, Sparkles, Globe, Video, Eye, User, Rocket, Star,
+  Mail, Map, BookOpen, TrendingUp, Users, Crown, Loader2, Briefcase,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -110,7 +87,6 @@ const ToolsDashboard = () => {
       setShowUpgradeModal(true);
       return;
     }
-
     navigate(tool.path);
   };
 
@@ -139,14 +115,14 @@ const ToolsDashboard = () => {
         <div className="container mx-auto text-center">
           <div className="inline-flex items-center px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
             <Rocket className="w-4 h-4 mr-2" />
-            Free + Pro AI Career Tools
+            AI Career Tools
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-foreground mb-4 sm:mb-6">
             Choose Your
             <span className="text-gradient-primary"> AI Tool</span>
           </h1>
           <p className="text-base sm:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-3xl mx-auto">
-            Start with free tools, then upgrade for premium job search, networking, and automation workflows.
+            Explore all tools to accelerate your career. Some features require a Pro subscription.
           </p>
         </div>
       </section>
@@ -166,18 +142,11 @@ const ToolsDashboard = () => {
                     key={tool.name}
                     className="group hover:shadow-2xl transition-all duration-300 border border-border hover:border-primary/30 hover:scale-[1.02] sm:hover:scale-105 relative overflow-hidden"
                   >
-                    {(tool.popular || tool.premium) && (
-                      <div className="absolute top-4 right-4 z-10 flex gap-1.5">
-                        {tool.premium && (
-                          <Badge className="bg-gradient-primary text-primary-foreground text-[10px]">
-                            <Crown className="w-3 h-3 mr-0.5" /> Pro
-                          </Badge>
-                        )}
-                        {tool.popular && (
-                          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px]">
-                            <Star className="w-3 h-3 mr-0.5" /> Popular
-                          </Badge>
-                        )}
+                    {tool.popular && (
+                      <div className="absolute top-4 right-4 z-10">
+                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px]">
+                          <Star className="w-3 h-3 mr-0.5" /> Popular
+                        </Badge>
                       </div>
                     )}
 
@@ -198,7 +167,7 @@ const ToolsDashboard = () => {
                         onClick={() => handleToolAccess(tool)}
                         className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90 transition-all`}
                       >
-                        {tool.premium ? (isPro ? "Open Pro Feature" : "Upgrade to Access") : "Try Now"}
+                        Try Now
                       </Button>
                     </CardContent>
                   </Card>
