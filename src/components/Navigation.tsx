@@ -85,7 +85,7 @@ export const Navigation = () => {
                     <HoveredLink to="/resume-examples">Resume Examples</HoveredLink>
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Job Search 👑">
+                <MenuItem setActive={setActive} active={active} item="Job Search">
                   <div className="text-sm grid grid-cols-2 gap-6 p-4 min-w-[520px]">
                     <ProductItem
                       title="Job Search"
@@ -125,7 +125,7 @@ export const Navigation = () => {
                     />
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Network 👑">
+                <MenuItem setActive={setActive} active={active} item="Network">
                   <div className="flex flex-col space-y-4 text-sm">
                     <HoveredLink to="/network">Find Recruiters & Contacts</HoveredLink>
                     <HoveredLink to="/linkedin-optimizer">LinkedIn Optimizer</HoveredLink>
@@ -135,10 +135,10 @@ export const Navigation = () => {
                     <HoveredLink to="/career-path-planner">Career Path Planner</HoveredLink>
                     <HoveredLink to="/industry-insights">Industry Insights</HoveredLink>
                     <HoveredLink to="/portfolio-builder">Portfolio Builder</HoveredLink>
-                    <HoveredLink to="/referral-mapper">Referral Mapper ✨</HoveredLink>
+                    <HoveredLink to="/referral-mapper">Referral Mapper</HoveredLink>
                   </div>
                 </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Pro Tools 👑">
+                <MenuItem setActive={setActive} active={active} item="Pro Tools">
                   <div className="flex flex-col space-y-4 text-sm">
                     <HoveredLink to="/smart-apply">Smart Apply Pipeline</HoveredLink>
                     <HoveredLink to="/auto-follow-up">Auto Follow-Up</HoveredLink>
