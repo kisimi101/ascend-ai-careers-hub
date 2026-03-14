@@ -135,7 +135,7 @@ export const Navigation = () => {
                     <HoveredLink to="/career-path-planner">Career Path Planner</HoveredLink>
                     <HoveredLink to="/industry-insights">Industry Insights</HoveredLink>
                     <HoveredLink to="/portfolio-builder">Portfolio Builder</HoveredLink>
-                    <HoveredLink to="/referral-mapper">Referral Mapper ✨</HoveredLink>
+                    <HoveredLink to="/referral-mapper">Referral Mapper</HoveredLink>
                   </div>
                 </MenuItem>
                 <MenuItem setActive={setActive} active={active} item="Pro Tools">
