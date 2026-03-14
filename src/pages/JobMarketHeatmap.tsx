@@ -15,7 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface HeatmapCell {
   location: string;
   role: string;
-  demand: number; // 0-100
+  demand: number;
   avgSalary: number;
   openings: number;
   growth: number;
@@ -23,13 +23,15 @@ interface HeatmapCell {
 
 const LOCATIONS = [
   'San Francisco, CA', 'New York, NY', 'Seattle, WA', 'Austin, TX', 'Boston, MA',
-  'Chicago, IL', 'Los Angeles, CA', 'Denver, CO', 'Atlanta, GA', 'Miami, FL',
-  'Portland, OR', 'Remote',
+  'Toronto, Canada', 'London, UK', 'Berlin, Germany', 'Singapore',
+  'Bangalore, India', 'Dubai, UAE', 'Sydney, Australia',
+  'Tokyo, Japan', 'São Paulo, Brazil', 'Lagos, Nigeria', 'Remote',
 ];
 
 const ROLES = [
   'Software Engineer', 'Product Manager', 'Data Scientist', 'UX Designer',
   'DevOps Engineer', 'Marketing Manager', 'Sales Rep', 'Project Manager',
+  'Cybersecurity Analyst', 'Cloud Architect', 'Financial Analyst', 'Nurse',
 ];
 
 const JobMarketHeatmap = () => {
@@ -41,14 +43,11 @@ const JobMarketHeatmap = () => {
   const [selectedCell, setSelectedCell] = useState<HeatmapCell | null>(null);
   const [viewMode, setViewMode] = useState<'demand' | 'salary' | 'growth'>('demand');
 
-  useEffect(() => {
-    generateHeatmapData();
-  }, [selectedIndustry]);
+  useEffect(() => { generateHeatmapData(); }, [selectedIndustry]);
 
   const generateHeatmapData = async () => {
     setIsLoading(true);
     try {
-      // Try to get live data from industry insights
       const { data, error } = await supabase.functions.invoke('fetch-job-market', {
         body: { industry: selectedIndustry }
       });
@@ -58,36 +57,19 @@ const JobMarketHeatmap = () => {
 
       if (!error && data?.marketAnalysis?.topLocations) {
         const locations = data.marketAnalysis.topLocations.map((l: any) => l.city);
-        const allLocations = [...new Set([...locations, ...LOCATIONS])].slice(0, 12);
-        
+        const allLocations = [...new Set([...locations, ...LOCATIONS])].slice(0, 16);
         for (const loc of allLocations) {
           for (const role of roles) {
             const locData = data.marketAnalysis.topLocations.find((l: any) => l.city === loc);
             const baseSalary = locData?.avgSalary || 90000 + Math.random() * 80000;
             const baseJobs = locData?.jobs || Math.floor(1000 + Math.random() * 50000);
-            
-            cells.push({
-              location: loc,
-              role,
-              demand: Math.min(100, Math.floor(20 + Math.random() * 80)),
-              avgSalary: Math.floor(baseSalary * (0.8 + Math.random() * 0.4)),
-              openings: Math.floor(baseJobs * (0.05 + Math.random() * 0.15)),
-              growth: Math.floor(-5 + Math.random() * 30),
-            });
+            cells.push({ location: loc, role, demand: Math.min(100, Math.floor(20 + Math.random() * 80)), avgSalary: Math.floor(baseSalary * (0.8 + Math.random() * 0.4)), openings: Math.floor(baseJobs * (0.05 + Math.random() * 0.15)), growth: Math.floor(-5 + Math.random() * 30) });
           }
         }
       } else {
-        // Fallback mock data
         for (const loc of LOCATIONS) {
           for (const role of roles) {
-            cells.push({
-              location: loc,
-              role,
-              demand: Math.floor(20 + Math.random() * 80),
-              avgSalary: Math.floor(60000 + Math.random() * 120000),
-              openings: Math.floor(500 + Math.random() * 30000),
-              growth: Math.floor(-5 + Math.random() * 30),
-            });
+            cells.push({ location: loc, role, demand: Math.floor(20 + Math.random() * 80), avgSalary: Math.floor(60000 + Math.random() * 120000), openings: Math.floor(500 + Math.random() * 30000), growth: Math.floor(-5 + Math.random() * 30) });
           }
         }
       }
@@ -99,48 +81,15 @@ const JobMarketHeatmap = () => {
     }
   };
 
-  const getDemandColor = (value: number) => {
-    if (value >= 80) return 'bg-red-500 text-white';
-    if (value >= 60) return 'bg-orange-500 text-white';
-    if (value >= 40) return 'bg-amber-400 text-black';
-    if (value >= 20) return 'bg-yellow-200 text-black';
-    return 'bg-green-100 text-black';
-  };
-
-  const getSalaryColor = (salary: number) => {
-    if (salary >= 160000) return 'bg-emerald-600 text-white';
-    if (salary >= 130000) return 'bg-emerald-500 text-white';
-    if (salary >= 100000) return 'bg-emerald-400 text-white';
-    if (salary >= 75000) return 'bg-emerald-200 text-black';
-    return 'bg-emerald-100 text-black';
-  };
-
-  const getGrowthColor = (growth: number) => {
-    if (growth >= 20) return 'bg-blue-600 text-white';
-    if (growth >= 10) return 'bg-blue-400 text-white';
-    if (growth >= 0) return 'bg-blue-200 text-black';
-    return 'bg-gray-200 text-red-600';
-  };
-
-  const getCellColor = (cell: HeatmapCell) => {
-    if (viewMode === 'salary') return getSalaryColor(cell.avgSalary);
-    if (viewMode === 'growth') return getGrowthColor(cell.growth);
-    return getDemandColor(cell.demand);
-  };
-
-  const getCellValue = (cell: HeatmapCell) => {
-    if (viewMode === 'salary') return `$${Math.round(cell.avgSalary / 1000)}k`;
-    if (viewMode === 'growth') return `${cell.growth > 0 ? '+' : ''}${cell.growth}%`;
-    return `${cell.demand}`;
-  };
+  const getDemandColor = (v: number) => v >= 80 ? 'bg-red-500 text-white' : v >= 60 ? 'bg-orange-500 text-white' : v >= 40 ? 'bg-amber-400 text-black' : v >= 20 ? 'bg-yellow-200 text-black' : 'bg-green-100 text-black';
+  const getSalaryColor = (s: number) => s >= 160000 ? 'bg-emerald-600 text-white' : s >= 130000 ? 'bg-emerald-500 text-white' : s >= 100000 ? 'bg-emerald-400 text-white' : s >= 75000 ? 'bg-emerald-200 text-black' : 'bg-emerald-100 text-black';
+  const getGrowthColor = (g: number) => g >= 20 ? 'bg-blue-600 text-white' : g >= 10 ? 'bg-blue-400 text-white' : g >= 0 ? 'bg-blue-200 text-black' : 'bg-gray-200 text-red-600';
+  const getCellColor = (cell: HeatmapCell) => viewMode === 'salary' ? getSalaryColor(cell.avgSalary) : viewMode === 'growth' ? getGrowthColor(cell.growth) : getDemandColor(cell.demand);
+  const getCellValue = (cell: HeatmapCell) => viewMode === 'salary' ? `$${Math.round(cell.avgSalary / 1000)}k` : viewMode === 'growth' ? `${cell.growth > 0 ? '+' : ''}${cell.growth}%` : `${cell.demand}`;
 
   const uniqueLocations = [...new Set(heatmapData.map(c => c.location))];
   const uniqueRoles = [...new Set(heatmapData.map(c => c.role))];
-
-  // Top hotspots
-  const topHotspots = [...heatmapData]
-    .sort((a, b) => b.demand - a.demand)
-    .slice(0, 6);
+  const topHotspots = [...heatmapData].sort((a, b) => b.demand - a.demand).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,18 +97,15 @@ const JobMarketHeatmap = () => {
       <div className="container mx-auto px-4 pt-24 sm:pt-28 pb-20 max-w-7xl">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
-            <Map className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
-            Job Market Heatmap
+            <Map className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />Job Market Heatmap
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Visual demand map by role and location with salary data</p>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Visual demand map by role and location with salary data — worldwide</p>
         </div>
 
-        {/* Controls */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search a role..." value={searchRole} onChange={e => setSearchRole(e.target.value)} className="pl-9"
-              onKeyDown={e => e.key === 'Enter' && generateHeatmapData()} />
+            <Input placeholder="Search a role..." value={searchRole} onChange={e => setSearchRole(e.target.value)} className="pl-9" onKeyDown={e => e.key === 'Enter' && generateHeatmapData()} />
           </div>
           <Select value={selectedIndustry} onValueChange={setSelectedIndustry}>
             <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
@@ -169,6 +115,17 @@ const JobMarketHeatmap = () => {
               <SelectItem value="healthcare">Healthcare</SelectItem>
               <SelectItem value="marketing">Marketing</SelectItem>
               <SelectItem value="engineering">Engineering</SelectItem>
+              <SelectItem value="education">Education</SelectItem>
+              <SelectItem value="manufacturing">Manufacturing</SelectItem>
+              <SelectItem value="retail">Retail & E-commerce</SelectItem>
+              <SelectItem value="legal">Legal</SelectItem>
+              <SelectItem value="media">Media & Entertainment</SelectItem>
+              <SelectItem value="hospitality">Hospitality & Tourism</SelectItem>
+              <SelectItem value="energy">Energy & Utilities</SelectItem>
+              <SelectItem value="construction">Construction</SelectItem>
+              <SelectItem value="agriculture">Agriculture</SelectItem>
+              <SelectItem value="government">Government</SelectItem>
+              <SelectItem value="transportation">Transportation & Logistics</SelectItem>
             </SelectContent>
           </Select>
           <Tabs value={viewMode} onValueChange={v => setViewMode(v as any)}>
@@ -187,35 +144,21 @@ const JobMarketHeatmap = () => {
           <Card><CardContent className="py-20 text-center"><Loader2 className="w-10 h-10 animate-spin mx-auto text-primary mb-3" /><p className="text-muted-foreground">Loading market data...</p></CardContent></Card>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-            {/* Heatmap Grid */}
             <div className="xl:col-span-3">
               <Card>
                 <CardContent className="pt-6 overflow-x-auto">
                   <div className="min-w-[700px]">
                     <div className="grid" style={{ gridTemplateColumns: `160px repeat(${uniqueRoles.length}, 1fr)` }}>
-                      {/* Header row */}
                       <div className="p-2 font-medium text-xs text-muted-foreground">Location / Role</div>
-                      {uniqueRoles.map(role => (
-                        <div key={role} className="p-2 font-medium text-xs text-center truncate" title={role}>
-                          {role.split(' ')[0]}
-                        </div>
-                      ))}
-                      {/* Data rows */}
+                      {uniqueRoles.map(role => (<div key={role} className="p-2 font-medium text-xs text-center truncate" title={role}>{role.split(' ')[0]}</div>))}
                       {uniqueLocations.map(loc => (
                         <React.Fragment key={loc}>
-                          <div className="p-2 text-sm font-medium flex items-center gap-1 truncate border-t" title={loc}>
-                            <MapPin className="w-3 h-3 shrink-0" />{loc.split(',')[0]}
-                          </div>
+                          <div className="p-2 text-sm font-medium flex items-center gap-1 truncate border-t" title={loc}><MapPin className="w-3 h-3 shrink-0" />{loc.split(',')[0]}</div>
                           {uniqueRoles.map(role => {
                             const cell = heatmapData.find(c => c.location === loc && c.role === role);
                             if (!cell) return <div key={role} className="p-2 border-t" />;
                             return (
-                              <div
-                                key={role}
-                                className={`p-2 text-center text-xs font-bold rounded-sm m-0.5 cursor-pointer transition-all hover:scale-105 hover:shadow-lg border-t ${getCellColor(cell)}`}
-                                onClick={() => setSelectedCell(cell)}
-                                title={`${role} in ${loc}: ${cell.openings.toLocaleString()} openings, $${cell.avgSalary.toLocaleString()} avg`}
-                              >
+                              <div key={role} className={`p-2 text-center text-xs font-bold rounded-sm m-0.5 cursor-pointer transition-all hover:scale-105 hover:shadow-lg border-t ${getCellColor(cell)}`} onClick={() => setSelectedCell(cell)} title={`${role} in ${loc}: ${cell.openings.toLocaleString()} openings, $${cell.avgSalary.toLocaleString()} avg`}>
                                 {getCellValue(cell)}
                               </div>
                             );
@@ -224,30 +167,12 @@ const JobMarketHeatmap = () => {
                       ))}
                     </div>
                   </div>
-                  {/* Legend */}
                   <div className="flex items-center gap-4 mt-4 pt-4 border-t text-xs text-muted-foreground">
                     <span>Low</span>
                     <div className="flex gap-1">
-                      {viewMode === 'demand' && <>
-                        <div className="w-6 h-4 rounded bg-green-100" />
-                        <div className="w-6 h-4 rounded bg-yellow-200" />
-                        <div className="w-6 h-4 rounded bg-amber-400" />
-                        <div className="w-6 h-4 rounded bg-orange-500" />
-                        <div className="w-6 h-4 rounded bg-red-500" />
-                      </>}
-                      {viewMode === 'salary' && <>
-                        <div className="w-6 h-4 rounded bg-emerald-100" />
-                        <div className="w-6 h-4 rounded bg-emerald-200" />
-                        <div className="w-6 h-4 rounded bg-emerald-400" />
-                        <div className="w-6 h-4 rounded bg-emerald-500" />
-                        <div className="w-6 h-4 rounded bg-emerald-600" />
-                      </>}
-                      {viewMode === 'growth' && <>
-                        <div className="w-6 h-4 rounded bg-gray-200" />
-                        <div className="w-6 h-4 rounded bg-blue-200" />
-                        <div className="w-6 h-4 rounded bg-blue-400" />
-                        <div className="w-6 h-4 rounded bg-blue-600" />
-                      </>}
+                      {viewMode === 'demand' && <><div className="w-6 h-4 rounded bg-green-100" /><div className="w-6 h-4 rounded bg-yellow-200" /><div className="w-6 h-4 rounded bg-amber-400" /><div className="w-6 h-4 rounded bg-orange-500" /><div className="w-6 h-4 rounded bg-red-500" /></>}
+                      {viewMode === 'salary' && <><div className="w-6 h-4 rounded bg-emerald-100" /><div className="w-6 h-4 rounded bg-emerald-200" /><div className="w-6 h-4 rounded bg-emerald-400" /><div className="w-6 h-4 rounded bg-emerald-500" /><div className="w-6 h-4 rounded bg-emerald-600" /></>}
+                      {viewMode === 'growth' && <><div className="w-6 h-4 rounded bg-gray-200" /><div className="w-6 h-4 rounded bg-blue-200" /><div className="w-6 h-4 rounded bg-blue-400" /><div className="w-6 h-4 rounded bg-blue-600" /></>}
                     </div>
                     <span>High</span>
                   </div>
@@ -255,9 +180,7 @@ const JobMarketHeatmap = () => {
               </Card>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-4">
-              {/* Selected Cell Detail */}
               {selectedCell && (
                 <Card className="border-primary">
                   <CardHeader className="pb-3">
@@ -265,42 +188,20 @@ const JobMarketHeatmap = () => {
                     <CardDescription className="flex items-center gap-1"><MapPin className="w-3 h-3" />{selectedCell.location}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Demand Score</span>
-                      <span className="font-bold">{selectedCell.demand}/100</span>
-                    </div>
+                    <div className="flex justify-between text-sm"><span className="text-muted-foreground">Demand Score</span><span className="font-bold">{selectedCell.demand}/100</span></div>
                     <Progress value={selectedCell.demand} className="h-2" />
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Avg. Salary</span>
-                      <span className="font-bold text-green-600">${selectedCell.avgSalary.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Open Positions</span>
-                      <span className="font-bold">{selectedCell.openings.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">YoY Growth</span>
-                      <span className={`font-bold ${selectedCell.growth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                        {selectedCell.growth > 0 ? '+' : ''}{selectedCell.growth}%
-                      </span>
-                    </div>
+                    <div className="flex justify-between text-sm"><span className="text-muted-foreground">Avg. Salary</span><span className="font-bold text-green-600">${selectedCell.avgSalary.toLocaleString()}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-muted-foreground">Open Positions</span><span className="font-bold">{selectedCell.openings.toLocaleString()}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-muted-foreground">YoY Growth</span><span className={`font-bold ${selectedCell.growth >= 0 ? 'text-green-600' : 'text-red-500'}`}>{selectedCell.growth > 0 ? '+' : ''}{selectedCell.growth}%</span></div>
                   </CardContent>
                 </Card>
               )}
-
-              {/* Top Hotspots */}
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2"><Flame className="w-4 h-4 text-orange-500" />Top Hotspots</CardTitle>
-                </CardHeader>
+                <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><Flame className="w-4 h-4 text-orange-500" />Top Hotspots</CardTitle></CardHeader>
                 <CardContent className="space-y-2">
                   {topHotspots.map((h, i) => (
-                    <div key={i} className="flex items-center justify-between text-sm cursor-pointer hover:bg-muted/50 rounded p-1.5 -mx-1.5"
-                      onClick={() => setSelectedCell(h)}>
-                      <div>
-                        <p className="font-medium text-xs">{h.role}</p>
-                        <p className="text-xs text-muted-foreground">{h.location}</p>
-                      </div>
+                    <div key={i} className="flex items-center justify-between text-sm cursor-pointer hover:bg-muted/50 rounded p-1.5 -mx-1.5" onClick={() => setSelectedCell(h)}>
+                      <div><p className="font-medium text-xs">{h.role}</p><p className="text-xs text-muted-foreground">{h.location}</p></div>
                       <Badge variant="secondary" className="text-xs">{h.demand}</Badge>
                     </div>
                   ))}
