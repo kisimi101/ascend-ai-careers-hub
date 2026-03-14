@@ -69,7 +69,7 @@ export const CreativeTemplate = ({ resumeData, accentColor = "#6d28d9" }: Templa
                     <span className="text-gray-400 text-[11px] ml-3 whitespace-nowrap">{exp.duration}</span>
                   </div>
                   <p className="font-semibold text-[12px] mb-1" style={{ color: accentColor }}>{exp.company}</p>
-                  {exp.description && <p className="text-gray-600 leading-[1.7]">{exp.description}</p>}
+                  {exp.description && <BulletList description={exp.description} bulletColor={accentColor} textClassName="text-gray-600 text-[12px] leading-[1.7]" />}
                 </div>
               )
             ))}

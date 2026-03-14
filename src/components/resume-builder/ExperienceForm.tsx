@@ -43,9 +43,10 @@ export const ExperienceForm = ({ experience, onUpdate, onAdd }: ExperienceFormPr
             onChange={(e) => handleChange(index, 'duration', e.target.value)}
           />
           <Textarea
-            placeholder="Job Description"
+            placeholder="Enter each achievement on a new line, e.g.:&#10;Led a team of 10 engineers to deliver project 2 weeks early&#10;Increased revenue by 25% through process optimization&#10;Managed $2M annual budget with zero overruns"
             value={exp.description}
             onChange={(e) => handleChange(index, 'description', e.target.value)}
+            rows={5}
           />
         </div>
       ))}

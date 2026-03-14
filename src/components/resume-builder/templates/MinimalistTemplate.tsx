@@ -43,9 +43,7 @@ export const MinimalistTemplate = ({ resumeData, accentColor = "#737373" }: Temp
                     <span className="text-gray-400 text-[11px]">{exp.duration}</span>
                   </div>
                   <p className="text-[12px] mb-2" style={{ color: accentColor }}>{exp.company}</p>
-                  {exp.description && (
-                    <p className="text-gray-500 leading-[1.8]">{exp.description}</p>
-                  )}
+                  {exp.description && <BulletList description={exp.description} bulletColor={accentColor} textClassName="text-gray-500 text-[12px] leading-[1.8]" />}
                 </div>
               )
             ))}

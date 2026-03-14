@@ -66,11 +66,11 @@ Skills: ${resumeData.skills.join(', ')}
           },
           {
             role: 'user',
-            content: `Please analyze and optimize this resume. Provide improved versions of the summary and experience descriptions that are more impactful and ATS-friendly. Return the response in JSON format with this structure:
+            content: `Please analyze and optimize this resume. Provide improved versions of the summary and experience descriptions that are more impactful and ATS-friendly. For each experience description, write 3-5 achievement bullet points separated by newlines (\\n). Each bullet should start with a strong action verb and include metrics. Return the response in JSON format with this structure:
 {
   "optimizedSummary": "improved summary",
   "optimizedExperience": [
-    {"company": "...", "position": "...", "duration": "...", "description": "improved description"}
+    {"company": "...", "position": "...", "duration": "...", "description": "Achievement 1\\nAchievement 2\\nAchievement 3"}
   ],
   "suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"]
 }

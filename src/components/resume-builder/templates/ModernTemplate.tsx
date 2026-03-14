@@ -45,7 +45,7 @@ export const ModernTemplate = ({ resumeData, accentColor = "#2563eb" }: Template
                   <span className="text-gray-400 text-[11px] whitespace-nowrap ml-4">{exp.duration}</span>
                 </div>
                 <p className="font-medium text-[12px] mb-1.5" style={{ color: accentColor }}>{exp.company}</p>
-                {exp.description && <p className="text-gray-600 leading-[1.7]">{exp.description}</p>}
+                {exp.description && <BulletList description={exp.description} bulletColor={accentColor} textClassName="text-gray-600 text-[12px] leading-[1.7]" />}
               </div>
             )
           ))}
