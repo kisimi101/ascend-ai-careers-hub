@@ -27,9 +27,6 @@ const Index = () => {
       <FloatingSideTools />
       <Hero />
       <Suspense fallback={<SectionFallback />}>
-        <DashboardPreview />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
         <ResumeTemplates />
       </Suspense>
       <Suspense fallback={<SectionFallback />}>
