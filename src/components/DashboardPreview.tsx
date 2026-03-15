@@ -51,9 +51,10 @@ const item = {
 /* ── Gauge Component ── */
 const CareerHealthGauge = ({ score }: { score: number }) => {
   const angle = (score / 100) * 180;
-  const r = 80;
+  const r = 70;
   const cx = 100;
-  const cy = 95;
+  const cy = 90;
+  const strokeW = 22;
   const rad = (a: number) => ((180 - a) * Math.PI) / 180;
   const arcPath = (startAngle: number, endAngle: number) => {
     const x1 = cx + r * Math.cos(rad(startAngle));
@@ -67,31 +68,32 @@ const CareerHealthGauge = ({ score }: { score: number }) => {
   const grade = score >= 80 ? "A" : score >= 60 ? "B" : score >= 40 ? "C" : "D";
 
   return (
-    <div className="flex flex-col items-center">
-      <svg viewBox="0 0 200 120" className="w-full max-w-[220px]">
+    <div className="flex flex-col items-center pt-2">
+      <svg viewBox="0 0 200 115" className="w-full max-w-[260px]">
         {/* Background arc */}
-        <path d={arcPath(0, 180)} fill="none" stroke="hsl(var(--muted))" strokeWidth="14" strokeLinecap="round" />
+        <path d={arcPath(0, 180)} fill="none" stroke="hsl(var(--muted))" strokeWidth={strokeW} strokeLinecap="round" />
         {/* Score arc */}
         <motion.path
           d={arcPath(0, angle)}
           fill="none"
           stroke="hsl(var(--primary))"
-          strokeWidth="14"
+          strokeWidth={strokeW}
           strokeLinecap="round"
           initial={{ pathLength: 0 }}
           whileInView={{ pathLength: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: "easeOut" }}
         />
-        {/* Score text */}
-        <text x={cx} y={cy - 10} textAnchor="middle" className="fill-foreground text-[11px] font-medium">
+        {/* Grade label */}
+        <text x={cx} y={cy - 16} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: 13, fontFamily: "Space Grotesk" }}>
           Grade {grade}
         </text>
-        <text x={cx} y={cy + 20} textAnchor="middle" className="fill-foreground text-[32px] font-bold" style={{ fontFamily: "Space Grotesk" }}>
+        {/* Score number */}
+        <text x={cx} y={cy + 16} textAnchor="middle" className="fill-foreground" style={{ fontSize: 38, fontWeight: 700, fontFamily: "Space Grotesk" }}>
           {score}
         </text>
       </svg>
-      <span className="text-sm text-muted-foreground -mt-1">Points</span>
+      <span className="text-sm text-muted-foreground -mt-2">Points</span>
     </div>
   );
 };
