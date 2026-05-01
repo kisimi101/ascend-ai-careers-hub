@@ -27,6 +27,7 @@ const ResumeBuilder = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("modern-professional");
   const [accentColor, setAccentColor] = useState("#2563eb");
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [hasOptimized, setHasOptimized] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
       fullName: "",
@@ -152,12 +153,14 @@ const ResumeBuilder = () => {
           title: "Resume Optimized!",
           description: "Your resume has been enhanced with AI suggestions.",
         });
+        setHasOptimized(true);
       } else {
         // Fallback if AI optimization fails
         toast({
           title: "Optimization Complete",
           description: "View your ATS score and suggestions below.",
         });
+        setHasOptimized(true);
       }
     } catch (error) {
       console.error('Optimization error:', error);
