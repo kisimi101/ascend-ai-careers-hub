@@ -505,6 +505,7 @@ const ResumeBuilder = () => {
               resumeData={resumeData}
               selectedTemplate={selectedTemplate}
               accentColor={accentColor}
+              density={density}
               onDownloadPDF={downloadPDF}
               onDownloadDOCX={downloadDOCX}
               onDownloadPNG={downloadPNG}
