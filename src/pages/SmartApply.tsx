@@ -527,6 +527,34 @@ const SmartApply = () => {
           </p>
         </motion.div>
 
+        {/* Usage indicator */}
+        {isAuthenticated && (
+          <div className="max-w-xl mx-auto mb-6 space-y-2">
+            <SearchUsageBadge
+              used={usage?.used}
+              limit={usage?.limit}
+              tier={usage?.tier}
+              monthlyUsed={usage?.monthlyUsed}
+              monthlyLimit={usage?.monthlyLimit}
+            />
+            <div className="flex items-center justify-between text-xs text-muted-foreground bg-muted/40 border border-border/60 rounded-lg px-3 py-2">
+              <span className="flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-primary" />
+                Instant applies available this run
+              </span>
+              <span className="font-medium text-foreground">
+                {isPro ? "Unlimited" : `${matchedJobs.filter(j => j.selected).length} selected`}
+              </span>
+            </div>
+            {resumeStyle?.template && (
+              <p className="text-xs text-muted-foreground text-center">
+                Using your <span className="font-medium text-foreground capitalize">{resumeStyle.template.replace(/-/g, " ")}</span> template
+                {resumeStyle.density && <> · <span className="capitalize">{resumeStyle.density}</span> density</>}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-between max-w-lg mx-auto mb-2">
