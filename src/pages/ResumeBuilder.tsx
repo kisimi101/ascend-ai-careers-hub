@@ -347,10 +347,35 @@ const ResumeBuilder = () => {
         );
       case 5:
         return (
-          <ATSScoreCard
-            resumeData={resumeData}
-            selectedTemplate={selectedTemplate}
-          />
+          <div className="space-y-4">
+            <ATSScoreCard
+              resumeData={resumeData}
+              selectedTemplate={selectedTemplate}
+            />
+            {hasOptimized && (
+              <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-orange-500/10 p-5">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground mb-1">Resume ready — what's next?</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Your optimized resume is ready. Apply it to live job openings with one click.
+                    </p>
+                    <Button
+                      className="bg-gradient-to-r from-primary to-orange-500 text-white hover:opacity-90 w-full sm:w-auto"
+                      onClick={() => {
+                        localStorage.setItem('resume-data', JSON.stringify(resumeData));
+                        navigate('/smart-apply?source=builder');
+                      }}
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Find Jobs & Apply Now
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         );
       default:
         return null;
