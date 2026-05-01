@@ -199,6 +199,9 @@ const SmartApply = () => {
         body: { jobTitle: searchTitle, location: parsed.personalInfo.location || "", skills: parsed.skills },
       });
       if (jobError) throw jobError;
+      if (jobData?.used !== undefined) {
+        setUsage({ used: jobData.used, limit: jobData.limit, tier: jobData.tier, monthlyUsed: jobData.monthlyUsed, monthlyLimit: jobData.monthlyLimit });
+      }
 
       const jobs: MatchedJob[] = (jobData?.jobs || []).slice(0, 10).map((j: any) => ({
         title: j.title || j.positionName || "Untitled",
@@ -277,6 +280,9 @@ const SmartApply = () => {
         body: { jobTitle: suggestedTitles[0] || "Software Engineer", location: parsed.personalInfo?.location || "", skills: parsed.skills || [] },
       });
       if (jobError) throw jobError;
+      if (jobData?.used !== undefined) {
+        setUsage({ used: jobData.used, limit: jobData.limit, tier: jobData.tier, monthlyUsed: jobData.monthlyUsed, monthlyLimit: jobData.monthlyLimit });
+      }
 
       const jobs: MatchedJob[] = (jobData?.jobs || []).slice(0, 10).map((j: any) => ({
         title: j.title || j.positionName || "Untitled",
