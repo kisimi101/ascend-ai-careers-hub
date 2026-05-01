@@ -430,69 +430,11 @@ const ResumeExamples = () => {
           {selectedExample && (
             <div className="px-6 pb-6">
               <div className="bg-white text-gray-900 rounded-xl border shadow-sm overflow-hidden">
-                {/* Header band */}
-                <div className="px-8 py-6" style={{ background: `linear-gradient(135deg, hsl(${selectedExample.accent}), hsl(${selectedExample.accent} / 0.8))` }}>
-                  <h1 className="text-2xl font-bold text-white">{selectedExample.content.name}</h1>
-                  <p className="text-white/80 text-sm mt-1">{selectedExample.title} · {selectedExample.experience}</p>
-                </div>
-
-                <div className="p-8 space-y-6">
-                  {/* Summary */}
-                  <div>
-                    <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: `hsl(${selectedExample.accent})` }}>Professional Summary</h2>
-                    <p className="text-sm text-gray-700 leading-relaxed">{selectedExample.content.summary}</p>
-                  </div>
-
-                  {/* Experience */}
-                  <div>
-                    <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: `hsl(${selectedExample.accent})` }}>Experience</h2>
-                    <div className="space-y-5">
-                      {selectedExample.content.experience.map((exp, idx) => (
-                        <div key={idx}>
-                          <div className="flex justify-between items-baseline flex-wrap gap-1">
-                            <h3 className="font-semibold text-gray-900">{exp.title}</h3>
-                            <span className="text-xs text-gray-500">{exp.duration}</span>
-                          </div>
-                          <p className="text-sm text-gray-500 mb-1.5">{exp.company}</p>
-                          <ul className="space-y-1">
-                            {exp.bullets.map((b, j) => (
-                              <li key={j} className="flex gap-2 text-sm text-gray-700">
-                                <span className="shrink-0 mt-1 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `hsl(${selectedExample.accent})` }} />
-                                {b}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Education */}
-                  <div>
-                    <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: `hsl(${selectedExample.accent})` }}>Education</h2>
-                    {selectedExample.content.education.map((edu, idx) => (
-                      <div key={idx} className="flex justify-between text-sm">
-                        <span><span className="font-medium text-gray-900">{edu.degree}</span> · {edu.school}</span>
-                        <span className="text-gray-500">{edu.year}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Skills */}
-                  <div>
-                    <h2 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ color: `hsl(${selectedExample.accent})` }}>Skills</h2>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedExample.content.skills.map((skill, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 rounded-full text-xs font-medium"
-                          style={{ backgroundColor: `hsl(${selectedExample.accent} / 0.1)`, color: `hsl(${selectedExample.accent})` }}
-                        >{skill}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                {renderExampleTemplate(selectedExample)}
               </div>
+              <p className="text-xs text-muted-foreground mt-3 text-center">
+                Style: <span className="font-semibold capitalize">{selectedExample.templateStyle}</span> template — fully editable in the builder
+              </p>
 
               <div className="flex gap-3 mt-5">
                 <Button variant="outline" className="flex-1" onClick={() => setPreviewOpen(false)}>Close</Button>
