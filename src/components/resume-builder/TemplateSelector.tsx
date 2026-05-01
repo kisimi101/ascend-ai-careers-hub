@@ -30,6 +30,8 @@ interface TemplateSelectorProps {
   onSelectTemplate: (templateId: string) => void;
   accentColor?: string;
   onAccentColorChange?: (color: string) => void;
+  density?: "compact" | "standard" | "spacious";
+  onDensityChange?: (d: "compact" | "standard" | "spacious") => void;
 }
 
 const templates: ResumeTemplate[] = [
@@ -147,6 +149,8 @@ export const TemplateSelector = ({
   onSelectTemplate,
   accentColor,
   onAccentColorChange,
+  density = "standard",
+  onDensityChange,
 }: TemplateSelectorProps) => {
   const [previewTemplate, setPreviewTemplate] = useState<string | null>(null);
   const currentTemplate = templates.find(t => t.id === selectedTemplate);
@@ -282,6 +286,42 @@ export const TemplateSelector = ({
           </div>
         </div>
       )}
+
+      {/* Density Variant Selector */}
+      {onDensityChange && (
+        <div className="pt-2 animate-fade-in">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-medium text-foreground">Layout Density</span>
+            <span className="text-xs text-muted-foreground">— spacing & content size</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(["compact", "standard", "spacious"] as const).map((d) => {
+              const active = density === d;
+              const labels: Record<typeof d, { name: string; desc: string }> = {
+                compact: { name: "Compact", desc: "Fit more on one page" },
+                standard: { name: "Standard", desc: "Balanced default" },
+                spacious: { name: "Spacious", desc: "Premium whitespace" },
+              };
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => onDensityChange(d)}
+                  className={`text-left rounded-lg border-2 p-2.5 transition-all ${
+                    active
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <div className="text-xs font-semibold text-foreground">{labels[d].name}</div>
+                  <div className="text-[10px] text-muted-foreground leading-tight mt-0.5">{labels[d].desc}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Template Preview Modal */}
       <Dialog open={!!previewTemplate} onOpenChange={(open) => !open && setPreviewTemplate(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">

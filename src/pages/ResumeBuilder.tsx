@@ -28,6 +28,7 @@ const ResumeBuilder = () => {
   const [accentColor, setAccentColor] = useState("#2563eb");
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [hasOptimized, setHasOptimized] = useState(false);
+  const [density, setDensity] = useState<"compact" | "standard" | "spacious">("standard");
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
       fullName: "",
@@ -313,6 +314,8 @@ const ResumeBuilder = () => {
             onSelectTemplate={setSelectedTemplate}
             accentColor={accentColor}
             onAccentColorChange={setAccentColor}
+            density={density}
+            onDensityChange={setDensity}
           />
         );
       case 1:
@@ -365,6 +368,11 @@ const ResumeBuilder = () => {
                       className="bg-gradient-to-r from-primary to-orange-500 text-white hover:opacity-90 w-full sm:w-auto"
                       onClick={() => {
                         localStorage.setItem('resume-data', JSON.stringify(resumeData));
+                        localStorage.setItem('resume-style', JSON.stringify({
+                          template: selectedTemplate,
+                          accentColor,
+                          density,
+                        }));
                         navigate('/smart-apply?source=builder');
                       }}
                     >
@@ -464,8 +472,13 @@ const ResumeBuilder = () => {
                             variant="outline"
                             className="border-primary text-primary hover:bg-primary/10"
                             onClick={() => {
-                              // Save resume data to localStorage for SmartApply to pick up
+                              // Save resume data + style choices to localStorage for SmartApply
                               localStorage.setItem('resume-data', JSON.stringify(resumeData));
+                              localStorage.setItem('resume-style', JSON.stringify({
+                                template: selectedTemplate,
+                                accentColor,
+                                density,
+                              }));
                               navigate('/smart-apply?source=builder');
                             }}
                           >
@@ -502,6 +515,7 @@ const ResumeBuilder = () => {
               resumeData={resumeData}
               selectedTemplate={selectedTemplate}
               accentColor={accentColor}
+              density={density}
               onDownloadPDF={downloadPDF}
               onDownloadDOCX={downloadDOCX}
               onDownloadPNG={downloadPNG}

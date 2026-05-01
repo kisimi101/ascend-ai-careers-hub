@@ -8,6 +8,7 @@ import { CreativeTemplate } from "./templates/CreativeTemplate";
 import { ExecutiveTemplate } from "./templates/ExecutiveTemplate";
 import { MinimalistTemplate } from "./templates/MinimalistTemplate";
 import { ResumeData } from "./types";
+import { densityWrapperStyle, densityClassName, type Density } from "./templates/densityStyles";
 import { useState } from "react";
 import {
   Dialog,
@@ -28,6 +29,7 @@ interface EnhancedResumePreviewProps {
   resumeData: ResumeData;
   selectedTemplate: string;
   accentColor?: string;
+  density?: Density;
   onDownloadPDF: () => void;
   onDownloadDOCX: () => void;
   onDownloadPNG: () => void;
@@ -37,6 +39,7 @@ export const EnhancedResumePreview = ({
   resumeData, 
   selectedTemplate,
   accentColor,
+  density = "standard",
   onDownloadPDF,
   onDownloadDOCX,
   onDownloadPNG
@@ -95,18 +98,18 @@ export const EnhancedResumePreview = ({
           </div>
         </CardHeader>
         <CardContent>
-          <div 
-            id="resume-preview" 
-            className="border rounded-lg min-h-[700px] max-h-[800px] shadow-sm overflow-y-auto"
-            style={{ aspectRatio: '8.5/11' }}
+          <div
+            id="resume-preview"
+            className={`border rounded-lg min-h-[700px] max-h-[800px] shadow-sm overflow-y-auto ${densityClassName(density)}`}
+            style={{ aspectRatio: '8.5/11', ...densityWrapperStyle(density) }}
           >
             {renderTemplate()}
           </div>
           
           <div className="mt-3 text-xs text-muted-foreground text-center">
-            Template: {selectedTemplate.split('-').map(word => 
-              word.charAt(0).toUpperCase() + word.slice(1)
-            ).join(' ')}
+            Style: <span className="font-medium text-foreground">{selectedTemplate.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>
+            <span className="mx-1">·</span>
+            <span className="capitalize">{density}</span> density
           </div>
           
           <div className="mt-3">

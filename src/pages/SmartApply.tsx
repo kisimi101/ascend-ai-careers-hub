@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +32,7 @@ import jsPDF from "jspdf";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
@@ -88,6 +89,8 @@ const SmartApply = () => {
   const [expandedJob, setExpandedJob] = useState<number | null>(null);
   const [progressPercent, setProgressPercent] = useState(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [resumeStyle, setResumeStyle] = useState<{ template?: string; accentColor?: string; density?: string } | null>(null);
+  const [usage, setUsage] = useState<{ used: number; limit: number; tier: string; monthlyUsed?: number; monthlyLimit?: number | null } | null>(null);
 
   const requirePro = (action: () => void) => {
     if (isPro) {
@@ -96,6 +99,20 @@ const SmartApply = () => {
       setShowUpgradeModal(true);
     }
   };
+
+  // Load synced resume style + saved resume from builder
+  useEffect(() => {
+    try {
+      const styleRaw = localStorage.getItem("resume-style");
+      if (styleRaw) setResumeStyle(JSON.parse(styleRaw));
+      const savedRaw = localStorage.getItem("resume-data");
+      if (savedRaw && !resumeData) {
+        const parsed = JSON.parse(savedRaw);
+        if (parsed?.personalInfo?.fullName) setResumeData(parsed);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const stepLabels: Record<PipelineStep, string> = {
     upload: "Upload Resume",
@@ -182,6 +199,9 @@ const SmartApply = () => {
         body: { jobTitle: searchTitle, location: parsed.personalInfo.location || "", skills: parsed.skills },
       });
       if (jobError) throw jobError;
+      if (jobData?.used !== undefined) {
+        setUsage({ used: jobData.used, limit: jobData.limit, tier: jobData.tier, monthlyUsed: jobData.monthlyUsed, monthlyLimit: jobData.monthlyLimit });
+      }
 
       const jobs: MatchedJob[] = (jobData?.jobs || []).slice(0, 10).map((j: any) => ({
         title: j.title || j.positionName || "Untitled",
@@ -260,6 +280,9 @@ const SmartApply = () => {
         body: { jobTitle: suggestedTitles[0] || "Software Engineer", location: parsed.personalInfo?.location || "", skills: parsed.skills || [] },
       });
       if (jobError) throw jobError;
+      if (jobData?.used !== undefined) {
+        setUsage({ used: jobData.used, limit: jobData.limit, tier: jobData.tier, monthlyUsed: jobData.monthlyUsed, monthlyLimit: jobData.monthlyLimit });
+      }
 
       const jobs: MatchedJob[] = (jobData?.jobs || []).slice(0, 10).map((j: any) => ({
         title: j.title || j.positionName || "Untitled",
@@ -503,6 +526,34 @@ const SmartApply = () => {
             Upload your resume and our AI will optimize it, find matching jobs, generate tailored cover letters, and queue everything for one-click batch apply.
           </p>
         </motion.div>
+
+        {/* Usage indicator */}
+        {isAuthenticated && (
+          <div className="max-w-xl mx-auto mb-6 space-y-2">
+            <SearchUsageBadge
+              used={usage?.used}
+              limit={usage?.limit}
+              tier={usage?.tier}
+              monthlyUsed={usage?.monthlyUsed}
+              monthlyLimit={usage?.monthlyLimit}
+            />
+            <div className="flex items-center justify-between text-xs text-muted-foreground bg-muted/40 border border-border/60 rounded-lg px-3 py-2">
+              <span className="flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-primary" />
+                Instant applies available this run
+              </span>
+              <span className="font-medium text-foreground">
+                {isPro ? "Unlimited" : `${matchedJobs.filter(j => j.selected).length} selected`}
+              </span>
+            </div>
+            {resumeStyle?.template && (
+              <p className="text-xs text-muted-foreground text-center">
+                Using your <span className="font-medium text-foreground capitalize">{resumeStyle.template.replace(/-/g, " ")}</span> template
+                {resumeStyle.density && <> · <span className="capitalize">{resumeStyle.density}</span> density</>}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Progress Steps */}
         <div className="mb-8">

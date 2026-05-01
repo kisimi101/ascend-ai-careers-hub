@@ -36,7 +36,7 @@ const JobSearch = () => {
   const [jobs, setJobs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [searchUsage, setSearchUsage] = useState<{ used: number; limit: number; tier: string } | null>(null);
+  const [searchUsage, setSearchUsage] = useState<{ used: number; limit: number; tier: string; monthlyUsed?: number; monthlyLimit?: number | null } | null>(null);
   const [filters, setFilters] = useState({
     jobType: [],
     experience: [],
@@ -78,7 +78,7 @@ const JobSearch = () => {
       if (error) throw error;
       setJobs(data?.jobs || []);
       if (data?.used !== undefined) {
-        setSearchUsage({ used: data.used, limit: data.limit, tier: data.tier });
+        setSearchUsage({ used: data.used, limit: data.limit, tier: data.tier, monthlyUsed: data.monthlyUsed, monthlyLimit: data.monthlyLimit });
       }
       if ((data?.jobs || []).length === 0) {
         toast({ title: "No jobs found", description: "Try different keywords or location." });
@@ -102,7 +102,13 @@ const JobSearch = () => {
         
         {/* Search Usage Badge */}
         <div className="container mx-auto px-4 sm:px-6 pt-4">
-          <SearchUsageBadge used={searchUsage?.used} limit={searchUsage?.limit} tier={searchUsage?.tier} />
+          <SearchUsageBadge
+            used={searchUsage?.used}
+            limit={searchUsage?.limit}
+            tier={searchUsage?.tier}
+            monthlyUsed={searchUsage?.monthlyUsed}
+            monthlyLimit={searchUsage?.monthlyLimit}
+          />
         </div>
 
         {/* Main Search Bar */}

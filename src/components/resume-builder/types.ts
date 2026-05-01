@@ -19,6 +19,7 @@ export interface ResumeData {
   }>;
   skills: string[];
   sectionOrder?: Array<"experience" | "education" | "skills" | "summary">;
+  density?: "compact" | "standard" | "spacious";
 }
 
 export interface ResumeTemplate {
