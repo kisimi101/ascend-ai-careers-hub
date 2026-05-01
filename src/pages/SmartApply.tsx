@@ -32,6 +32,7 @@ import jsPDF from "jspdf";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
@@ -88,6 +89,8 @@ const SmartApply = () => {
   const [expandedJob, setExpandedJob] = useState<number | null>(null);
   const [progressPercent, setProgressPercent] = useState(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [resumeStyle, setResumeStyle] = useState<{ template?: string; accentColor?: string; density?: string } | null>(null);
+  const [usage, setUsage] = useState<{ used: number; limit: number; tier: string; monthlyUsed?: number; monthlyLimit?: number | null } | null>(null);
 
   const requirePro = (action: () => void) => {
     if (isPro) {
