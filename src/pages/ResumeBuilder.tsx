@@ -314,6 +314,8 @@ const ResumeBuilder = () => {
             onSelectTemplate={setSelectedTemplate}
             accentColor={accentColor}
             onAccentColorChange={setAccentColor}
+            density={density}
+            onDensityChange={setDensity}
           />
         );
       case 1:
