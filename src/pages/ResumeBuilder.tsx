@@ -467,8 +467,13 @@ const ResumeBuilder = () => {
                             variant="outline"
                             className="border-primary text-primary hover:bg-primary/10"
                             onClick={() => {
-                              // Save resume data to localStorage for SmartApply to pick up
+                              // Save resume data + style choices to localStorage for SmartApply
                               localStorage.setItem('resume-data', JSON.stringify(resumeData));
+                              localStorage.setItem('resume-style', JSON.stringify({
+                                template: selectedTemplate,
+                                accentColor,
+                                density,
+                              }));
                               navigate('/smart-apply?source=builder');
                             }}
                           >
