@@ -12,6 +12,11 @@ const TIER_LIMITS: Record<string, number> = {
   enterprise: 999999, // unlimited
 };
 
+// Monthly caps (only enforced for tiers in this map)
+const MONTHLY_LIMITS: Record<string, number> = {
+  pro: 1500,
+};
+
 async function getUserTier(supabaseAdmin: any, userId: string): Promise<string> {
   try {
     const polarAccessToken = Deno.env.get('POLAR_ACCESS_TOKEN');
@@ -66,6 +71,26 @@ async function getDailySearchCount(userId: string): Promise<{ count: number; id:
   return { count: data?.search_count || 0, id: data?.id || null };
 }
 
+async function getMonthlySearchCount(userId: string): Promise<number> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+
+  const now = new Date();
+  const firstOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+    .toISOString()
+    .split('T')[0];
+
+  const { data } = await adminClient
+    .from('search_usage')
+    .select('search_count')
+    .eq('user_id', userId)
+    .gte('search_date', firstOfMonth);
+
+  if (!data) return 0;
+  return data.reduce((sum: number, row: any) => sum + (row.search_count || 0), 0);
+}
+
 async function incrementSearchCount(userId: string, existingId: string | null, currentCount: number) {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -110,7 +135,9 @@ serve(async (req) => {
       const { count } = await getDailySearchCount(user.id);
       const tier = await getUserTier(null, user.id);
       const limit = TIER_LIMITS[tier] || 5;
-      return new Response(JSON.stringify({ used: count, limit, tier }), {
+      const monthlyLimit = MONTHLY_LIMITS[tier] || null;
+      const monthlyUsed = monthlyLimit ? await getMonthlySearchCount(user.id) : 0;
+      return new Response(JSON.stringify({ used: count, limit, tier, monthlyUsed, monthlyLimit }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -134,6 +161,27 @@ serve(async (req) => {
         }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Monthly cap enforcement (Pro = 1,500/month)
+    const monthlyLimit = MONTHLY_LIMITS[tier] || null;
+    let monthlyUsed = 0;
+    if (monthlyLimit) {
+      monthlyUsed = await getMonthlySearchCount(user.id);
+      if (monthlyUsed >= monthlyLimit) {
+        return new Response(
+          JSON.stringify({
+            error: `Monthly search limit reached (${monthlyLimit}/${monthlyLimit}). Upgrade to Enterprise for unlimited searches.`,
+            jobs: [],
+            used: dailyCount,
+            limit,
+            tier,
+            monthlyUsed,
+            monthlyLimit,
+          }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Increment search count
@@ -221,7 +269,14 @@ serve(async (req) => {
         };
       });
 
-    return new Response(JSON.stringify({ jobs, used: dailyCount + 1, limit, tier }), {
+    return new Response(JSON.stringify({
+      jobs,
+      used: dailyCount + 1,
+      limit,
+      tier,
+      monthlyUsed: monthlyLimit ? monthlyUsed + 1 : 0,
+      monthlyLimit,
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
