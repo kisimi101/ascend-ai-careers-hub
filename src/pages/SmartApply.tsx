@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -99,6 +99,20 @@ const SmartApply = () => {
       setShowUpgradeModal(true);
     }
   };
+
+  // Load synced resume style + saved resume from builder
+  useEffect(() => {
+    try {
+      const styleRaw = localStorage.getItem("resume-style");
+      if (styleRaw) setResumeStyle(JSON.parse(styleRaw));
+      const savedRaw = localStorage.getItem("resume-data");
+      if (savedRaw && !resumeData) {
+        const parsed = JSON.parse(savedRaw);
+        if (parsed?.personalInfo?.fullName) setResumeData(parsed);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const stepLabels: Record<PipelineStep, string> = {
     upload: "Upload Resume",
