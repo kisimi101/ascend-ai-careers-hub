@@ -368,6 +368,11 @@ const ResumeBuilder = () => {
                       className="bg-gradient-to-r from-primary to-orange-500 text-white hover:opacity-90 w-full sm:w-auto"
                       onClick={() => {
                         localStorage.setItem('resume-data', JSON.stringify(resumeData));
+                        localStorage.setItem('resume-style', JSON.stringify({
+                          template: selectedTemplate,
+                          accentColor,
+                          density,
+                        }));
                         navigate('/smart-apply?source=builder');
                       }}
                     >
