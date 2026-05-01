@@ -42,7 +42,7 @@ const pricingPlans = [
       "ATS Score Analysis",
       "AI Interview Practice",
       "Unlimited Cover Letters",
-      "50 Job Searches / day",
+      "50 Job Searches / day (1,500/month cap)",
       "Smart Apply Pipeline",
       "LinkedIn Profile Optimizer",
       "Company Research Tool",

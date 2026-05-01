@@ -1,0 +1,32 @@
+# CareerNow
+
+CareerNow is an all-in-one, AI-powered career platform that helps job seekers create ATS-optimized resumes, find jobs, prepare for interviews, and manage their full job search.
+
+## Who it's for
+- Job seekers (entry-level to executive)
+- Career changers and returners
+- Students and new graduates
+- Career coaches and recruiters (Enterprise)
+
+## Main use cases
+- Build ATS-friendly resumes with 6 professional templates and AI optimization
+- Generate tailored cover letters and follow-up emails
+- Search jobs across 14+ job boards (LinkedIn, Indeed, RemoteOK, We Work Remotely, etc.)
+- Practice interviews with AI feedback
+- Track applications, analyze skills gaps, and plan career paths
+- Optimize LinkedIn profiles and research target companies
+
+## Pricing
+- Free: limited preview access
+- Pro: $12/month — full builder, unlimited downloads, 50 job searches/day
+- Enterprise: $39/month — unlimited searches, team features
+
+## Resources
+- Product overview: /product.md
+- Pricing details: /pricing.md
+- FAQ: /faq.md
+- Static AI-readable page: /llm.html
+- Sitemap: /sitemap.xml
+
+## Contact
+Website: https://careernow.xyz
