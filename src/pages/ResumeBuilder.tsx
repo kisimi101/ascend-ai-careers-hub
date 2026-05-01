@@ -28,6 +28,7 @@ const ResumeBuilder = () => {
   const [accentColor, setAccentColor] = useState("#2563eb");
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [hasOptimized, setHasOptimized] = useState(false);
+  const [density, setDensity] = useState<"compact" | "standard" | "spacious">("standard");
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
       fullName: "",
