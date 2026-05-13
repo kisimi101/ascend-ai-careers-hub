@@ -707,11 +707,18 @@ const SmartApply = () => {
             <div className="flex items-center justify-between text-xs text-muted-foreground bg-muted/40 border border-border/60 rounded-lg px-3 py-2">
               <span className="flex items-center gap-1.5">
                 <Zap className="h-3.5 w-3.5 text-primary" />
-                Instant applies available this run
+                Instant Applies remaining this month
               </span>
               <span className="font-medium text-foreground">
-                {isPro ? "Unlimited" : `${matchedJobs.filter(j => j.selected).length} selected`}
+                {instantLimit === Infinity
+                  ? "Unlimited"
+                  : `${instantRemaining} / ${instantLimit}`}
               </span>
+            </div>
+            <div className="text-right">
+              <Link to="/apply-history" className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+                <History className="h-3 w-3" /> View apply history
+              </Link>
             </div>
             {resumeStyle?.template && (
               <p className="text-xs text-muted-foreground text-center">
