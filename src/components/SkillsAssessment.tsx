@@ -170,9 +170,9 @@ export const SkillsAssessment = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                   <div className="text-center p-4 bg-emerald-500/10 rounded-lg">
-                    <CheckCircle className="text-emerald-500 mx-auto mb-2" size={24} />
-                    <div className="font-semibold text-emerald-500">Correct Answers</div>
-                    <div className="text-2xl font-bold text-emerald-500">
+                    <CheckCircle className="text-success mx-auto mb-2" size={24} />
+                    <div className="font-semibold text-success">Correct Answers</div>
+                    <div className="text-2xl font-bold text-success">
                       {answers.filter((answer, index) => answer === skillsQuestions[index].correct).length}
                     </div>
                   </div>
