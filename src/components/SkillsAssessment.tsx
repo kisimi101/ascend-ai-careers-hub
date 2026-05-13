@@ -85,7 +85,7 @@ export const SkillsAssessment = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
-              <span className="bg-blue-500/10 text-blue-500 px-4 py-2 rounded-full text-sm font-semibold">
+              <span className="bg-info/15 text-info px-4 py-2 rounded-full text-sm font-semibold">
                 🎯 Skills Assessment
               </span>
             </div>
@@ -114,7 +114,7 @@ export const SkillsAssessment = () => {
               <CardContent className="text-center">
                 <div className="grid grid-cols-3 gap-4 mb-8">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-500">5</div>
+                    <div className="text-2xl font-bold text-info">5</div>
                     <div className="text-sm text-muted-foreground">Questions</div>
                   </div>
                   <div className="text-center">
@@ -122,7 +122,7 @@ export const SkillsAssessment = () => {
                     <div className="text-sm text-muted-foreground">Minutes</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-emerald-500">Free</div>
+                    <div className="text-2xl font-bold text-success">Free</div>
                     <div className="text-sm text-muted-foreground">Always</div>
                   </div>
                 </div>
@@ -170,9 +170,9 @@ export const SkillsAssessment = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                   <div className="text-center p-4 bg-emerald-500/10 rounded-lg">
-                    <CheckCircle className="text-emerald-500 mx-auto mb-2" size={24} />
-                    <div className="font-semibold text-emerald-500">Correct Answers</div>
-                    <div className="text-2xl font-bold text-emerald-500">
+                    <CheckCircle className="text-success mx-auto mb-2" size={24} />
+                    <div className="font-semibold text-success">Correct Answers</div>
+                    <div className="text-2xl font-bold text-success">
                       {answers.filter((answer, index) => answer === skillsQuestions[index].correct).length}
                     </div>
                   </div>
