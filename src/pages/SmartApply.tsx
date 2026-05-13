@@ -386,14 +386,60 @@ const SmartApply = () => {
     setMatchedJobs(prev => prev.map((j, i) => i === index ? { ...j, selected: !j.selected } : j));
   };
 
+  const recordRun = (jobs: MatchedJob[]) => {
+    const id = `run-${Date.now()}`;
+    setCurrentRunId(id);
+    saveRun({
+      id,
+      timestamp: Date.now(),
+      template: resumeStyle?.template,
+      jobs: jobs.map<ApplyHistoryJob>((j) => ({
+        title: j.title,
+        company: j.company,
+        location: j.location,
+        url: j.url,
+        source: j.source,
+        status: "queued",
+      })),
+    });
+  };
+
   const handleBatchApply = () => {
     requirePro(() => {
       const selected = matchedJobs.filter(j => j.selected);
+      if (instantLimit !== Infinity && selected.length > instantRemaining) {
+        toast({
+          title: "Instant Apply cap reached",
+          description: `You have ${instantRemaining} instant applies left this month. Deselect jobs or wait until next month.`,
+          variant: "destructive",
+        });
+        return;
+      }
       selected.forEach((job, i) => {
         setTimeout(() => {
           window.open(job.url, "_blank");
         }, i * 500);
       });
+      const next = incrementInstantApply(selected.length);
+      const limit = getInstantApplyLimit(tierKey);
+      setInstantRemaining(limit === Infinity ? Infinity : Math.max(0, limit - next.used));
+      // Mark jobs as opened in history
+      if (currentRunId) {
+        try {
+          const raw = localStorage.getItem("smart-apply-history");
+          if (raw) {
+            const all = JSON.parse(raw);
+            const run = all.find((r: any) => r.id === currentRunId);
+            if (run) {
+              const selectedSet = new Set(selected.map((s) => s.url));
+              run.jobs.forEach((j: any) => {
+                if (selectedSet.has(j.url)) j.status = "opened";
+              });
+              localStorage.setItem("smart-apply-history", JSON.stringify(all));
+            }
+          }
+        } catch {}
+      }
       toast({
         title: `Opening ${selected.length} job${selected.length > 1 ? "s" : ""}`,
         description: "Each job page will open in a new tab. Use your cover letter from below!",
