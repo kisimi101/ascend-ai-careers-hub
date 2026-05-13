@@ -29,9 +29,25 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { createRoot } from "react-dom/client";
+import { ModernTemplate } from "@/components/resume-builder/templates/ModernTemplate";
+import { ClassicTemplate } from "@/components/resume-builder/templates/ClassicTemplate";
+import { TechTemplate } from "@/components/resume-builder/templates/TechTemplate";
+import { CreativeTemplate } from "@/components/resume-builder/templates/CreativeTemplate";
+import { ExecutiveTemplate } from "@/components/resume-builder/templates/ExecutiveTemplate";
+import { MinimalistTemplate } from "@/components/resume-builder/templates/MinimalistTemplate";
+import { densityWrapperStyle, densityClassName, type Density } from "@/components/resume-builder/templates/densityStyles";
+import {
+  saveRun,
+  getInstantApplyRemaining,
+  incrementInstantApply,
+  getInstantApplyLimit,
+  type ApplyHistoryJob,
+} from "@/lib/applyHistory";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 
 interface ResumeData {
@@ -79,7 +95,7 @@ const SmartApply = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isPro, isLoading: subLoading } = useSubscription();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [step, setStep] = useState<PipelineStep>("upload");
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
@@ -91,6 +107,41 @@ const SmartApply = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [resumeStyle, setResumeStyle] = useState<{ template?: string; accentColor?: string; density?: string } | null>(null);
   const [usage, setUsage] = useState<{ used: number; limit: number; tier: string; monthlyUsed?: number; monthlyLimit?: number | null } | null>(null);
+  const [currentRunId, setCurrentRunId] = useState<string | null>(null);
+  const [instantRemaining, setInstantRemaining] = useState<number>(getInstantApplyRemaining(isPro ? "pro" : "free"));
+
+  const tierKey = isPro ? "pro" : "free";
+  const instantLimit = getInstantApplyLimit(tierKey);
+
+  useEffect(() => {
+    setInstantRemaining(getInstantApplyRemaining(tierKey));
+  }, [tierKey]);
+
+  // Autofill from saved profile (name/email/phone/location)
+  useEffect(() => {
+    if (!user?.id) return;
+    (async () => {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, email")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!profile) return;
+        setResumeData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            personalInfo: {
+              ...prev.personalInfo,
+              fullName: prev.personalInfo.fullName || profile.full_name || "",
+              email: prev.personalInfo.email || profile.email || user.email || "",
+            },
+          };
+        });
+      } catch {}
+    })();
+  }, [user?.id]);
 
   const requirePro = (action: () => void) => {
     if (isPro) {
@@ -108,11 +159,17 @@ const SmartApply = () => {
       const savedRaw = localStorage.getItem("resume-data");
       if (savedRaw && !resumeData) {
         const parsed = JSON.parse(savedRaw);
-        if (parsed?.personalInfo?.fullName) setResumeData(parsed);
+        if (parsed?.personalInfo?.fullName) {
+          // Merge profile defaults if available
+          if (user?.email && !parsed.personalInfo.email) {
+            parsed.personalInfo.email = user.email;
+          }
+          setResumeData(parsed);
+        }
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user?.id]);
 
   const stepLabels: Record<PipelineStep, string> = {
     upload: "Upload Resume",
