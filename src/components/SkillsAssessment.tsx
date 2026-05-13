@@ -85,7 +85,7 @@ export const SkillsAssessment = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
-              <span className="bg-blue-500/10 text-blue-500 px-4 py-2 rounded-full text-sm font-semibold">
+              <span className="bg-info/15 text-info px-4 py-2 rounded-full text-sm font-semibold">
                 🎯 Skills Assessment
               </span>
             </div>
