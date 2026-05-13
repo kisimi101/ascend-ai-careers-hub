@@ -24,14 +24,31 @@ import {
   Download,
   Crown,
   Lock,
+  History,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { createRoot } from "react-dom/client";
+import { ModernTemplate } from "@/components/resume-builder/templates/ModernTemplate";
+import { ClassicTemplate } from "@/components/resume-builder/templates/ClassicTemplate";
+import { TechTemplate } from "@/components/resume-builder/templates/TechTemplate";
+import { CreativeTemplate } from "@/components/resume-builder/templates/CreativeTemplate";
+import { ExecutiveTemplate } from "@/components/resume-builder/templates/ExecutiveTemplate";
+import { MinimalistTemplate } from "@/components/resume-builder/templates/MinimalistTemplate";
+import { densityWrapperStyle, densityClassName, type Density } from "@/components/resume-builder/templates/densityStyles";
+import {
+  saveRun,
+  getInstantApplyRemaining,
+  incrementInstantApply,
+  getInstantApplyLimit,
+  type ApplyHistoryJob,
+} from "@/lib/applyHistory";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 
 interface ResumeData {
@@ -79,7 +96,7 @@ const SmartApply = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isPro, isLoading: subLoading } = useSubscription();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [step, setStep] = useState<PipelineStep>("upload");
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
@@ -91,6 +108,41 @@ const SmartApply = () => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [resumeStyle, setResumeStyle] = useState<{ template?: string; accentColor?: string; density?: string } | null>(null);
   const [usage, setUsage] = useState<{ used: number; limit: number; tier: string; monthlyUsed?: number; monthlyLimit?: number | null } | null>(null);
+  const [currentRunId, setCurrentRunId] = useState<string | null>(null);
+  const [instantRemaining, setInstantRemaining] = useState<number>(getInstantApplyRemaining(isPro ? "pro" : "free"));
+
+  const tierKey = isPro ? "pro" : "free";
+  const instantLimit = getInstantApplyLimit(tierKey);
+
+  useEffect(() => {
+    setInstantRemaining(getInstantApplyRemaining(tierKey));
+  }, [tierKey]);
+
+  // Autofill from saved profile (name/email/phone/location)
+  useEffect(() => {
+    if (!user?.id) return;
+    (async () => {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, email")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (!profile) return;
+        setResumeData((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            personalInfo: {
+              ...prev.personalInfo,
+              fullName: prev.personalInfo.fullName || profile.full_name || "",
+              email: prev.personalInfo.email || profile.email || user.email || "",
+            },
+          };
+        });
+      } catch {}
+    })();
+  }, [user?.id]);
 
   const requirePro = (action: () => void) => {
     if (isPro) {
@@ -108,11 +160,17 @@ const SmartApply = () => {
       const savedRaw = localStorage.getItem("resume-data");
       if (savedRaw && !resumeData) {
         const parsed = JSON.parse(savedRaw);
-        if (parsed?.personalInfo?.fullName) setResumeData(parsed);
+        if (parsed?.personalInfo?.fullName) {
+          // Merge profile defaults if available
+          if (user?.email && !parsed.personalInfo.email) {
+            parsed.personalInfo.email = user.email;
+          }
+          setResumeData(parsed);
+        }
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user?.id]);
 
   const stepLabels: Record<PipelineStep, string> = {
     upload: "Upload Resume",
@@ -240,6 +298,7 @@ const SmartApply = () => {
       setProgressPercent(100);
       setStep("ready");
       toast({ title: "Pipeline complete!", description: `Found ${jobs.length} matching jobs with tailored cover letters.` });
+      recordRun(jobs);
     } catch (err: any) {
       console.error("Smart apply error:", err);
       toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
@@ -314,6 +373,7 @@ const SmartApply = () => {
       setProgressPercent(100);
       setStep("ready");
       toast({ title: "Pipeline complete!", description: `Found ${jobs.length} matching jobs.` });
+      recordRun(jobs);
     } catch (err: any) {
       console.error("Smart apply error:", err);
       toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
@@ -327,14 +387,60 @@ const SmartApply = () => {
     setMatchedJobs(prev => prev.map((j, i) => i === index ? { ...j, selected: !j.selected } : j));
   };
 
+  const recordRun = (jobs: MatchedJob[]) => {
+    const id = `run-${Date.now()}`;
+    setCurrentRunId(id);
+    saveRun({
+      id,
+      timestamp: Date.now(),
+      template: resumeStyle?.template,
+      jobs: jobs.map<ApplyHistoryJob>((j) => ({
+        title: j.title,
+        company: j.company,
+        location: j.location,
+        url: j.url,
+        source: j.source,
+        status: "queued",
+      })),
+    });
+  };
+
   const handleBatchApply = () => {
     requirePro(() => {
       const selected = matchedJobs.filter(j => j.selected);
+      if (instantLimit !== Infinity && selected.length > instantRemaining) {
+        toast({
+          title: "Instant Apply cap reached",
+          description: `You have ${instantRemaining} instant applies left this month. Deselect jobs or wait until next month.`,
+          variant: "destructive",
+        });
+        return;
+      }
       selected.forEach((job, i) => {
         setTimeout(() => {
           window.open(job.url, "_blank");
         }, i * 500);
       });
+      const next = incrementInstantApply(selected.length);
+      const limit = getInstantApplyLimit(tierKey);
+      setInstantRemaining(limit === Infinity ? Infinity : Math.max(0, limit - next.used));
+      // Mark jobs as opened in history
+      if (currentRunId) {
+        try {
+          const raw = localStorage.getItem("smart-apply-history");
+          if (raw) {
+            const all = JSON.parse(raw);
+            const run = all.find((r: any) => r.id === currentRunId);
+            if (run) {
+              const selectedSet = new Set(selected.map((s) => s.url));
+              run.jobs.forEach((j: any) => {
+                if (selectedSet.has(j.url)) j.status = "opened";
+              });
+              localStorage.setItem("smart-apply-history", JSON.stringify(all));
+            }
+          }
+        } catch {}
+      }
       toast({
         title: `Opening ${selected.length} job${selected.length > 1 ? "s" : ""}`,
         description: "Each job page will open in a new tab. Use your cover letter from below!",
@@ -441,6 +547,68 @@ const SmartApply = () => {
     });
   };
 
+  const downloadStyledResumePDF = () => {
+    requirePro(async () => {
+      if (!resumeData) return;
+      const template = resumeStyle?.template || "modern-professional";
+      const accent = resumeStyle?.accentColor || "#2563eb";
+      const density = (resumeStyle?.density as Density) || "standard";
+
+      const container = document.createElement("div");
+      container.style.position = "fixed";
+      container.style.left = "-9999px";
+      container.style.top = "0";
+      container.style.width = "816px"; // ~ 8.5in @ 96dpi
+      container.style.background = "#ffffff";
+      document.body.appendChild(container);
+
+      const inner = document.createElement("div");
+      inner.id = "styled-resume-export";
+      inner.className = densityClassName(density);
+      Object.assign(inner.style, densityWrapperStyle(density), { background: "#ffffff" });
+      container.appendChild(inner);
+
+      const root = createRoot(inner);
+      const props = { resumeData, accentColor: accent };
+      const node =
+        template === "classic-minimal" ? <ClassicTemplate {...props} /> :
+        template === "tech-specialist" ? <TechTemplate {...props} /> :
+        template === "creative-designer" ? <CreativeTemplate {...props} /> :
+        template === "executive" ? <ExecutiveTemplate {...props} /> :
+        template === "minimalist" ? <MinimalistTemplate {...props} /> :
+        <ModernTemplate {...props} />;
+      root.render(node);
+
+      try {
+        // Wait for paint
+        await new Promise((r) => setTimeout(r, 300));
+        const canvas = await html2canvas(inner, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const maxW = pageW - margin * 2;
+        const maxH = pageH - margin * 2;
+        const widthFitH = (canvas.height * maxW) / canvas.width;
+        if (widthFitH <= maxH) {
+          pdf.addImage(imgData, "PNG", margin, margin, maxW, widthFitH);
+        } else {
+          const scale = maxH / widthFitH;
+          const finalW = maxW * scale;
+          pdf.addImage(imgData, "PNG", (pageW - finalW) / 2, margin, finalW, maxH);
+        }
+        pdf.save(`${resumeData.personalInfo.fullName || "resume"}-styled.pdf`);
+        toast({ title: "Downloaded!", description: `Styled PDF saved using your ${template.replace(/-/g, " ")} template.` });
+      } catch (err: any) {
+        toast({ title: "Export failed", description: err.message || "Could not generate styled PDF.", variant: "destructive" });
+      } finally {
+        root.unmount();
+        document.body.removeChild(container);
+      }
+    });
+  };
+
   const downloadCoverLetterPDF = (job: MatchedJob) => {
     requirePro(() => {
       if (!job.coverLetter) return;
@@ -540,11 +708,18 @@ const SmartApply = () => {
             <div className="flex items-center justify-between text-xs text-muted-foreground bg-muted/40 border border-border/60 rounded-lg px-3 py-2">
               <span className="flex items-center gap-1.5">
                 <Zap className="h-3.5 w-3.5 text-primary" />
-                Instant applies available this run
+                Instant Applies remaining this month
               </span>
               <span className="font-medium text-foreground">
-                {isPro ? "Unlimited" : `${matchedJobs.filter(j => j.selected).length} selected`}
+                {instantLimit === Infinity
+                  ? "Unlimited"
+                  : `${instantRemaining} / ${instantLimit}`}
               </span>
+            </div>
+            <div className="text-right">
+              <Link to="/apply-history" className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+                <History className="h-3 w-3" /> View apply history
+              </Link>
             </div>
             {resumeStyle?.template && (
               <p className="text-xs text-muted-foreground text-center">
@@ -623,6 +798,9 @@ const SmartApply = () => {
                     <Button size="sm" variant="outline" onClick={downloadResumePDF} className="w-fit">
                       <Download className="h-4 w-4 mr-1" /> Download Resume PDF
                     </Button>
+                    <Button size="sm" onClick={downloadStyledResumePDF} className="w-fit">
+                      <Sparkles className="h-4 w-4 mr-1" /> Styled PDF
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -667,10 +845,21 @@ const SmartApply = () => {
                 <Button size="sm" variant="outline" onClick={downloadAllCoverLetters} disabled={!matchedJobs.some(j => j.coverLetter)}>
                   <Download className="h-4 w-4 mr-1" /> All Cover Letters
                 </Button>
-                <Button size="sm" onClick={handleBatchApply} disabled={!matchedJobs.some(j => j.selected)}>
-                  <ExternalLink className="h-4 w-4 mr-1" />
-                  Apply ({matchedJobs.filter(j => j.selected).length})
-                </Button>
+                {(() => {
+                  const selectedCount = matchedJobs.filter(j => j.selected).length;
+                  const overCap = instantLimit !== Infinity && selectedCount > instantRemaining;
+                  return (
+                    <Button
+                      size="sm"
+                      onClick={handleBatchApply}
+                      disabled={selectedCount === 0 || overCap || (instantLimit !== Infinity && instantRemaining === 0)}
+                      title={overCap ? `Only ${instantRemaining} instant applies left this month` : undefined}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Apply ({selectedCount}){instantLimit !== Infinity && ` · ${instantRemaining} left`}
+                    </Button>
+                  );
+                })()}
               </div>
             </div>
 
