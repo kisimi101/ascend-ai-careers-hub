@@ -798,6 +798,9 @@ const SmartApply = () => {
                     <Button size="sm" variant="outline" onClick={downloadResumePDF} className="w-fit">
                       <Download className="h-4 w-4 mr-1" /> Download Resume PDF
                     </Button>
+                    <Button size="sm" onClick={downloadStyledResumePDF} className="w-fit">
+                      <Sparkles className="h-4 w-4 mr-1" /> Styled PDF
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
