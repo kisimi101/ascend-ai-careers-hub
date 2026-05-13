@@ -546,6 +546,68 @@ const SmartApply = () => {
     });
   };
 
+  const downloadStyledResumePDF = () => {
+    requirePro(async () => {
+      if (!resumeData) return;
+      const template = resumeStyle?.template || "modern-professional";
+      const accent = resumeStyle?.accentColor || "#2563eb";
+      const density = (resumeStyle?.density as Density) || "standard";
+
+      const container = document.createElement("div");
+      container.style.position = "fixed";
+      container.style.left = "-9999px";
+      container.style.top = "0";
+      container.style.width = "816px"; // ~ 8.5in @ 96dpi
+      container.style.background = "#ffffff";
+      document.body.appendChild(container);
+
+      const inner = document.createElement("div");
+      inner.id = "styled-resume-export";
+      inner.className = densityClassName(density);
+      Object.assign(inner.style, densityWrapperStyle(density), { background: "#ffffff" });
+      container.appendChild(inner);
+
+      const root = createRoot(inner);
+      const props = { resumeData, accentColor: accent };
+      const node =
+        template === "classic-minimal" ? <ClassicTemplate {...props} /> :
+        template === "tech-specialist" ? <TechTemplate {...props} /> :
+        template === "creative-designer" ? <CreativeTemplate {...props} /> :
+        template === "executive" ? <ExecutiveTemplate {...props} /> :
+        template === "minimalist" ? <MinimalistTemplate {...props} /> :
+        <ModernTemplate {...props} />;
+      root.render(node);
+
+      try {
+        // Wait for paint
+        await new Promise((r) => setTimeout(r, 300));
+        const canvas = await html2canvas(inner, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const maxW = pageW - margin * 2;
+        const maxH = pageH - margin * 2;
+        const widthFitH = (canvas.height * maxW) / canvas.width;
+        if (widthFitH <= maxH) {
+          pdf.addImage(imgData, "PNG", margin, margin, maxW, widthFitH);
+        } else {
+          const scale = maxH / widthFitH;
+          const finalW = maxW * scale;
+          pdf.addImage(imgData, "PNG", (pageW - finalW) / 2, margin, finalW, maxH);
+        }
+        pdf.save(`${resumeData.personalInfo.fullName || "resume"}-styled.pdf`);
+        toast({ title: "Downloaded!", description: `Styled PDF saved using your ${template.replace(/-/g, " ")} template.` });
+      } catch (err: any) {
+        toast({ title: "Export failed", description: err.message || "Could not generate styled PDF.", variant: "destructive" });
+      } finally {
+        root.unmount();
+        document.body.removeChild(container);
+      }
+    });
+  };
+
   const downloadCoverLetterPDF = (job: MatchedJob) => {
     requirePro(() => {
       if (!job.coverLetter) return;
