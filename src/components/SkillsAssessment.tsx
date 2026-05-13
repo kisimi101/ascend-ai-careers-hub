@@ -114,7 +114,7 @@ export const SkillsAssessment = () => {
               <CardContent className="text-center">
                 <div className="grid grid-cols-3 gap-4 mb-8">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-500">5</div>
+                    <div className="text-2xl font-bold text-info">5</div>
                     <div className="text-sm text-muted-foreground">Questions</div>
                   </div>
                   <div className="text-center">
@@ -122,7 +122,7 @@ export const SkillsAssessment = () => {
                     <div className="text-sm text-muted-foreground">Minutes</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-emerald-500">Free</div>
+                    <div className="text-2xl font-bold text-success">Free</div>
                     <div className="text-sm text-muted-foreground">Always</div>
                   </div>
                 </div>
