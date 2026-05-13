@@ -23,7 +23,7 @@ export const CreativeTemplate = ({ resumeData, accentColor = "#6d28d9" }: Templa
         </div>
 
         <div className="mb-6">
-          <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 mb-3">Contact</h3>
+          <h2 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 mb-3">Contact</h2>
           <div className="space-y-2 text-white/80 text-[11px]">
             {resumeData.personalInfo.email && <div className="break-all">{resumeData.personalInfo.email}</div>}
             {resumeData.personalInfo.phone && <div>{resumeData.personalInfo.phone}</div>}
@@ -33,7 +33,7 @@ export const CreativeTemplate = ({ resumeData, accentColor = "#6d28d9" }: Templa
 
         {resumeData.skills.length > 0 && resumeData.skills[0] && (
           <div>
-            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 mb-3">Skills</h3>
+            <h2 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 mb-3">Skills</h2>
             <div className="space-y-2">
               {resumeData.skills.map((skill, index) => (
                 <div key={index} className="text-[11px]">
