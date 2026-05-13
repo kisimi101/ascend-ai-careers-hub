@@ -33,7 +33,7 @@ export const CreativeTemplate = ({ resumeData, accentColor = "#6d28d9" }: Templa
 
         {resumeData.skills.length > 0 && resumeData.skills[0] && (
           <div>
-            <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 mb-3">Skills</h3>
+            <h2 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/60 mb-3">Skills</h2>
             <div className="space-y-2">
               {resumeData.skills.map((skill, index) => (
                 <div key={index} className="text-[11px]">
