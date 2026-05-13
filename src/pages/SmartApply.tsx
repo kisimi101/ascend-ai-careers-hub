@@ -845,10 +845,21 @@ const SmartApply = () => {
                 <Button size="sm" variant="outline" onClick={downloadAllCoverLetters} disabled={!matchedJobs.some(j => j.coverLetter)}>
                   <Download className="h-4 w-4 mr-1" /> All Cover Letters
                 </Button>
-                <Button size="sm" onClick={handleBatchApply} disabled={!matchedJobs.some(j => j.selected)}>
-                  <ExternalLink className="h-4 w-4 mr-1" />
-                  Apply ({matchedJobs.filter(j => j.selected).length})
-                </Button>
+                {(() => {
+                  const selectedCount = matchedJobs.filter(j => j.selected).length;
+                  const overCap = instantLimit !== Infinity && selectedCount > instantRemaining;
+                  return (
+                    <Button
+                      size="sm"
+                      onClick={handleBatchApply}
+                      disabled={selectedCount === 0 || overCap || (instantLimit !== Infinity && instantRemaining === 0)}
+                      title={overCap ? `Only ${instantRemaining} instant applies left this month` : undefined}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Apply ({selectedCount}){instantLimit !== Infinity && ` · ${instantRemaining} left`}
+                    </Button>
+                  );
+                })()}
               </div>
             </div>
 
