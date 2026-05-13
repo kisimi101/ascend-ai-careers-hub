@@ -24,6 +24,7 @@ import {
   Download,
   Crown,
   Lock,
+  History,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
