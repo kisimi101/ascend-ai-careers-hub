@@ -47,6 +47,7 @@ import SharedResume from "./pages/SharedResume";
 import ResumeAnalytics from "./pages/ResumeAnalytics";
 import GetStarted from "./pages/GetStarted";
 import SmartApply from "./pages/SmartApply";
+import ApplyHistory from "./pages/ApplyHistory";
 import AutoFollowUp from "./pages/AutoFollowUp";
 import JobMarketHeatmap from "./pages/JobMarketHeatmap";
 import InterviewQuestionBank from "./pages/InterviewQuestionBank";
@@ -114,6 +115,7 @@ const App = () => (
                   <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
                   <Route path="/smart-apply" element={<ProtectedRoute><ProRoute featureName="Smart Apply"><SmartApply /></ProRoute></ProtectedRoute>} />
+                  <Route path="/apply-history" element={<ProtectedRoute><ApplyHistory /></ProtectedRoute>} />
                   <Route path="/auto-follow-up" element={<ProtectedRoute><ProRoute featureName="Auto Follow-Up"><AutoFollowUp /></ProRoute></ProtectedRoute>} />
                   <Route path="/job-market-heatmap" element={<ProtectedRoute><ProRoute featureName="Job Market Heatmap"><JobMarketHeatmap /></ProRoute></ProtectedRoute>} />
                   <Route path="/interview-question-bank" element={<ProtectedRoute><ProRoute featureName="Interview Question Bank"><InterviewQuestionBank /></ProRoute></ProtectedRoute>} />
