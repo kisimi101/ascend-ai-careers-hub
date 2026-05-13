@@ -23,7 +23,7 @@ const SectionFallback = () => (
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <Navigation />
       <FloatingCTA />
       <FloatingSideTools />
@@ -66,7 +66,7 @@ const Index = () => {
       <Suspense fallback={<SectionFallback />}>
         <Footer />
       </Suspense>
-    </div>
+    </main>
   );
 };
 
