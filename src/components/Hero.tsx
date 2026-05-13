@@ -16,6 +16,11 @@ export const Hero = () => {
           alt="Abstract career growth path"
           className="h-full w-full object-cover"
           loading="eager"
+          decoding="async"
+          // @ts-ignore - fetchpriority is a valid HTML attribute
+          fetchpriority="high"
+          width={1920}
+          height={879}
         />
         {/* readability overlay */}
         <div className="absolute inset-0 bg-background/55" />
