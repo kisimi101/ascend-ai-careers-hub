@@ -55,6 +55,7 @@ import CareerTimeline from "./pages/CareerTimeline";
 import ReferralMapper from "./pages/ReferralMapper";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
+import JobSearchToolsLanding from "./pages/JobSearchToolsLanding";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +78,7 @@ const App = () => (
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Index />} />
+                  <Route path="/job-search-tools" element={<JobSearchToolsLanding />} />
                   <Route path="/get-started" element={<ProtectedRoute><GetStarted /></ProtectedRoute>} />
                   
                   {/* Protected routes - All tools require authentication */}
