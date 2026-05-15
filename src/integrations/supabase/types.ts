@@ -251,6 +251,45 @@ export type Database = {
         }
         Relationships: []
       }
+      keyword_trends: {
+        Row: {
+          captured_at: string
+          cpc: number | null
+          created_at: string
+          difficulty: number | null
+          id: string
+          keyword: string
+          notes: string | null
+          source: string
+          user_id: string
+          volume: number | null
+        }
+        Insert: {
+          captured_at?: string
+          cpc?: number | null
+          created_at?: string
+          difficulty?: number | null
+          id?: string
+          keyword: string
+          notes?: string | null
+          source?: string
+          user_id: string
+          volume?: number | null
+        }
+        Update: {
+          captured_at?: string
+          cpc?: number | null
+          created_at?: string
+          difficulty?: number | null
+          id?: string
+          keyword?: string
+          notes?: string | null
+          source?: string
+          user_id?: string
+          volume?: number | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
