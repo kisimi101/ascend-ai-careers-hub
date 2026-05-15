@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.polar-customer-portal]
 verify_jwt = false
+
+[functions.tailored-resume-preview]
+verify_jwt = false

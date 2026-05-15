@@ -56,6 +56,10 @@ import ReferralMapper from "./pages/ReferralMapper";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 import JobSearchToolsLanding from "./pages/JobSearchToolsLanding";
+import AiResumeBuilderLanding from "./pages/AiResumeBuilderLanding";
+import FreeResumeTemplatesHub from "./pages/FreeResumeTemplatesHub";
+import TailoredResumeOnboarding from "./pages/TailoredResumeOnboarding";
+import SeoKeywordTracker from "./pages/SeoKeywordTracker";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +83,10 @@ const App = () => (
                   {/* Public routes */}
                   <Route path="/" element={<Index />} />
                   <Route path="/job-search-tools" element={<JobSearchToolsLanding />} />
+                  <Route path="/ai-resume-builder" element={<AiResumeBuilderLanding />} />
+                  <Route path="/free-resume-templates" element={<FreeResumeTemplatesHub />} />
+                  <Route path="/tailored-resume" element={<TailoredResumeOnboarding />} />
+                  <Route path="/seo-keyword-tracker" element={<ProtectedRoute><SeoKeywordTracker /></ProtectedRoute>} />
                   <Route path="/get-started" element={<ProtectedRoute><GetStarted /></ProtectedRoute>} />
                   
                   {/* Protected routes - All tools require authentication */}
