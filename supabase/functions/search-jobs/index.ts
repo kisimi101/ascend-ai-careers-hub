@@ -17,6 +17,48 @@ const MONTHLY_LIMITS: Record<string, number> = {
   pro: 1500,
 };
 
+// Anonymous (no-signup) trial — per fingerprint per day
+const GUEST_DAILY_LIMIT = 10;
+
+function getFingerprint(req: Request): string {
+  const ip = (req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown')
+    .split(',')[0]
+    .trim();
+  const ua = req.headers.get('user-agent') || 'ua';
+  // Lightweight stable hash – fingerprint is not security-sensitive, just for rate counting.
+  let h = 0;
+  const s = `${ip}|${ua}`;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return `${ip}:${(h >>> 0).toString(36)}`;
+}
+
+async function getGuestCount(fingerprint: string, action: string): Promise<{ count: number; id: string | null }> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await adminClient
+    .from('guest_usage')
+    .select('id, count')
+    .eq('fingerprint', fingerprint)
+    .eq('action', action)
+    .eq('usage_date', today)
+    .maybeSingle();
+  return { count: data?.count || 0, id: data?.id || null };
+}
+
+async function incrementGuestCount(fingerprint: string, action: string, existingId: string | null, currentCount: number) {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+  const today = new Date().toISOString().split('T')[0];
+  if (existingId) {
+    await adminClient.from('guest_usage').update({ count: currentCount + 1, updated_at: new Date().toISOString() }).eq('id', existingId);
+  } else {
+    await adminClient.from('guest_usage').insert({ fingerprint, action, usage_date: today, count: 1 });
+  }
+}
+
 async function getUserTier(supabaseAdmin: any, userId: string): Promise<string> {
   try {
     const polarAccessToken = Deno.env.get('POLAR_ACCESS_TOKEN');
@@ -116,22 +158,32 @@ serve(async (req) => {
   }
 
   try {
-    // Auth check
+    // Optional auth — guests get a free trial via fingerprint.
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized', jobs: [] }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const authClient = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
-    const { data: { user }, error: authError } = await authClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized', jobs: [] }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    let user: { id: string } | null = null;
+    if (authHeader) {
+      try {
+        const authClient = createClient(supabaseUrl, supabaseAnonKey, { global: { headers: { Authorization: authHeader } } });
+        const { data } = await authClient.auth.getUser();
+        if (data?.user) user = { id: data.user.id };
+      } catch (e) {
+        console.warn('Auth header present but invalid, falling back to guest:', (e as Error).message);
+      }
     }
+    const isGuest = !user;
+    const fingerprint = isGuest ? getFingerprint(req) : '';
 
     // Check if this is a usage query only
     const body = await req.json();
     if (body.checkUsageOnly) {
+      if (isGuest) {
+        const { count } = await getGuestCount(fingerprint, 'search');
+        return new Response(JSON.stringify({ used: count, limit: GUEST_DAILY_LIMIT, tier: 'guest', monthlyUsed: 0, monthlyLimit: null }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       const { count } = await getDailySearchCount(user.id);
       const tier = await getUserTier(null, user.id);
       const limit = TIER_LIMITS[tier] || 5;
@@ -144,12 +196,32 @@ serve(async (req) => {
 
     const { skills, jobTitle, location, experience } = body;
 
-    // Server-side rate limit check based on subscription tier
-    const tier = await getUserTier(null, user.id);
-    const limit = TIER_LIMITS[tier] || 5;
-    const { count: dailyCount, id: usageId } = await getDailySearchCount(user.id);
+    // Guest path — IP-fingerprinted rate limit, no Polar tier checks.
+    if (isGuest) {
+      const { count: guestCount, id: guestUsageId } = await getGuestCount(fingerprint, 'search');
+      if (guestCount >= GUEST_DAILY_LIMIT) {
+        return new Response(
+          JSON.stringify({
+            error: `Free guest limit reached (${GUEST_DAILY_LIMIT}/${GUEST_DAILY_LIMIT}). Sign up free to keep searching.`,
+            jobs: [],
+            used: guestCount,
+            limit: GUEST_DAILY_LIMIT,
+            tier: 'guest',
+            requiresSignup: true,
+          }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      await incrementGuestCount(fingerprint, 'search', guestUsageId, guestCount);
+      var guestUsedAfter = guestCount + 1;
+    }
 
-    if (dailyCount >= limit) {
+    // Server-side rate limit check based on subscription tier
+    const tier = isGuest ? 'guest' : await getUserTier(null, user!.id);
+    const limit = TIER_LIMITS[tier] || 5;
+    const { count: dailyCount, id: usageId } = isGuest ? { count: 0, id: null } : await getDailySearchCount(user!.id);
+
+    if (!isGuest && dailyCount >= limit) {
       const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
       return new Response(
         JSON.stringify({ 
@@ -164,10 +236,10 @@ serve(async (req) => {
     }
 
     // Monthly cap enforcement (Pro = 1,500/month)
-    const monthlyLimit = MONTHLY_LIMITS[tier] || null;
+    const monthlyLimit = isGuest ? null : (MONTHLY_LIMITS[tier] || null);
     let monthlyUsed = 0;
     if (monthlyLimit) {
-      monthlyUsed = await getMonthlySearchCount(user.id);
+      monthlyUsed = await getMonthlySearchCount(user!.id);
       if (monthlyUsed >= monthlyLimit) {
         return new Response(
           JSON.stringify({
@@ -184,10 +256,12 @@ serve(async (req) => {
       }
     }
 
-    // Increment search count
-    await incrementSearchCount(user.id, usageId, dailyCount);
+    // Increment search count (logged-in users only — guests already incremented above)
+    if (!isGuest) {
+      await incrementSearchCount(user!.id, usageId, dailyCount);
+    }
 
-    console.log("Searching jobs for user:", user.id, { skills, jobTitle, location, tier, dailyCount: dailyCount + 1 });
+    console.log("Searching jobs:", isGuest ? `guest:${fingerprint}` : user!.id, { skills, jobTitle, location, tier, dailyCount: dailyCount + 1 });
 
     const apifyApiKey = Deno.env.get('APIFY_API_KEY');
     if (!apifyApiKey) {
@@ -271,11 +345,12 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       jobs,
-      used: dailyCount + 1,
-      limit,
+      used: isGuest ? (guestUsedAfter as number) : dailyCount + 1,
+      limit: isGuest ? GUEST_DAILY_LIMIT : limit,
       tier,
       monthlyUsed: monthlyLimit ? monthlyUsed + 1 : 0,
       monthlyLimit,
+      isGuest,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
