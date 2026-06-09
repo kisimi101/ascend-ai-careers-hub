@@ -1089,6 +1089,7 @@ const SmartApply = () => {
       </div>
 
       <Footer />
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} defaultTab="signup" />
     </div>
   );
 };
