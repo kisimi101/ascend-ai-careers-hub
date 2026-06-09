@@ -113,6 +113,36 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_usage: {
+        Row: {
+          action: string
+          count: number
+          created_at: string
+          fingerprint: string
+          id: string
+          updated_at: string
+          usage_date: string
+        }
+        Insert: {
+          action: string
+          count?: number
+          created_at?: string
+          fingerprint: string
+          id?: string
+          updated_at?: string
+          usage_date?: string
+        }
+        Update: {
+          action?: string
+          count?: number
+          created_at?: string
+          fingerprint?: string
+          id?: string
+          updated_at?: string
+          usage_date?: string
+        }
+        Relationships: []
+      }
       interview_questions: {
         Row: {
           category: string

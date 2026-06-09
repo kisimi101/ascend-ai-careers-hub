@@ -97,7 +97,8 @@ const App = () => (
                   <Route path="/cover-letter-generator" element={<ProtectedRoute><CoverLetterGenerator /></ProtectedRoute>} />
                   <Route path="/resume-checker" element={<ProtectedRoute><ResumeChecker /></ProtectedRoute>} />
                   <Route path="/resume-summary-generator" element={<ProtectedRoute><ResumeSummaryGenerator /></ProtectedRoute>} />
-                  <Route path="/job-search" element={<ProtectedRoute><ProRoute featureName="Job Search"><JobSearch /></ProRoute></ProtectedRoute>} />
+                  {/* Job Search: free guest trial (10/day), Pro for more */}
+                  <Route path="/job-search" element={<JobSearch />} />
                   <Route path="/resume-bullet-generator" element={<ProtectedRoute><ResumeBulletGenerator /></ProtectedRoute>} />
                   <Route path="/resume-skills-generator" element={<ProtectedRoute><ResumeSkillsGenerator /></ProtectedRoute>} />
                   <Route path="/resume-keyword-scanner" element={<ProtectedRoute><ResumeKeywordScanner /></ProtectedRoute>} />
@@ -125,7 +126,8 @@ const App = () => (
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
-                  <Route path="/smart-apply" element={<ProtectedRoute><ProRoute featureName="Smart Apply"><SmartApply /></ProRoute></ProtectedRoute>} />
+                  {/* Smart Apply: 1 free guest application, then signup */}
+                  <Route path="/smart-apply" element={<SmartApply />} />
                   <Route path="/apply-history" element={<ProtectedRoute><ApplyHistory /></ProtectedRoute>} />
                   <Route path="/auto-follow-up" element={<ProtectedRoute><ProRoute featureName="Auto Follow-Up"><AutoFollowUp /></ProRoute></ProtectedRoute>} />
                   <Route path="/job-market-heatmap" element={<ProtectedRoute><ProRoute featureName="Job Market Heatmap"><JobMarketHeatmap /></ProRoute></ProtectedRoute>} />
