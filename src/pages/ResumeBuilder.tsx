@@ -597,6 +597,7 @@ const ResumeBuilder = () => {
         ]}
       />
       <Footer />
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} defaultTab="signup" />
     </div>
   );
 };
