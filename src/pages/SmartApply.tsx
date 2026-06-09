@@ -319,6 +319,7 @@ const SmartApply = () => {
       setStep("ready");
       toast({ title: "Pipeline complete!", description: `Found ${jobs.length} matching jobs with tailored cover letters.` });
       recordRun(jobs);
+      if (!isAuthenticated) guestApply.recordUse();
     } catch (err: any) {
       console.error("Smart apply error:", err);
       toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
@@ -395,6 +396,7 @@ const SmartApply = () => {
       setStep("ready");
       toast({ title: "Pipeline complete!", description: `Found ${jobs.length} matching jobs.` });
       recordRun(jobs);
+      if (!isAuthenticated) guestApply.recordUse();
     } catch (err: any) {
       console.error("Smart apply error:", err);
       toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
