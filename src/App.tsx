@@ -92,7 +92,8 @@ const App = () => (
                   {/* Protected routes - All tools require authentication */}
                   <Route path="/tools" element={<ProtectedRoute><ToolsDashboard /></ProtectedRoute>} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  <Route path="/resume-builder" element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
+                  {/* Resume Builder is open for free trial — gated downloads inside */}
+                  <Route path="/resume-builder" element={<ResumeBuilder />} />
                   <Route path="/cover-letter-generator" element={<ProtectedRoute><CoverLetterGenerator /></ProtectedRoute>} />
                   <Route path="/resume-checker" element={<ProtectedRoute><ResumeChecker /></ProtectedRoute>} />
                   <Route path="/resume-summary-generator" element={<ProtectedRoute><ResumeSummaryGenerator /></ProtectedRoute>} />
