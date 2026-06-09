@@ -50,6 +50,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
+import { useTrialLimit } from "@/hooks/useTrialLimit";
+import { AuthDialog } from "@/components/auth/AuthDialog";
 
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
@@ -97,6 +99,19 @@ const SmartApply = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { isPro, isLoading: subLoading } = useSubscription();
   const { isAuthenticated, user } = useAuth();
+  const guestApply = useTrialLimit("smart-apply", 1);
+  const [authOpen, setAuthOpen] = useState(false);
+
+  const ensureCanRunApply = (): boolean => {
+    if (isAuthenticated) return true;
+    if (guestApply.canUse) return true;
+    toast({
+      title: "Free application used",
+      description: "Sign up free to apply to more jobs.",
+    });
+    setAuthOpen(true);
+    return false;
+  };
 
   const [step, setStep] = useState<PipelineStep>("upload");
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
@@ -187,6 +202,11 @@ const SmartApply = () => {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!ensureCanRunApply()) {
+      // Reset file input so the user can retry after signing up
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
 
     const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
     if (!allowedTypes.includes(file.type)) {
@@ -309,6 +329,7 @@ const SmartApply = () => {
   };
 
   const handleUseExisting = async () => {
+    if (!ensureCanRunApply()) return;
     const saved = localStorage.getItem("resume-data");
     if (!saved) {
       toast({ title: "No resume found", description: "Please upload a resume or build one first.", variant: "destructive" });
