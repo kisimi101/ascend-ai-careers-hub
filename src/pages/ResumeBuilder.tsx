@@ -21,6 +21,9 @@ import jsPDF from "jspdf";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OnboardingTour } from "@/components/OnboardingTour";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTrialLimit } from "@/hooks/useTrialLimit";
+import { AuthDialog } from "@/components/auth/AuthDialog";
 
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -52,6 +55,64 @@ const ResumeBuilder = () => {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const downloadTrial = useTrialLimit("resume-download", 1);
+  const [authOpen, setAuthOpen] = useState(false);
+
+  // Restore previously saved resume + style so users coming back from
+  // Smart Apply / Job Search keep their work for evaluation.
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem("resume-data");
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        if (parsed && parsed.personalInfo) {
+          setResumeData((prev) => ({
+            ...prev,
+            ...parsed,
+            sectionOrder:
+              parsed.sectionOrder || prev.sectionOrder || [
+                "summary",
+                "experience",
+                "education",
+                "skills",
+              ],
+          }));
+        }
+      }
+      const savedStyle = localStorage.getItem("resume-style");
+      if (savedStyle) {
+        const s = JSON.parse(savedStyle);
+        if (s?.template) setSelectedTemplate(s.template);
+        if (s?.accentColor) setAccentColor(s.accentColor);
+        if (s?.density) setDensity(s.density);
+      }
+    } catch (e) {
+      console.error("Failed to restore resume draft", e);
+    }
+  }, []);
+
+  // Auto-save the working draft so it survives navigation to job search/apply.
+  useEffect(() => {
+    try {
+      localStorage.setItem("resume-data", JSON.stringify(resumeData));
+      localStorage.setItem(
+        "resume-style",
+        JSON.stringify({ template: selectedTemplate, accentColor, density })
+      );
+    } catch {}
+  }, [resumeData, selectedTemplate, accentColor, density]);
+
+  const requireDownloadAccess = (): boolean => {
+    if (isAuthenticated) return true;
+    if (downloadTrial.canUse) return true;
+    toast({
+      title: "Free download used",
+      description: "Sign up free to download more resumes.",
+    });
+    setAuthOpen(true);
+    return false;
+  };
 
   const steps = [
     { title: "Template", icon: Settings },
@@ -176,6 +237,7 @@ const ResumeBuilder = () => {
   };
 
   const downloadPDF = async () => {
+    if (!requireDownloadAccess()) return;
     try {
       toast({
         title: "Generating PDF...",
@@ -235,6 +297,7 @@ const ResumeBuilder = () => {
       const fileName = `${resumeData.personalInfo.fullName || 'Resume'}_Resume.pdf`;
       pdf.save(fileName);
 
+      if (!isAuthenticated) downloadTrial.recordUse();
       toast({
         title: "Success!",
         description: "Your resume has been downloaded as PDF.",
@@ -257,6 +320,7 @@ const ResumeBuilder = () => {
   };
 
   const downloadPNG = async () => {
+    if (!requireDownloadAccess()) return;
     try {
       toast({
         title: "Generating PNG...",
@@ -288,7 +352,7 @@ const ResumeBuilder = () => {
           link.download = `${resumeData.personalInfo.fullName || 'Resume'}_Resume.png`;
           link.click();
           URL.revokeObjectURL(url);
-          
+          if (!isAuthenticated) downloadTrial.recordUse();
           toast({
             title: "Success!",
             description: "Your resume has been downloaded as PNG.",
@@ -533,6 +597,7 @@ const ResumeBuilder = () => {
         ]}
       />
       <Footer />
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} defaultTab="signup" />
     </div>
   );
 };
