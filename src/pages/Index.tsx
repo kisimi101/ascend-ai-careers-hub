@@ -4,6 +4,8 @@ import { Hero } from "@/components/Hero";
 import { AnnotatedResumePreview } from "@/components/AnnotatedResumePreview";
 import { FloatingCTA } from "@/components/FloatingCTA";
 import { FloatingSideTools } from "@/components/FloatingSideTools";
+import { ToolsGrid } from "@/components/ToolsGrid";
+import { FreeTierCallout } from "@/components/FreeTierCallout";
 
 const DashboardPreview = lazy(() => import("@/components/DashboardPreview").then(m => ({ default: m.DashboardPreview })));
 const ResumeTemplates = lazy(() => import("@/components/ResumeTemplates").then(m => ({ default: m.ResumeTemplates })));
@@ -42,6 +44,7 @@ const Index = () => {
       <Suspense fallback={<SectionFallback />}>
         <DashboardPreview />
       </Suspense>
+      <ToolsGrid />
       <Suspense fallback={<SectionFallback />}>
         <ResumeTemplates />
       </Suspense>
@@ -54,6 +57,7 @@ const Index = () => {
       <Suspense fallback={<SectionFallback />}>
         <SkillsAssessment />
       </Suspense>
+      <FreeTierCallout />
       <Suspense fallback={<SectionFallback />}>
         <PricingSection />
       </Suspense>
