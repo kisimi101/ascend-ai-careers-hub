@@ -21,7 +21,7 @@ const tools = [
   {
     name: "Cover Letter Generator",
     desc: "Tailored cover letters in seconds for any role.",
-    href: "/cover-letter",
+    href: "/cover-letter-generator",
     icon: Mail,
   },
   {
