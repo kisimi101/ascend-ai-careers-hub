@@ -20,16 +20,19 @@ const MONTHLY_LIMITS: Record<string, number> = {
 // Anonymous (no-signup) trial — per fingerprint per day
 const GUEST_DAILY_LIMIT = 10;
 
-function getFingerprint(req: Request): string {
+async function getFingerprint(req: Request): Promise<string> {
   const ip = (req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown')
     .split(',')[0]
     .trim();
   const ua = req.headers.get('user-agent') || 'ua';
-  // Lightweight stable hash – fingerprint is not security-sensitive, just for rate counting.
-  let h = 0;
-  const s = `${ip}|${ua}`;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-  return `${ip}:${(h >>> 0).toString(36)}`;
+  const lang = req.headers.get('accept-language') || '';
+  const chUa = req.headers.get('sec-ch-ua') || '';
+  const platform = req.headers.get('sec-ch-ua-platform') || '';
+  const raw = `${ip}|${ua}|${lang}|${chUa}|${platform}`;
+  const buf = new TextEncoder().encode(raw);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  const hex = Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  return `${ip}:${hex.slice(0, 24)}`;
 }
 
 async function getGuestCount(fingerprint: string, action: string): Promise<{ count: number; id: string | null }> {
@@ -173,7 +176,7 @@ serve(async (req) => {
       }
     }
     const isGuest = !user;
-    const fingerprint = isGuest ? getFingerprint(req) : '';
+    const fingerprint = isGuest ? await getFingerprint(req) : '';
 
     // Check if this is a usage query only
     const body = await req.json();

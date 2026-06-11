@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,13 +7,118 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const GUEST_APPLY_LIMIT = 1;
+
+async function makeFingerprint(req: Request): Promise<string> {
+  const ip = (req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "unknown")
+    .split(",")[0]
+    .trim();
+  const ua = req.headers.get("user-agent") || "ua";
+  const lang = req.headers.get("accept-language") || "";
+  const chUa = req.headers.get("sec-ch-ua") || "";
+  const platform = req.headers.get("sec-ch-ua-platform") || "";
+  const raw = `${ip}|${ua}|${lang}|${chUa}|${platform}`;
+  const buf = new TextEncoder().encode(raw);
+  const hash = await crypto.subtle.digest("SHA-256", buf);
+  const hex = Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return `${ip}:${hex.slice(0, 24)}`;
+}
+
+function admin() {
+  return createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+}
+
+async function getGuestApplyTotal(fingerprint: string): Promise<number> {
+  const { data } = await admin()
+    .from("guest_usage")
+    .select("count")
+    .eq("fingerprint", fingerprint)
+    .eq("action", "smart-apply");
+  return (data || []).reduce((s: number, r: any) => s + (r.count || 0), 0);
+}
+
+async function incrementGuestApply(fingerprint: string) {
+  const today = new Date().toISOString().split("T")[0];
+  const { data: existing } = await admin()
+    .from("guest_usage")
+    .select("id, count")
+    .eq("fingerprint", fingerprint)
+    .eq("action", "smart-apply")
+    .eq("usage_date", today)
+    .maybeSingle();
+  if (existing?.id) {
+    await admin().from("guest_usage").update({ count: (existing.count || 0) + 1, updated_at: new Date().toISOString() }).eq("id", existing.id);
+  } else {
+    await admin().from("guest_usage").insert({ fingerprint, action: "smart-apply", usage_date: today, count: 1 });
+  }
+}
+
+async function isAuthed(req: Request): Promise<boolean> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) return false;
+  try {
+    const client = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data } = await client.auth.getUser();
+    return !!data?.user;
+  } catch {
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { resumeData, action } = await req.json();
+    const body = await req.json();
+    const { resumeData, action } = body;
+
+    // Usage check endpoint — clients use this to render remaining counts.
+    if (body.checkUsageOnly) {
+      const authed = await isAuthed(req);
+      if (authed) {
+        return new Response(JSON.stringify({ tier: "user", used: 0, limit: null, remaining: null, isGuest: false }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const fp = await makeFingerprint(req);
+      const used = await getGuestApplyTotal(fp);
+      return new Response(JSON.stringify({
+        tier: "guest",
+        used,
+        limit: GUEST_APPLY_LIMIT,
+        remaining: Math.max(0, GUEST_APPLY_LIMIT - used),
+        isGuest: true,
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Server-side enforcement for guests on the apply pipeline.
+    // The pipeline always begins with action="optimize"; gate it there so
+    // generate-cover-letters in the same flow is implicitly allowed once started.
+    let guestFingerprint: string | null = null;
+    if (action === "optimize") {
+      const authed = await isAuthed(req);
+      if (!authed) {
+        guestFingerprint = await makeFingerprint(req);
+        const used = await getGuestApplyTotal(guestFingerprint);
+        if (used >= GUEST_APPLY_LIMIT) {
+          return new Response(
+            JSON.stringify({
+              error: `Free Smart Apply limit reached (${GUEST_APPLY_LIMIT}/${GUEST_APPLY_LIMIT}). Sign up free to keep applying.`,
+              requiresSignup: true,
+              tier: "guest",
+              used,
+              limit: GUEST_APPLY_LIMIT,
+              remaining: 0,
+            }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -84,6 +190,9 @@ ${resumeContext}`,
       if (!jsonMatch) throw new Error("Could not parse AI optimization response");
 
       const result = JSON.parse(jsonMatch[0]);
+      if (guestFingerprint) {
+        try { await incrementGuestApply(guestFingerprint); } catch (e) { console.error("guest_usage increment failed", e); }
+      }
       return new Response(JSON.stringify({ success: true, ...result }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

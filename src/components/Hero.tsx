@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-careerhub.jpg";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -34,10 +34,16 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 backdrop-blur px-4 py-2 text-sm text-muted-foreground"
+            className="flex flex-wrap items-center gap-2"
           >
-            <span className="h-2 w-2 rounded-full bg-primary" />
-            AI-powered career toolkit — built for job seekers
+            <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 backdrop-blur px-4 py-2 text-sm text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-primary" />
+              AI-powered career toolkit — built for job seekers
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 backdrop-blur px-3 py-2 text-xs text-muted-foreground">
+              <Users className="h-3.5 w-3.5 text-primary" />
+              Trusted by 500+ job seekers across 8 countries
+            </span>
           </motion.div>
 
           <motion.h1
@@ -63,20 +69,28 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.24, ease: "easeOut" }}
-            className="mt-8 flex flex-col sm:flex-row gap-3"
+            className="mt-8 flex flex-col sm:flex-row flex-wrap gap-3"
           >
             <Button
               size="lg"
               className="btn-gradient h-12 px-7 text-base"
-              onClick={() => navigate("/get-started")}
+              onClick={() => navigate("/resume-checker")}
             >
-              Build your resume
+              Check if your resume beats ATS — free
               <ArrowRight className="ml-1" />
             </Button>
             <Button
               size="lg"
               variant="outline"
               className="h-12 px-7 text-base bg-card/40 backdrop-blur"
+              onClick={() => navigate("/smart-apply")}
+            >
+              Try Smart Apply free →
+            </Button>
+            <Button
+              size="lg"
+              variant="ghost"
+              className="h-12 px-7 text-base"
               onClick={() =>
                 document.getElementById("pricing-section")?.scrollIntoView({ behavior: "smooth" })
               }
@@ -93,15 +107,15 @@ export const Hero = () => {
           >
             <span className="inline-flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary" />
-              No credit card required
+              Build &amp; download 1 resume — no signup needed
             </span>
             <span className="inline-flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary" />
-              Built-in dashboard + trackers
+              10 job searches/day — free
             </span>
             <span className="inline-flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-primary" />
-              Fast AI workflows
+              1 full Smart Apply pipeline — free
             </span>
           </motion.div>
         </div>

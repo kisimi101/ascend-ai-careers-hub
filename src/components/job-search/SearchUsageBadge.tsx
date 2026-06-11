@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Search, Zap, Crown } from "lucide-react";
+import { Search, Zap, Crown, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ export const SearchUsageBadge = ({ used: propUsed, limit: propLimit, tier: propT
   }, [propUsed, propLimit, propTier, propMonthlyUsed, propMonthlyLimit]);
 
   useEffect(() => {
-    if (!isAuthenticated || propUsed !== undefined) return;
+    if (propUsed !== undefined) return;
     fetchUsage();
   }, [isAuthenticated]);
 
@@ -56,7 +56,7 @@ export const SearchUsageBadge = ({ used: propUsed, limit: propLimit, tier: propT
     }
   };
 
-  if (!isAuthenticated || loading) return null;
+  if (loading) return null;
 
   const remaining = Math.max(0, limit - used);
   const percentage = limit > 0 ? (used / limit) * 100 : 0;
@@ -67,6 +67,16 @@ export const SearchUsageBadge = ({ used: propUsed, limit: propLimit, tier: propT
   const monthAtLimit = monthlyLimit ? monthlyUsed >= monthlyLimit : false;
 
   const TierIcon = tier === "enterprise" ? Crown : tier === "pro" ? Zap : Search;
+
+  // Daily reset = next UTC midnight.
+  const resetIn = useMemo(() => {
+    const now = new Date();
+    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const ms = next.getTime() - now.getTime();
+    const h = Math.floor(ms / 3.6e6);
+    const m = Math.floor((ms % 3.6e6) / 6e4);
+    return `${h}h ${m}m`;
+  }, [used, limit]);
 
   return (
     <div className="flex flex-col gap-2 bg-card border rounded-lg px-4 py-2.5">
@@ -98,7 +108,21 @@ export const SearchUsageBadge = ({ used: propUsed, limit: propLimit, tier: propT
             Upgrade
           </Button>
         )}
+        {tier === "guest" && (
+          <Button variant="ghost" size="sm" className="text-xs text-primary h-7 px-2" onClick={() => navigate("/get-started")}>
+            Sign up free
+          </Button>
+        )}
       </div>
+      {!isUnlimited && (
+        <div className="flex items-center gap-1.5 pl-7 text-[11px] text-muted-foreground">
+          <Clock className="h-3 w-3" />
+          Resets in {resetIn}
+          {isAtLimit && tier === "guest" && (
+            <span className="ml-2 text-destructive font-medium">Limit reached — sign up free to keep searching.</span>
+          )}
+        </div>
+      )}
       {monthlyLimit && (
         <div className="flex items-center gap-2 pl-7">
           <span className="text-xs text-muted-foreground whitespace-nowrap">
