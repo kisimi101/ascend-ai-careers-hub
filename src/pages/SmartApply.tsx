@@ -747,6 +747,24 @@ const SmartApply = () => {
         </motion.div>
 
         {/* Usage indicator */}
+        {!isAuthenticated && serverUsage && (
+          <div className="max-w-xl mx-auto mb-6">
+            <div className={`rounded-lg border px-4 py-3 flex items-center justify-between gap-3 ${
+              serverUsage.remaining <= 0 ? "border-destructive/40 bg-destructive/5" : "border-border bg-card/60"
+            }`}>
+              <div className="flex items-center gap-2 text-sm">
+                <Zap className={`h-4 w-4 ${serverUsage.remaining <= 0 ? "text-destructive" : "text-primary"}`} />
+                <span className="font-medium text-foreground">
+                  {serverUsage.remaining} of {serverUsage.limit} free Smart Apply pipeline left
+                </span>
+                <span className="text-xs text-muted-foreground hidden sm:inline">· lifetime free trial</span>
+              </div>
+              <Button size="sm" variant={serverUsage.remaining <= 0 ? "default" : "outline"} onClick={() => setAuthOpen(true)}>
+                {serverUsage.remaining <= 0 ? "Sign up free" : "Sign up"}
+              </Button>
+            </div>
+          </div>
+        )}
         {isAuthenticated && (
           <div className="max-w-xl mx-auto mb-6 space-y-2">
             <SearchUsageBadge
