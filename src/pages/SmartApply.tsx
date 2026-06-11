@@ -101,14 +101,42 @@ const SmartApply = () => {
   const { isAuthenticated, user } = useAuth();
   const guestApply = useTrialLimit("smart-apply", 1);
   const [authOpen, setAuthOpen] = useState(false);
+  const [serverUsage, setServerUsage] = useState<{ used: number; limit: number; remaining: number; isGuest: boolean } | null>(null);
 
-  const ensureCanRunApply = (): boolean => {
+  // Pull authoritative guest usage from server so cleared localStorage can't reset it.
+  useEffect(() => {
+    if (isAuthenticated) { setServerUsage(null); return; }
+    (async () => {
+      try {
+        const { data } = await supabase.functions.invoke("smart-match", { body: { checkUsageOnly: true } });
+        if (data && typeof data.used === "number") {
+          setServerUsage({ used: data.used, limit: data.limit, remaining: data.remaining, isGuest: !!data.isGuest });
+        }
+      } catch {}
+    })();
+  }, [isAuthenticated]);
+
+  const ensureCanRunApply = async (): Promise<boolean> => {
     if (isAuthenticated) return true;
+    // Authoritative server check — localStorage can be cleared, server can't.
+    try {
+      const { data } = await supabase.functions.invoke("smart-match", { body: { checkUsageOnly: true } });
+      if (data && typeof data.used === "number") {
+        setServerUsage({ used: data.used, limit: data.limit, remaining: data.remaining, isGuest: !!data.isGuest });
+        if (data.remaining <= 0) {
+          toast({
+            title: "Free Smart Apply used",
+            description: "Sign up free to keep applying.",
+            variant: "destructive",
+          });
+          setAuthOpen(true);
+          return false;
+        }
+        return true;
+      }
+    } catch {}
+    // Fallback to local
     if (guestApply.canUse) return true;
-    toast({
-      title: "Free application used",
-      description: "Sign up free to apply to more jobs.",
-    });
     setAuthOpen(true);
     return false;
   };
@@ -202,7 +230,7 @@ const SmartApply = () => {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!ensureCanRunApply()) {
+    if (!(await ensureCanRunApply())) {
       // Reset file input so the user can retry after signing up
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
@@ -330,7 +358,7 @@ const SmartApply = () => {
   };
 
   const handleUseExisting = async () => {
-    if (!ensureCanRunApply()) return;
+    if (!(await ensureCanRunApply())) return;
     const saved = localStorage.getItem("resume-data");
     if (!saved) {
       toast({ title: "No resume found", description: "Please upload a resume or build one first.", variant: "destructive" });
