@@ -109,7 +109,7 @@ export const SearchUsageBadge = ({ used: propUsed, limit: propLimit, tier: propT
           </Button>
         )}
         {tier === "guest" && (
-          <Button variant="ghost" size="sm" className="text-xs text-primary h-7 px-2" onClick={() => navigate("/auth")}>
+          <Button variant="ghost" size="sm" className="text-xs text-primary h-7 px-2" onClick={() => navigate("/get-started")}>
             Sign up free
           </Button>
         )}
