@@ -532,6 +532,24 @@ const ResumeBuilder = () => {
           <p className="text-gray-600 max-w-2xl mx-auto">
             Create a professional, ATS-friendly resume in minutes with our AI-powered builder
           </p>
+          {!isAuthenticated && downloadUsage && (
+            <div className="mt-4 inline-flex flex-wrap items-center justify-center gap-3 rounded-full border bg-card px-4 py-2 text-sm shadow-sm">
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <DownloadIcon className="h-4 w-4 text-primary" />
+                {downloadUsage.remaining > 0
+                  ? `${downloadUsage.remaining} of ${downloadUsage.limit} free download left`
+                  : `Free download used (${downloadUsage.used}/${downloadUsage.limit})`}
+              </span>
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" /> Resets in {resetIn}
+              </span>
+              {downloadUsage.remaining === 0 && (
+                <Button size="sm" className="h-7 btn-gradient" onClick={() => setAuthOpen(true)}>
+                  Sign up free
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
