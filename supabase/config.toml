@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.tailored-resume-preview]
 verify_jwt = false
+
+[functions.track-download]
+verify_jwt = false
