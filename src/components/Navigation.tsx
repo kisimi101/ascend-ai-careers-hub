@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { HoveredLink, Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
@@ -9,17 +8,78 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 import LanguageSelector from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { User, Menu as MenuIcon, X, LayoutDashboard, Settings } from "lucide-react";
+import {
+  User, Menu as MenuIcon, Settings, LayoutDashboard, FileText, Search,
+  Zap, MessageSquareText, MoreHorizontal, Briefcase, BarChart3, Mail,
+  Linkedin, Users, Target, GraduationCap, Map, Building2, Languages,
+  Crown, Compass, FileSearch, FileEdit, Sparkles, Calendar,
+} from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { GuestUsageWidget } from "@/components/GuestUsageWidget";
+
+type PrimaryItem = { label: string; path: string; icon: React.ComponentType<{ className?: string }> };
+
+const PRIMARY_NAV: PrimaryItem[] = [
+  { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { label: "Resume Builder", path: "/resume-builder", icon: FileText },
+  { label: "Job Search", path: "/job-search", icon: Search },
+  { label: "Smart Apply", path: "/smart-apply", icon: Zap },
+  { label: "Interview", path: "/interview-practice", icon: MessageSquareText },
+];
+
+const MORE_GROUPS: { heading: string; items: PrimaryItem[] }[] = [
+  {
+    heading: "Resume Tools",
+    items: [
+      { label: "Resume Checker", path: "/resume-checker", icon: FileSearch },
+      { label: "Keyword Scanner", path: "/resume-keyword-scanner", icon: Target },
+      { label: "Resume Comparison", path: "/resume-comparison", icon: FileEdit },
+      { label: "Resume Examples", path: "/resume-examples", icon: FileText },
+      { label: "Resume Translator", path: "/resume-translator", icon: Languages },
+    ],
+  },
+  {
+    heading: "Job Hunt",
+    items: [
+      { label: "Cover Letter", path: "/cover-letter-generator", icon: Mail },
+      { label: "Job Tracker", path: "/job-tracker", icon: Briefcase },
+      { label: "Salary Estimator", path: "/salary-estimator", icon: BarChart3 },
+      { label: "Company Research", path: "/company-research", icon: Building2 },
+    ],
+  },
+  {
+    heading: "Network & Growth",
+    items: [
+      { label: "Network", path: "/network", icon: Users },
+      { label: "LinkedIn Optimizer", path: "/linkedin-optimizer", icon: Linkedin },
+      { label: "LinkedIn Import", path: "/linkedin-import", icon: Linkedin },
+      { label: "Skills Gap", path: "/skills-gap-analyzer", icon: GraduationCap },
+      { label: "Career Path", path: "/career-path-planner", icon: Compass },
+      { label: "Portfolio Builder", path: "/portfolio-builder", icon: Sparkles },
+    ],
+  },
+  {
+    heading: "Pro",
+    items: [
+      { label: "Question Bank", path: "/interview-question-bank", icon: MessageSquareText },
+      { label: "Auto Follow-Up", path: "/auto-follow-up", icon: Calendar },
+      { label: "Market Heatmap", path: "/job-market-heatmap", icon: Map },
+      { label: "Career Timeline", path: "/career-timeline", icon: Crown },
+      { label: "Referral Mapper", path: "/referral-mapper", icon: Users },
+    ],
+  },
+];
 
 export const Navigation = () => {
-  const [active, setActive] = useState<string | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const handleSignIn = () => {
     setAuthMode('signin');
@@ -59,103 +119,25 @@ export const Navigation = () => {
     { label: "Company Research", path: "/company-research" },
     { label: "Network (Pro)", path: "/network" },
   ];
-  
+
+  const isMoreActive = MORE_GROUPS.some((g) => g.items.some((i) => location.pathname.startsWith(i.path)));
+
   return (
     <>
       <div className="fixed top-0 w-full z-50 glass border-b border-border/50">
-        <div className="container mx-auto container-padding py-4 flex items-center justify-between">
+        {/* Top row: brand + utilities + account */}
+        <div className="container mx-auto container-padding pt-3 pb-2 flex items-center justify-between gap-3">
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <img src={logo} alt="CareerNow AI Logo" width={40} height={40} decoding="async" className="w-10 h-10 rounded-lg" />
-            <span className="text-xl font-bold text-gradient-primary">
-              CareerNow
-            </span>
+            <img src={logo} alt="CareerNow AI Logo" width={36} height={36} decoding="async" className="w-9 h-9 rounded-lg" />
+            <span className="text-lg font-bold text-gradient-primary leading-none">CareerNow</span>
           </Link>
-          
-          {/* Desktop Menu */}
-          <div className="hidden md:block">
-            <div className={cn("max-w-2xl mx-auto")}>
-              <Menu setActive={setActive}>
-                <MenuItem setActive={setActive} active={active} item="Resume Builder">
-                  <div className="flex flex-col space-y-4 text-sm">
-                    <HoveredLink to="/resume-builder">AI Resume Builder</HoveredLink>
-                    <HoveredLink to="/resume-checker">Resume Checker</HoveredLink>
-                    <HoveredLink to="/resume-keyword-scanner">Keyword Scanner</HoveredLink>
-                    <HoveredLink to="/resume-comparison">Resume Comparison</HoveredLink>
-                    <HoveredLink to="/resume-summary-generator">Resume Summary</HoveredLink>
-                    <HoveredLink to="/resume-examples">Resume Examples</HoveredLink>
-                  </div>
-                </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Job Search">
-                  <div className="text-sm grid grid-cols-2 gap-6 p-4 min-w-[520px]">
-                    <ProductItem
-                      title="Job Search"
-                      href="/job-search"
-                      src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=140&h=70&fit=crop"
-                      description="Search thousands of jobs across top boards"
-                    />
-                    <ProductItem
-                      title="Jobs for Your Resume"
-                      href="/resume-job-search"
-                      src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=140&h=70&fit=crop"
-                      description="AI-matched jobs based on your resume skills"
-                    />
-                    <ProductItem
-                      title="Cover Letter Generator"
-                      href="/cover-letter-generator"
-                      src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=140&h=70&fit=crop"
-                      description="Create personalized cover letters in minutes"
-                    />
-                    <ProductItem
-                      title="Interview Practice"
-                      href="/interview-practice"
-                      src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=140&h=70&fit=crop"
-                      description="Practice with AI-powered interview questions"
-                    />
-                    <ProductItem
-                      title="Job Tracker"
-                      href="/job-tracker"
-                      src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=140&h=70&fit=crop"
-                      description="Track all your applications in one place"
-                    />
-                    <ProductItem
-                      title="Salary Estimator"
-                      href="/salary-estimator"
-                      src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=140&h=70&fit=crop"
-                      description="Get accurate salary estimates for your role"
-                    />
-                  </div>
-                </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Network">
-                  <div className="flex flex-col space-y-4 text-sm">
-                    <HoveredLink to="/network">Find Recruiters & Contacts</HoveredLink>
-                    <HoveredLink to="/linkedin-optimizer">LinkedIn Optimizer</HoveredLink>
-                    <HoveredLink to="/company-research">Company Research</HoveredLink>
-                    <HoveredLink to="/skills-gap-analyzer">Skills Gap Analyzer</HoveredLink>
-                    <HoveredLink to="/reference-manager">Reference Manager</HoveredLink>
-                    <HoveredLink to="/career-path-planner">Career Path Planner</HoveredLink>
-                    <HoveredLink to="/industry-insights">Industry Insights</HoveredLink>
-                    <HoveredLink to="/portfolio-builder">Portfolio Builder</HoveredLink>
-                    <HoveredLink to="/referral-mapper">Referral Mapper</HoveredLink>
-                  </div>
-                </MenuItem>
-                <MenuItem setActive={setActive} active={active} item="Pro Tools">
-                  <div className="flex flex-col space-y-4 text-sm">
-                    <HoveredLink to="/smart-apply">Smart Apply Pipeline</HoveredLink>
-                    <HoveredLink to="/auto-follow-up">Auto Follow-Up</HoveredLink>
-                    <HoveredLink to="/job-market-heatmap">Job Market Heatmap</HoveredLink>
-                    <HoveredLink to="/interview-question-bank">Interview Question Bank</HoveredLink>
-                    <HoveredLink to="/career-timeline">Career Timeline</HoveredLink>
-                  </div>
-                </MenuItem>
-              </Menu>
-            </div>
-          </div>
-          
+
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <GuestUsageWidget />
             <LanguageSelector />
+            <ThemeToggle />
             {isAuthenticated && <NotificationCenter />}
-            
+
             {/* Mobile Menu Button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -223,7 +205,7 @@ export const Navigation = () => {
                 </div>
               </SheetContent>
             </Sheet>
-            
+
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center gap-1.5">
               {isAuthenticated ? (
@@ -261,6 +243,69 @@ export const Navigation = () => {
                 </>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Bottom row: horizontal pill nav (desktop only) */}
+        <div className="hidden md:block border-t border-border/40">
+          <div className="container mx-auto container-padding py-2 flex items-center gap-1 overflow-x-auto no-scrollbar">
+            {PRIMARY_NAV.map(({ label, path, icon: Icon }) => (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) =>
+                  cn(
+                    "inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary ring-1 ring-primary/30"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  )
+                }
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </NavLink>
+            ))}
+
+            <Popover open={moreOpen} onOpenChange={setMoreOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
+                    isMoreActive
+                      ? "bg-primary/10 text-primary ring-1 ring-primary/30"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  )}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                  More
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-[640px] p-4">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                  {MORE_GROUPS.map((group) => (
+                    <div key={group.heading}>
+                      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                        {group.heading}
+                      </div>
+                      <div className="flex flex-col">
+                        {group.items.map(({ label, path, icon: Icon }) => (
+                          <Link
+                            key={path}
+                            to={path}
+                            onClick={() => setMoreOpen(false)}
+                            className="inline-flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-accent text-foreground"
+                          >
+                            <Icon className="h-4 w-4 text-primary/70" />
+                            {label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>

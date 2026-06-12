@@ -24,6 +24,8 @@ import { OnboardingTour } from "@/components/OnboardingTour";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTrialLimit } from "@/hooks/useTrialLimit";
 import { AuthDialog } from "@/components/auth/AuthDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { Clock, Download as DownloadIcon } from "lucide-react";
 
 const ResumeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -58,6 +60,54 @@ const ResumeBuilder = () => {
   const { isAuthenticated } = useAuth();
   const downloadTrial = useTrialLimit("resume-download", 1);
   const [authOpen, setAuthOpen] = useState(false);
+  const [downloadUsage, setDownloadUsage] = useState<{ used: number; limit: number; remaining: number } | null>(null);
+
+  const resetIn = (() => {
+    const now = new Date();
+    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const ms = next.getTime() - now.getTime();
+    const h = Math.floor(ms / 3.6e6);
+    const m = Math.floor((ms % 3.6e6) / 6e4);
+    return `${h}h ${m}m`;
+  })();
+
+  const refreshDownloadUsage = async () => {
+    if (isAuthenticated) return;
+    try {
+      const { data } = await supabase.functions.invoke("track-download", { body: { consume: false } });
+      if (data) setDownloadUsage({ used: data.used ?? 0, limit: data.limit ?? 1, remaining: data.remaining ?? 0 });
+    } catch {}
+  };
+
+  useEffect(() => {
+    refreshDownloadUsage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  // Server-side check & consume — returns true if download should proceed.
+  const consumeServerDownload = async (): Promise<boolean> => {
+    if (isAuthenticated) return true;
+    try {
+      const { data, error } = await supabase.functions.invoke("track-download", { body: { consume: true } });
+      if (error || !data?.allowed) {
+        toast({
+          title: "Free download used",
+          description: data?.error || `You've used your 1 free download. Resets in ${resetIn}. Sign up free to download more.`,
+          variant: "destructive",
+        });
+        if (data) setDownloadUsage({ used: data.used ?? 1, limit: data.limit ?? 1, remaining: 0 });
+        setAuthOpen(true);
+        return false;
+      }
+      setDownloadUsage({ used: data.used, limit: data.limit, remaining: data.remaining });
+      return true;
+    } catch (e) {
+      console.error("download check failed", e);
+      // Fail closed for guests to enforce the cap server-side.
+      toast({ title: "Couldn't verify free download", description: "Please try again.", variant: "destructive" });
+      return false;
+    }
+  };
 
   // Restore previously saved resume + style so users coming back from
   // Smart Apply / Job Search keep their work for evaluation.
@@ -237,7 +287,7 @@ const ResumeBuilder = () => {
   };
 
   const downloadPDF = async () => {
-    if (!requireDownloadAccess()) return;
+    if (!(await consumeServerDownload())) return;
     try {
       toast({
         title: "Generating PDF...",
@@ -320,7 +370,7 @@ const ResumeBuilder = () => {
   };
 
   const downloadPNG = async () => {
-    if (!requireDownloadAccess()) return;
+    if (!(await consumeServerDownload())) return;
     try {
       toast({
         title: "Generating PNG...",
@@ -482,6 +532,24 @@ const ResumeBuilder = () => {
           <p className="text-gray-600 max-w-2xl mx-auto">
             Create a professional, ATS-friendly resume in minutes with our AI-powered builder
           </p>
+          {!isAuthenticated && downloadUsage && (
+            <div className="mt-4 inline-flex flex-wrap items-center justify-center gap-3 rounded-full border bg-card px-4 py-2 text-sm shadow-sm">
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <DownloadIcon className="h-4 w-4 text-primary" />
+                {downloadUsage.remaining > 0
+                  ? `${downloadUsage.remaining} of ${downloadUsage.limit} free download left`
+                  : `Free download used (${downloadUsage.used}/${downloadUsage.limit})`}
+              </span>
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" /> Resets in {resetIn}
+              </span>
+              {downloadUsage.remaining === 0 && (
+                <Button size="sm" className="h-7 btn-gradient" onClick={() => setAuthOpen(true)}>
+                  Sign up free
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
