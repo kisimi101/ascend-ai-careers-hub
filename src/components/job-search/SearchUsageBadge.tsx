@@ -56,6 +56,17 @@ export const SearchUsageBadge = ({ used: propUsed, limit: propLimit, tier: propT
     }
   };
 
+  // Daily reset = next UTC midnight. Must be declared before any early return
+  // so hook order stays stable across renders (fixes "Rendered more hooks…").
+  const resetIn = useMemo(() => {
+    const now = new Date();
+    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const ms = next.getTime() - now.getTime();
+    const h = Math.floor(ms / 3.6e6);
+    const m = Math.floor((ms % 3.6e6) / 6e4);
+    return `${h}h ${m}m`;
+  }, [used, limit]);
+
   if (loading) return null;
 
   const remaining = Math.max(0, limit - used);
@@ -67,16 +78,6 @@ export const SearchUsageBadge = ({ used: propUsed, limit: propLimit, tier: propT
   const monthAtLimit = monthlyLimit ? monthlyUsed >= monthlyLimit : false;
 
   const TierIcon = tier === "enterprise" ? Crown : tier === "pro" ? Zap : Search;
-
-  // Daily reset = next UTC midnight.
-  const resetIn = useMemo(() => {
-    const now = new Date();
-    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-    const ms = next.getTime() - now.getTime();
-    const h = Math.floor(ms / 3.6e6);
-    const m = Math.floor((ms % 3.6e6) / 6e4);
-    return `${h}h ${m}m`;
-  }, [used, limit]);
 
   return (
     <div className="flex flex-col gap-2 bg-card border rounded-lg px-4 py-2.5">
