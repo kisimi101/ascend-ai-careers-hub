@@ -125,8 +125,8 @@ export const Navigation = () => {
   return (
     <>
       <div className="fixed top-0 w-full z-50 glass border-b border-border/50">
-        {/* Top row: brand + utilities + account */}
-        <div className="container mx-auto container-padding pt-3 pb-2 flex items-center justify-between gap-3">
+        {/* Top row: centered brand + utilities + account */}
+        <div className="container mx-auto container-padding pt-3 pb-2 relative flex items-center justify-center gap-4">
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <img src={logo} alt="CareerNow AI Logo" width={36} height={36} decoding="async" className="w-9 h-9 rounded-lg" />
             <span className="text-lg font-bold text-gradient-primary leading-none">CareerNow</span>
@@ -246,9 +246,9 @@ export const Navigation = () => {
           </div>
         </div>
 
-        {/* Bottom row: horizontal pill nav (desktop only) */}
+        {/* Bottom row: centered horizontal pill nav (desktop only) */}
         <div className="hidden md:block border-t border-border/40">
-          <div className="container mx-auto container-padding py-2 flex items-center gap-1 overflow-x-auto no-scrollbar">
+          <div className="container mx-auto container-padding py-2 flex items-center justify-center gap-1 overflow-x-auto no-scrollbar">
             {PRIMARY_NAV.map(({ label, path, icon: Icon }) => (
               <NavLink
                 key={path}
