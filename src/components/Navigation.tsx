@@ -12,7 +12,7 @@ import {
   User, Menu as MenuIcon, Settings, LayoutDashboard, FileText, Search,
   Zap, MessageSquareText, MoreHorizontal, Briefcase, BarChart3, Mail,
   Linkedin, Users, Target, GraduationCap, Map, Building2, Languages,
-  Crown, Compass, FileSearch, FileEdit, Sparkles, Calendar,
+  Crown, Compass, FileSearch, FileEdit, Sparkles, Calendar, ChevronDown,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -266,30 +266,38 @@ export const Navigation = () => {
 
         {/* Third row: always-visible category groups (desktop only) */}
         <div className="hidden md:block border-t border-border/40 bg-background/40">
-          <div className="container mx-auto container-padding py-3 flex items-start justify-center gap-8 overflow-x-auto no-scrollbar">
+          <div className="container mx-auto container-padding py-2 flex items-center justify-center gap-2">
             {MORE_GROUPS.map((group) => (
-              <div key={group.heading} className="flex items-center gap-2 whitespace-nowrap">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground pr-1">
+              <div key={group.heading} className="relative group">
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
                   {group.heading}
-                </span>
-                <div className="flex items-center gap-1">
-                  {group.items.map(({ label, path, icon: Icon }) => (
-                    <NavLink
-                      key={path}
-                      to={path}
-                      className={({ isActive }) =>
-                        cn(
-                          "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors",
-                          isActive
-                            ? "bg-primary/10 text-primary ring-1 ring-primary/30"
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                        )
-                      }
-                    >
-                      <Icon className="h-3.5 w-3.5 text-primary/70" />
-                      {label}
-                    </NavLink>
-                  ))}
+                  <ChevronDown className="h-3.5 w-3.5 transition-transform group-hover:rotate-180" />
+                </button>
+                <div
+                  className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150 absolute left-1/2 -translate-x-1/2 top-full pt-2 z-50"
+                >
+                  <div className="min-w-[240px] rounded-xl border border-border bg-popover text-popover-foreground shadow-lg p-2">
+                    {group.items.map(({ label, path, icon: Icon }) => (
+                      <NavLink
+                        key={path}
+                        to={path}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                            isActive
+                              ? "bg-primary/10 text-primary"
+                              : "text-foreground/80 hover:bg-accent hover:text-foreground"
+                          )
+                        }
+                      >
+                        <Icon className="h-4 w-4 text-primary/70" />
+                        {label}
+                      </NavLink>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
