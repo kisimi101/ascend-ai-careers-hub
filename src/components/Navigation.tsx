@@ -262,46 +262,38 @@ export const Navigation = () => {
                 {label}
               </NavLink>
             ))}
+          </div>
+        </div>
 
-            <Popover open={moreOpen} onOpenChange={setMoreOpen}>
-              <PopoverTrigger asChild>
-                <button
-                  className={cn(
-                    "inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors",
-                    isMoreActive
-                      ? "bg-primary/10 text-primary ring-1 ring-primary/30"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  )}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                  More
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-[640px] p-4">
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                  {MORE_GROUPS.map((group) => (
-                    <div key={group.heading}>
-                      <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                        {group.heading}
-                      </div>
-                      <div className="flex flex-col">
-                        {group.items.map(({ label, path, icon: Icon }) => (
-                          <Link
-                            key={path}
-                            to={path}
-                            onClick={() => setMoreOpen(false)}
-                            className="inline-flex items-center gap-2 px-2 py-1.5 rounded-md text-sm hover:bg-accent text-foreground"
-                          >
-                            <Icon className="h-4 w-4 text-primary/70" />
-                            {label}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
+        {/* Third row: always-visible category groups (desktop only) */}
+        <div className="hidden md:block border-t border-border/40 bg-background/40">
+          <div className="container mx-auto container-padding py-3 flex items-start justify-center gap-8 overflow-x-auto no-scrollbar">
+            {MORE_GROUPS.map((group) => (
+              <div key={group.heading} className="flex items-center gap-2 whitespace-nowrap">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground pr-1">
+                  {group.heading}
+                </span>
+                <div className="flex items-center gap-1">
+                  {group.items.map(({ label, path, icon: Icon }) => (
+                    <NavLink
+                      key={path}
+                      to={path}
+                      className={({ isActive }) =>
+                        cn(
+                          "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-colors",
+                          isActive
+                            ? "bg-primary/10 text-primary ring-1 ring-primary/30"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                        )
+                      }
+                    >
+                      <Icon className="h-3.5 w-3.5 text-primary/70" />
+                      {label}
+                    </NavLink>
                   ))}
                 </div>
-              </PopoverContent>
-            </Popover>
+              </div>
+            ))}
           </div>
         </div>
       </div>
