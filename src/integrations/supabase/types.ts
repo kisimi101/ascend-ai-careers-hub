@@ -640,7 +640,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_portfolios: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          github: string | null
+          id: string | null
+          linkedin: string | null
+          name: string | null
+          projects: Json | null
+          share_url: string | null
+          template: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          github?: string | null
+          id?: string | null
+          linkedin?: string | null
+          name?: string | null
+          projects?: Json | null
+          share_url?: string | null
+          template?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          github?: string | null
+          id?: string | null
+          linkedin?: string | null
+          name?: string | null
+          projects?: Json | null
+          share_url?: string | null
+          template?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
