@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { NotificationCenter } from "@/components/NotificationCenter";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { GuestUsageWidget } from "@/components/GuestUsageWidget";
 
 type PrimaryItem = { label: string; path: string; icon: React.ComponentType<{ className?: string }> };
@@ -76,7 +75,6 @@ export const Navigation = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -119,8 +117,6 @@ export const Navigation = () => {
     { label: "Company Research", path: "/company-research" },
     { label: "Network (Pro)", path: "/network" },
   ];
-
-  const isMoreActive = MORE_GROUPS.some((g) => g.items.some((i) => location.pathname.startsWith(i.path)));
 
   return (
     <>
