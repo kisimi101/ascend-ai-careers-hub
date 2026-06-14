@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
@@ -77,7 +77,6 @@ export const Navigation = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   
   const handleSignIn = () => {
     setAuthMode('signin');
