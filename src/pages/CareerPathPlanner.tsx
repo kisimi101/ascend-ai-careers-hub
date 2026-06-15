@@ -204,137 +204,34 @@ const CareerPathPlanner = () => {
     }
 
     setIsGenerating(true);
-    
-    // Simulate AI generation
-    setTimeout(() => {
-      const mockPlan: CareerPlan = {
-        currentRole: {
-          title: currentRole,
-          level: yearsExperience === '0-2' ? 'Entry Level' : yearsExperience === '3-5' ? 'Mid Level' : 'Senior Level',
-          salaryRange: '$60,000 - $85,000',
-          yearsExperience: yearsExperience,
-          skills: ['Communication', 'Problem Solving', 'Technical Skills', 'Project Management'],
-          description: 'Your current position in the career ladder.',
-          isCurrentRole: true
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-resume-tools", {
+        body: {
+          action: "career-plan",
+          currentRole,
+          industry,
+          yearsExperience,
+          careerGoal,
         },
-        paths: [
-          {
-            direction: 'Technical Leadership',
-            description: 'Advance your technical expertise while leading teams',
-            timeline: '3-5 years',
-            roles: [
-              {
-                title: 'Senior ' + currentRole,
-                level: 'Senior',
-                salaryRange: '$90,000 - $130,000',
-                yearsExperience: '5-7 years',
-                skills: ['Advanced Technical Skills', 'Mentoring', 'Architecture Design'],
-                description: 'Lead complex technical projects and mentor junior team members.'
-              },
-              {
-                title: 'Lead ' + currentRole.split(' ')[0] + ' Architect',
-                level: 'Lead',
-                salaryRange: '$130,000 - $170,000',
-                yearsExperience: '8-10 years',
-                skills: ['System Design', 'Technical Strategy', 'Cross-team Collaboration'],
-                description: 'Define technical direction and standards for the organization.'
-              },
-              {
-                title: 'Principal ' + currentRole.split(' ')[0] + ' / CTO',
-                level: 'Executive',
-                salaryRange: '$170,000 - $250,000+',
-                yearsExperience: '12+ years',
-                skills: ['Executive Leadership', 'Business Strategy', 'Innovation'],
-                description: 'Drive technology vision and strategy at the highest level.'
-              }
-            ],
-            requiredSkills: ['Advanced ' + industry + ' expertise', 'Leadership', 'Strategic Thinking', 'Communication'],
-            recommendedCertifications: ['AWS Solutions Architect', 'Google Cloud Professional', 'Certified Scrum Master']
-          },
-          {
-            direction: 'Management Track',
-            description: 'Transition into people management and organizational leadership',
-            timeline: '4-6 years',
-            roles: [
-              {
-                title: currentRole.split(' ')[0] + ' Team Lead',
-                level: 'Lead',
-                salaryRange: '$100,000 - $140,000',
-                yearsExperience: '5-7 years',
-                skills: ['Team Management', 'Project Planning', 'Stakeholder Communication'],
-                description: 'Lead a small team while maintaining technical involvement.'
-              },
-              {
-                title: currentRole.split(' ')[0] + ' Manager',
-                level: 'Manager',
-                salaryRange: '$130,000 - $180,000',
-                yearsExperience: '7-10 years',
-                skills: ['People Management', 'Budget Planning', 'Strategic Planning'],
-                description: 'Manage multiple teams and drive departmental initiatives.'
-              },
-              {
-                title: 'Director of ' + industry,
-                level: 'Director',
-                salaryRange: '$180,000 - $280,000+',
-                yearsExperience: '12+ years',
-                skills: ['Executive Communication', 'Organizational Design', 'P&L Management'],
-                description: 'Lead entire departments and shape organizational strategy.'
-              }
-            ],
-            requiredSkills: ['People Management', 'Strategic Planning', 'Budget Management', 'Executive Communication'],
-            recommendedCertifications: ['PMP', 'MBA', 'Leadership Development Programs']
-          },
-          {
-            direction: 'Specialist / Expert',
-            description: 'Become a deep expert in your specific domain',
-            timeline: '5-8 years',
-            roles: [
-              {
-                title: currentRole.split(' ')[0] + ' Specialist',
-                level: 'Specialist',
-                salaryRange: '$95,000 - $135,000',
-                yearsExperience: '5-8 years',
-                skills: ['Deep Domain Expertise', 'Research', 'Innovation'],
-                description: 'Become the go-to expert in a specific area.'
-              },
-              {
-                title: 'Senior ' + industry + ' Consultant',
-                level: 'Senior Consultant',
-                salaryRange: '$140,000 - $200,000',
-                yearsExperience: '8-12 years',
-                skills: ['Consulting', 'Client Relations', 'Thought Leadership'],
-                description: 'Advise organizations on complex challenges.'
-              },
-              {
-                title: industry + ' Fellow / Distinguished Expert',
-                level: 'Fellow',
-                salaryRange: '$180,000 - $300,000+',
-                yearsExperience: '15+ years',
-                skills: ['Industry Recognition', 'Publications', 'Speaking Engagements'],
-                description: 'Recognized industry expert and thought leader.'
-              }
-            ],
-            requiredSkills: ['Deep Technical Expertise', 'Research Skills', 'Public Speaking', 'Writing'],
-            recommendedCertifications: ['Industry-specific certifications', 'Advanced degrees', 'Published research']
-          }
-        ],
-        insights: [
-          'Based on your experience level, focus on building a strong technical foundation before transitioning to leadership.',
-          'Consider getting at least one industry certification within the next 12 months to boost your credibility.',
-          'Networking is crucial - aim to connect with 5+ professionals in your target role each quarter.',
-          'Side projects and open source contributions can accelerate your career progression significantly.',
-          'Document your achievements with metrics - this will be valuable for promotions and job applications.'
-        ]
-      };
-
-      setPlan(mockPlan);
-      setIsGenerating(false);
-      
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setPlan(data.result as CareerPlan);
       toast({
         title: "Career plan generated!",
-        description: "Explore your potential career paths below."
+        description: "Explore your potential career paths below.",
       });
-    }, 2500);
+    } catch (e: any) {
+      toast({
+        title: "Generation failed",
+        description: e?.message === "Unauthorized"
+          ? "Please sign in to use AI tools."
+          : (e?.message || "Try again later."),
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const getLevelColor = (level: string) => {

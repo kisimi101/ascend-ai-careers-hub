@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Target, Copy, RefreshCw, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ResumeBulletGenerator = () => {
   const [jobTitle, setJobTitle] = useState("");
@@ -31,25 +32,23 @@ const ResumeBulletGenerator = () => {
     }
 
     setIsGenerating(true);
-    
-    // Simulate AI bullet generation
-    setTimeout(() => {
-      const generatedBullets = [
-        `Led ${industry || 'cross-functional'} team of 5+ members to achieve ${Math.floor(Math.random() * 50) + 20}% improvement in project delivery`,
-        `Implemented strategic initiatives that resulted in $${(Math.random() * 500 + 100).toFixed(0)}K cost savings annually`,
-        `Collaborated with stakeholders to streamline processes, reducing turnaround time by ${Math.floor(Math.random() * 40) + 15}%`,
-        `Developed and executed ${workDescription.includes('manage') ? 'management' : 'technical'} solutions improving operational efficiency by ${Math.floor(Math.random() * 30) + 25}%`,
-        `Mentored junior team members while maintaining ${Math.floor(Math.random() * 20) + 95}% client satisfaction rate`
-      ];
-      
-      setBullets(generatedBullets);
-      setIsGenerating(false);
-      
-      toast({
-        title: "Bullets Generated!",
-        description: "AI has created optimized bullet points for your resume",
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-resume-tools", {
+        body: { action: "generate-bullets", jobTitle, industry, level, workDescription },
       });
-    }, 2000);
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setBullets(data.result.bullets || []);
+      toast({ title: "Bullets Generated!", description: "AI has created optimized bullet points." });
+    } catch (e: any) {
+      toast({
+        title: "Generation failed",
+        description: e?.message === "Unauthorized" ? "Please sign in to use AI tools." : (e?.message || "Try again later."),
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyToClipboard = (bullet: string) => {

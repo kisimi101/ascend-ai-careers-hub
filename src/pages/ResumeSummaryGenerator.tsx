@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Download, FileText, User, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SummaryData {
   jobTitle: string;
@@ -27,16 +29,26 @@ const ResumeSummaryGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const generateSummary = async () => {
     setIsGenerating(true);
-    
-    setTimeout(() => {
-      const summary = `${formData.experience} ${formData.jobTitle} with expertise in ${formData.skills}. Proven track record in ${formData.achievements}. Seeking to leverage strong analytical and problem-solving skills to drive business growth and deliver exceptional results in a dynamic work environment.`;
-      
-      setGeneratedSummary(summary);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-resume-tools", {
+        body: { action: "generate-summary", ...formData },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setGeneratedSummary(data.result.summary);
+    } catch (e: any) {
+      toast({
+        title: "Generation failed",
+        description: e?.message === "Unauthorized" ? "Please sign in to use AI tools." : (e?.message || "Try again later."),
+        variant: "destructive",
+      });
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const downloadSummary = () => {

@@ -6,6 +6,8 @@ import { Navigation } from "@/components/Navigation";
 import { Upload, FileText, CheckCircle, AlertTriangle, X, Target, Zap, Eye } from "lucide-react";
 import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AnalysisResult {
   overallScore: number;
@@ -33,6 +35,7 @@ const ResumeChecker = () => {
   const [jobDescription, setJobDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,53 +47,36 @@ const ResumeChecker = () => {
 
   const analyzeResume = async () => {
     if (!uploadedFile) return;
-    
     setIsAnalyzing(true);
-    
-    // Simulate analysis (in real implementation, this would process the file and use AI)
-    setTimeout(() => {
-      const mockResult: AnalysisResult = {
-        overallScore: 78,
-        atsCompatibility: 85,
-        sections: [
-          {
-            name: "Contact Information",
-            score: 95,
-            feedback: "Complete and well-formatted contact details",
-            suggestions: ["Consider adding LinkedIn profile"]
-          },
-          {
-            name: "Professional Summary",
-            score: 72,
-            feedback: "Good summary but could be more impactful",
-            suggestions: ["Add quantifiable achievements", "Use stronger action verbs"]
-          },
-          {
-            name: "Work Experience",
-            score: 80,
-            feedback: "Relevant experience clearly presented",
-            suggestions: ["Add more metrics and numbers", "Include specific technologies used"]
-          },
-          {
-            name: "Skills Section",
-            score: 65,
-            feedback: "Skills are listed but need better organization",
-            suggestions: ["Categorize technical and soft skills", "Match more keywords from job description"]
-          }
-        ],
-        keywords: {
-          found: ["JavaScript", "React", "Node.js", "Python", "SQL"],
-          missing: ["AWS", "Docker", "Kubernetes", "TypeScript", "GraphQL"]
+    try {
+      const buf = await uploadedFile.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let binary = "";
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunkSize)));
+      }
+      const fileBase64 = btoa(binary);
+      const { data, error } = await supabase.functions.invoke("ai-resume-tools", {
+        body: {
+          action: "check-resume",
+          fileBase64,
+          mimeType: uploadedFile.type,
+          jobDescription: jobDescription || undefined,
         },
-        formatting: {
-          score: 88,
-          issues: ["Consider using consistent bullet points", "Ensure proper margins"]
-        }
-      };
-      
-      setAnalysisResult(mockResult);
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setAnalysisResult(data.result as AnalysisResult);
+    } catch (e: any) {
+      toast({
+        title: "Analysis failed",
+        description: e?.message === "Unauthorized" ? "Please sign in to use AI tools." : (e?.message || "Try again later."),
+        variant: "destructive",
+      });
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   const getScoreColor = (score: number) => {
