@@ -171,14 +171,22 @@ export const TemplateSelector = ({
           const isSelected = selectedTemplate === template.id;
           const previewAccent = isSelected ? effectiveAccent : template.defaultAccent;
           return (
-            <button
+            <div
               key={template.id}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => {
                 onSelectTemplate(template.id);
                 onAccentColorChange?.(template.defaultAccent);
               }}
-              className={`group relative text-left rounded-xl border-2 transition-all duration-300 overflow-hidden bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelectTemplate(template.id);
+                  onAccentColorChange?.(template.defaultAccent);
+                }
+              }}
+              className={`group relative text-left rounded-xl border-2 transition-all duration-300 overflow-hidden bg-card cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary
                 hover:scale-[1.03] hover:shadow-xl hover:-translate-y-0.5
                 ${isSelected
                   ? 'border-primary shadow-lg ring-1 ring-primary/20'
@@ -234,7 +242,7 @@ export const TemplateSelector = ({
                   </span>
                 </div>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
