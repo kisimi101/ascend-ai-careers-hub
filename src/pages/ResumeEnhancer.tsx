@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Wand2, Upload, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const ResumeEnhancer = () => {
   const [originalResume, setOriginalResume] = useState('');
@@ -27,43 +28,29 @@ const ResumeEnhancer = () => {
     }
 
     setIsEnhancing(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Mock enhanced resume
-    const enhanced = originalResume.replace(/\b(managed|handled|worked)\b/gi, (match) => {
-      const replacements = {
-        managed: 'Led and optimized',
-        handled: 'Strategically coordinated',
-        worked: 'Collaborated effectively'
-      };
-      return replacements[match.toLowerCase() as keyof typeof replacements] || match;
-    });
-    
-    const mockAnalysis = {
-      overallScore: 85,
-      improvements: [
-        { category: 'Action Verbs', before: 65, after: 90, improvement: 25 },
-        { category: 'Quantifiable Results', before: 70, after: 85, improvement: 15 },
-        { category: 'Keywords', before: 60, after: 80, improvement: 20 },
-        { category: 'Formatting', before: 75, after: 95, improvement: 20 }
-      ],
-      suggestions: [
-        'Added stronger action verbs to increase impact',
-        'Enhanced quantifiable achievements',
-        'Improved keyword optimization for ATS systems',
-        'Refined formatting for better readability'
-      ]
-    };
-    
-    setEnhancedResume(enhanced);
-    setAnalysis(mockAnalysis);
-    setIsEnhancing(false);
-    
-    toast({
-      title: "Resume Enhanced!",
-      description: "Your resume has been optimized for better impact.",
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-resume-tools", {
+        body: { action: "enhance-resume", resumeText: originalResume },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const r = data.result;
+      setEnhancedResume(r.enhancedResume || "");
+      setAnalysis({
+        overallScore: r.overallScore ?? 85,
+        improvements: r.improvements || [],
+        suggestions: r.suggestions || [],
+      });
+      toast({ title: "Resume Enhanced!", description: "Your resume has been optimized." });
+    } catch (e: any) {
+      toast({
+        title: "Enhancement failed",
+        description: e?.message === "Unauthorized" ? "Please sign in to use AI tools." : (e?.message || "Try again later."),
+        variant: "destructive",
+      });
+    } finally {
+      setIsEnhancing(false);
+    }
   };
 
   return (
