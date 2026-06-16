@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
 
     switch (action) {
       case "check-resume": {
-        // body: { resumeText?: string, fileBase64?: string, mimeType?: string, jobDescription?: string }
+        // body: { resumeText?: string, fileBase64?: string, mimeType?: string, storagePath?: string, jobDescription?: string }
         const userContent: any[] = [
           {
             type: "text",
@@ -81,6 +81,26 @@ Deno.serve(async (req) => {
         ];
         if (body.resumeText) {
           userContent.push({ type: "text", text: `Resume text:\n${body.resumeText}` });
+        } else if (body.storagePath) {
+          // Fetch file from Storage (for large uploads bypassing 6MB edge cap)
+          const admin = createClient(
+            Deno.env.get("SUPABASE_URL")!,
+            Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+          );
+          const { data: blob, error: dlErr } = await admin.storage.from("uploads").download(body.storagePath);
+          if (dlErr || !blob) throw new Error(`Download failed: ${dlErr?.message || "unknown"}`);
+          const buf = new Uint8Array(await blob.arrayBuffer());
+          let bin = "";
+          const c = 0x8000;
+          for (let i = 0; i < buf.length; i += c) bin += String.fromCharCode.apply(null, Array.from(buf.subarray(i, i + c)));
+          const b64 = btoa(bin);
+          const mime = body.mimeType || blob.type || "application/pdf";
+          userContent.push({
+            type: "image_url",
+            image_url: { url: `data:${mime};base64,${b64}` },
+          });
+          // best-effort cleanup
+          admin.storage.from("uploads").remove([body.storagePath]).catch(() => {});
         } else if (body.fileBase64 && body.mimeType) {
           userContent.push({
             type: "image_url",

@@ -87,44 +87,42 @@ const App = () => (
                   <Route path="/free-resume-templates" element={<FreeResumeTemplatesHub />} />
                   <Route path="/tailored-resume" element={<TailoredResumeOnboarding />} />
                   <Route path="/seo-keyword-tracker" element={<ProtectedRoute><SeoKeywordTracker /></ProtectedRoute>} />
-                  <Route path="/get-started" element={<ProtectedRoute><GetStarted /></ProtectedRoute>} />
-                  
-                  {/* Protected routes - All tools require authentication */}
-                  <Route path="/tools" element={<ProtectedRoute><ToolsDashboard /></ProtectedRoute>} />
+                  <Route path="/get-started" element={<GetStarted />} />
+
+                  {/* Free tools — open to all visitors */}
+                  <Route path="/tools" element={<ToolsDashboard />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  {/* Resume Builder is open for free trial — gated downloads inside */}
                   <Route path="/resume-builder" element={<ResumeBuilder />} />
-                  <Route path="/cover-letter-generator" element={<ProtectedRoute><CoverLetterGenerator /></ProtectedRoute>} />
-                  <Route path="/resume-checker" element={<ProtectedRoute><ResumeChecker /></ProtectedRoute>} />
-                  <Route path="/resume-summary-generator" element={<ProtectedRoute><ResumeSummaryGenerator /></ProtectedRoute>} />
-                  {/* Job Search: free guest trial (10/day), Pro for more */}
+                  <Route path="/cover-letter-generator" element={<CoverLetterGenerator />} />
+                  <Route path="/resume-checker" element={<ResumeChecker />} />
+                  <Route path="/resume-summary-generator" element={<ResumeSummaryGenerator />} />
                   <Route path="/job-search" element={<JobSearch />} />
-                  <Route path="/resume-bullet-generator" element={<ProtectedRoute><ResumeBulletGenerator /></ProtectedRoute>} />
-                  <Route path="/resume-skills-generator" element={<ProtectedRoute><ResumeSkillsGenerator /></ProtectedRoute>} />
-                  <Route path="/resume-keyword-scanner" element={<ProtectedRoute><ResumeKeywordScanner /></ProtectedRoute>} />
-                  <Route path="/resignation-letter-generator" element={<ProtectedRoute><ResignationLetterGenerator /></ProtectedRoute>} />
-                  <Route path="/interview-practice" element={<ProtectedRoute><InterviewPractice /></ProtectedRoute>} />
-                  <Route path="/salary-estimator" element={<ProtectedRoute><SalaryEstimator /></ProtectedRoute>} />
+                  <Route path="/resume-bullet-generator" element={<ResumeBulletGenerator />} />
+                  <Route path="/resume-skills-generator" element={<ResumeSkillsGenerator />} />
+                  <Route path="/resume-keyword-scanner" element={<ResumeKeywordScanner />} />
+                  <Route path="/resignation-letter-generator" element={<ResignationLetterGenerator />} />
+                  <Route path="/interview-practice" element={<InterviewPractice />} />
+                  <Route path="/salary-estimator" element={<SalaryEstimator />} />
                   <Route path="/job-tracker" element={<ProtectedRoute><JobTracker /></ProtectedRoute>} />
-                  <Route path="/resume-enhancer" element={<ProtectedRoute><ResumeEnhancer /></ProtectedRoute>} />
-                  <Route path="/resume-translator" element={<ProtectedRoute><ResumeTranslator /></ProtectedRoute>} />
-                  <Route path="/resume-examples" element={<ProtectedRoute><ResumeExamples /></ProtectedRoute>} />
-                  <Route path="/social-preview" element={<ProtectedRoute><SocialPreview /></ProtectedRoute>} />
-                  <Route path="/video-resume" element={<ProtectedRoute><VideoResume /></ProtectedRoute>} />
-                  <Route path="/resume-comparison" element={<ProtectedRoute><ResumeComparison /></ProtectedRoute>} />
+                  <Route path="/resume-enhancer" element={<ResumeEnhancer />} />
+                  <Route path="/resume-translator" element={<ResumeTranslator />} />
+                  <Route path="/resume-examples" element={<ResumeExamples />} />
+                  <Route path="/social-preview" element={<SocialPreview />} />
+                  <Route path="/video-resume" element={<VideoResume />} />
+                  <Route path="/resume-comparison" element={<ResumeComparison />} />
                   <Route path="/network" element={<ProtectedRoute><ProRoute featureName="Recruiters & Contacts"><Network /></ProRoute></ProtectedRoute>} />
-                  <Route path="/resume-job-search" element={<ProtectedRoute><ResumeJobSearch /></ProtectedRoute>} />
-                  <Route path="/linkedin-optimizer" element={<ProtectedRoute><LinkedInOptimizer /></ProtectedRoute>} />
-                  <Route path="/linkedin-import" element={<ProtectedRoute><LinkedInImport /></ProtectedRoute>} />
-                  <Route path="/skills-gap-analyzer" element={<ProtectedRoute><SkillsGapAnalyzer /></ProtectedRoute>} />
+                  <Route path="/resume-job-search" element={<ResumeJobSearch />} />
+                  <Route path="/linkedin-optimizer" element={<LinkedInOptimizer />} />
+                  <Route path="/linkedin-import" element={<LinkedInImport />} />
+                  <Route path="/skills-gap-analyzer" element={<SkillsGapAnalyzer />} />
                   <Route path="/reference-manager" element={<ProtectedRoute><ReferenceManager /></ProtectedRoute>} />
-                  <Route path="/career-path-planner" element={<ProtectedRoute><CareerPathPlanner /></ProtectedRoute>} />
-                  <Route path="/industry-insights" element={<ProtectedRoute><IndustryInsights /></ProtectedRoute>} />
-                  <Route path="/portfolio-builder" element={<ProtectedRoute><PortfolioBuilder /></ProtectedRoute>} />
+                  <Route path="/career-path-planner" element={<CareerPathPlanner />} />
+                  <Route path="/industry-insights" element={<IndustryInsights />} />
+                  <Route path="/portfolio-builder" element={<PortfolioBuilder />} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/job-analytics" element={<ProtectedRoute><JobAnalytics /></ProtectedRoute>} />
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                  <Route path="/company-research" element={<ProtectedRoute><CompanyResearch /></ProtectedRoute>} />
+                  <Route path="/company-research" element={<CompanyResearch />} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
                   {/* Smart Apply: 1 free guest application, then signup */}
                   <Route path="/smart-apply" element={<SmartApply />} />

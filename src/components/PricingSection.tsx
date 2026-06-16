@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Zap, Star, Crown } from "lucide-react";
+import { Check, Zap, Star, Building2 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,41 +13,45 @@ const pricingPlans = [
     name: "Free",
     price: "$0",
     period: "/forever",
-    description: "Explore all tools with limited access",
+    description: "Everything you need to land your first job — no sign-in required",
     icon: Zap,
     gradient: "from-zinc-500 to-zinc-600",
     features: [
-      "3 Resume Templates",
-      "AI Resume Builder (preview only)",
-      "Resume Checker & Grader",
-      "Cover Letter Generator (1/day)",
-      "5 Job Searches / day",
-      "Skills Assessment Quiz",
+      "1 saved resume (all templates)",
+      "Up to 10 job applications / day",
+      "ATS Resume Checker (AI-powered)",
+      "AI Resume Enhancer & Summary",
+      "AI Bullet & Skills Generators",
+      "Cover Letter Generator",
+      "Smart Apply & Job Search",
+      "Interview Practice",
+      "LinkedIn Import & Optimizer",
+      "Career Path Planner",
+      "CSV export",
     ],
-    limitations: ["No resume downloads", "Limited AI generations", "5 daily job searches", "No priority support"],
+    limitations: [],
     cta: "Get Started Free"
   },
   {
     name: "Pro",
     price: "$12",
     period: "/month",
-    description: "Everything you need to land your dream job",
+    description: "For active job seekers — unlimited resumes & applications",
     icon: Star,
     gradient: "from-primary to-primary/80",
     popular: true,
     features: [
-      "Unlimited Resume Templates",
-      "Unlimited PDF/DOCX/PNG Downloads",
-      "AI Resume Optimizer & Enhancer",
-      "ATS Score Analysis",
-      "AI Interview Practice",
-      "Unlimited Cover Letters",
-      "50 Job Searches / day (1,500/month cap)",
-      "Smart Apply Pipeline",
-      "LinkedIn Profile Optimizer",
-      "Company Research Tool",
-      "Job Alerts & Tracking",
-      "Priority Support",
+      "Everything in Free",
+      "Unlimited saved resumes",
+      "Unlimited daily applications",
+      "PDF & DOCX downloads",
+      "Video-to-Resume AI (up to 50MB)",
+      "Resume Analytics & share links",
+      "Job Tracker with analytics",
+      "Auto Follow-Up emails",
+      "Career Timeline",
+      "Reference Manager",
+      "Priority AI model & support",
     ],
     limitations: [],
     cta: "Get Started"
@@ -57,22 +61,23 @@ const pricingPlans = [
     price: "$39",
     period: "/month",
     description: "For career coaches, agencies & teams",
-    icon: Crown,
-    gradient: "from-purple-500 to-indigo-500",
+    icon: Building2,
+    gradient: "from-zinc-700 to-zinc-900",
     features: [
       "Everything in Pro",
-      "Unlimited Job Searches",
-      "Up to 25 Team Members",
-      "Team Analytics Dashboard",
-      "Custom Resume Branding",
-      "Portfolio Builder",
-      "Career Path Planner",
-      "API Access",
-      "Dedicated Account Manager",
-      "White-label Options",
+      "Recruiters & Contacts (Network)",
+      "Referral Mapper",
+      "Job Market Heatmap",
+      "Industry Insights",
+      "SEO Keyword Tracker",
+      "Interview Question Bank (pro tier)",
+      "Up to 25 team seats",
+      "Custom resume branding",
+      "Dedicated account manager",
+      "SSO-ready",
     ],
     limitations: [],
-    cta: "Contact Sales"
+    cta: "Upgrade to Enterprise"
   }
 ];
 

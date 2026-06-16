@@ -8,6 +8,9 @@ import Footer from "@/components/Footer";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { AuthDialog } from "@/components/auth/AuthDialog";
+import { uploadLarge, MAX_UPLOAD_BYTES } from "@/lib/uploadLarge";
 
 interface AnalysisResult {
   overallScore: number;
@@ -33,45 +36,63 @@ const ResumeChecker = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [jobDescription, setJobDescription] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && (file.type === 'application/pdf' || file.type === 'application/msword' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-      setUploadedFile(file);
-      setAnalysisResult(null);
+    if (!file) return;
+    const okType = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type);
+    if (!okType) {
+      toast({ title: "Unsupported file", description: "Please upload a PDF or DOCX.", variant: "destructive" });
+      return;
     }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      toast({ title: "Too large", description: "Maximum file size is 50MB.", variant: "destructive" });
+      return;
+    }
+    setUploadedFile(file);
+    setAnalysisResult(null);
   };
 
   const analyzeResume = async () => {
     if (!uploadedFile) return;
+    if (!isAuthenticated) {
+      setShowAuth(true);
+      return;
+    }
     setIsAnalyzing(true);
     try {
-      const buf = await uploadedFile.arrayBuffer();
-      const bytes = new Uint8Array(buf);
-      let binary = "";
-      const chunkSize = 0x8000;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunkSize)));
+      let invokeBody: Record<string, unknown> = {
+        action: "check-resume",
+        mimeType: uploadedFile.type,
+        jobDescription: jobDescription || undefined,
+      };
+      // Files >4MB go through Storage to bypass the 6MB edge-function payload cap
+      if (uploadedFile.size > 4 * 1024 * 1024) {
+        const { path } = await uploadLarge(uploadedFile);
+        invokeBody.storagePath = path;
+      } else {
+        const buf = await uploadedFile.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        let binary = "";
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunkSize)));
+        }
+        invokeBody.fileBase64 = btoa(binary);
       }
-      const fileBase64 = btoa(binary);
-      const { data, error } = await supabase.functions.invoke("ai-resume-tools", {
-        body: {
-          action: "check-resume",
-          fileBase64,
-          mimeType: uploadedFile.type,
-          jobDescription: jobDescription || undefined,
-        },
-      });
+      const { data, error } = await supabase.functions.invoke("ai-resume-tools", { body: invokeBody });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setAnalysisResult(data.result as AnalysisResult);
     } catch (e: any) {
       toast({
         title: "Analysis failed",
-        description: e?.message === "Unauthorized" ? "Please sign in to use AI tools." : (e?.message || "Try again later."),
+        description: e?.message || "Try again later.",
         variant: "destructive",
       });
     } finally {
@@ -142,7 +163,7 @@ const ResumeChecker = () => {
                     <p className="text-sm text-gray-600 mb-2">
                       {uploadedFile ? uploadedFile.name : "Click to upload or drag and drop"}
                     </p>
-                    <p className="text-xs text-gray-400">PDF, DOC, DOCX up to 10MB</p>
+                    <p className="text-xs text-gray-400">PDF, DOC, DOCX up to 50MB</p>
                   </div>
                   
                   <input
@@ -327,6 +348,7 @@ const ResumeChecker = () => {
       </div>
 
       <Footer />
+      <AuthDialog open={showAuth} onOpenChange={setShowAuth} defaultTab="signin" />
     </div>
   );
 };

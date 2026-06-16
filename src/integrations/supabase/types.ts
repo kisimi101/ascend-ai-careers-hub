@@ -638,6 +638,45 @@ export type Database = {
         }
         Relationships: []
       }
+      video_jobs: {
+        Row: {
+          created_at: string
+          error: string | null
+          guest_id: string | null
+          id: string
+          progress: number
+          result: Json | null
+          status: string
+          storage_path: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          guest_id?: string | null
+          id?: string
+          progress?: number
+          result?: Json | null
+          status?: string
+          storage_path: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          guest_id?: string | null
+          id?: string
+          progress?: number
+          result?: Json | null
+          status?: string
+          storage_path?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       public_portfolios: {
