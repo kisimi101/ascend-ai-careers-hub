@@ -1,441 +1,275 @@
-import React, { useState } from 'react';
-import { Navigation } from '@/components/Navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Video, Play, Pause, Upload, Download, Share2, Clock, Eye } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Navigation } from "@/components/Navigation";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Video, Upload, Sparkles, CheckCircle2, AlertCircle, Mic, StopCircle } from "lucide-react";
+import Footer from "@/components/Footer";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { uploadLarge, MAX_UPLOAD_BYTES } from "@/lib/uploadLarge";
+
+type JobStatus = "idle" | "uploading" | "queued" | "downloading" | "transcribing" | "extracting" | "completed" | "failed";
+
+const STATUS_LABEL: Record<JobStatus, string> = {
+  idle: "Ready",
+  uploading: "Uploading video…",
+  queued: "Queued…",
+  downloading: "Loading your video…",
+  transcribing: "Transcribing speech…",
+  extracting: "Extracting your experience…",
+  completed: "Done",
+  failed: "Failed",
+};
+
+const STATUS_PROGRESS: Record<JobStatus, number> = {
+  idle: 0, uploading: 15, queued: 25, downloading: 35, transcribing: 55, extracting: 80, completed: 100, failed: 0,
+};
 
 const VideoResume = () => {
-  const [videoData, setVideoData] = useState({
-    title: '',
-    introduction: '',
-    keyPoints: [] as string[],
-    newPoint: '',
-    duration: '60'
-  });
-  const [isRecording, setIsRecording] = useState(false);
-  const [hasRecording, setHasRecording] = useState(false);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
-  const templates = [
-    {
-      id: 'professional',
-      name: 'Professional Introduction',
-      duration: '60 seconds',
-      script: 'Brief introduction → Key achievements → Career goals → Call to action',
-      description: 'Perfect for traditional industries and corporate roles'
-    },
-    {
-      id: 'creative',
-      name: 'Creative Showcase',
-      duration: '90 seconds',
-      script: 'Personal story → Portfolio highlights → Unique skills → Vision',
-      description: 'Ideal for creative fields like design, marketing, and media'
-    },
-    {
-      id: 'technical',
-      name: 'Technical Demo',
-      duration: '120 seconds',
-      script: 'Technical background → Project showcase → Problem-solving → Innovation',
-      description: 'Great for developers, engineers, and technical roles'
-    },
-    {
-      id: 'executive',
-      name: 'Executive Summary',
-      duration: '45 seconds',
-      script: 'Leadership experience → Strategic achievements → Vision → Value proposition',
-      description: 'Designed for senior leadership and executive positions'
-    }
-  ];
+  const [file, setFile] = useState<File | null>(null);
+  const [status, setStatus] = useState<JobStatus>("idle");
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
 
-  const addKeyPoint = () => {
-    if (videoData.newPoint.trim() && !videoData.keyPoints.includes(videoData.newPoint.trim())) {
-      setVideoData(prev => ({
-        ...prev,
-        keyPoints: [...prev.keyPoints, prev.newPoint.trim()],
-        newPoint: ''
-      }));
+  // recording
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<BlobPart[]>([]);
+  const videoElRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const previewUrl = file ? URL.createObjectURL(file) : null;
+  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
+
+  /* ---------- polling ---------- */
+  useEffect(() => {
+    if (!jobId) return;
+    let active = true;
+    const interval = setInterval(async () => {
+      const { data, error: e } = await supabase
+        .from("video_jobs")
+        .select("status, progress, result, error")
+        .eq("id", jobId)
+        .maybeSingle();
+      if (!active) return;
+      if (e) return;
+      if (!data) return;
+
+      const s = data.status as JobStatus;
+      setStatus(s);
+      setProgress(Math.max(STATUS_PROGRESS[s] ?? 0, data.progress ?? 0));
+
+      if (s === "completed" && data.result) {
+        clearInterval(interval);
+        // Save to localStorage so Resume Builder picks it up
+        localStorage.setItem("resume-data", JSON.stringify(data.result));
+        toast({ title: "Resume drafted!", description: "Opening the builder…" });
+        setTimeout(() => navigate("/resume-builder"), 800);
+      }
+      if (s === "failed") {
+        clearInterval(interval);
+        setError(data.error || "Processing failed. Please try a clearer recording.");
+      }
+    }, 2000);
+    return () => { active = false; clearInterval(interval); };
+  }, [jobId, navigate, toast]);
+
+  /* ---------- file picker ---------- */
+  const onPick = (f: File | null) => {
+    if (!f) return;
+    if (!f.type.startsWith("video/")) {
+      toast({ title: "Unsupported file", description: "Please upload a video (mp4, webm, mov).", variant: "destructive" });
+      return;
     }
+    if (f.size > MAX_UPLOAD_BYTES) {
+      toast({ title: "Too large", description: "Max 50MB. Try trimming or compressing the clip.", variant: "destructive" });
+      return;
+    }
+    setFile(f);
+    setError(null);
   };
 
-  const removeKeyPoint = (pointToRemove: string) => {
-    setVideoData(prev => ({
-      ...prev,
-      keyPoints: prev.keyPoints.filter(point => point !== pointToRemove)
-    }));
-  };
-
-  const startRecording = () => {
-    setIsRecording(true);
-    toast({
-      title: "Recording Started",
-      description: "Your video resume recording has begun.",
-    });
+  /* ---------- recording ---------- */
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      streamRef.current = stream;
+      if (videoElRef.current) {
+        videoElRef.current.srcObject = stream;
+        videoElRef.current.muted = true;
+        await videoElRef.current.play();
+      }
+      recordedChunksRef.current = [];
+      const mr = new MediaRecorder(stream, { mimeType: "video/webm" });
+      mr.ondataavailable = (e) => e.data.size && recordedChunksRef.current.push(e.data);
+      mr.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, { type: "video/webm" });
+        const f = new File([blob], `recording-${Date.now()}.webm`, { type: "video/webm" });
+        onPick(f);
+        streamRef.current?.getTracks().forEach((t) => t.stop());
+        if (videoElRef.current) videoElRef.current.srcObject = null;
+      };
+      mr.start();
+      mediaRecorderRef.current = mr;
+      setRecording(true);
+    } catch (e: any) {
+      toast({ title: "Camera blocked", description: e.message || "Allow camera access to record.", variant: "destructive" });
+    }
   };
 
   const stopRecording = () => {
-    setIsRecording(false);
-    setHasRecording(true);
-    toast({
-      title: "Recording Complete",
-      description: "Your video resume has been recorded successfully.",
-    });
+    mediaRecorderRef.current?.stop();
+    setRecording(false);
   };
 
-  const generateScript = () => {
-    if (!videoData.title || videoData.keyPoints.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please add a title and key points first",
-        variant: "destructive",
+  /* ---------- main flow ---------- */
+  const generate = async () => {
+    if (!file) return;
+    setError(null);
+    setStatus("uploading");
+    setProgress(10);
+    try {
+      const { path } = await uploadLarge(file);
+      const { data, error: e } = await supabase.functions.invoke("video-to-resume", {
+        body: { storagePath: path },
       });
-      return;
+      if (e) throw e;
+      if (data?.error) throw new Error(data.error);
+      setJobId(data.jobId);
+      setStatus("queued");
+      setProgress(25);
+    } catch (e: any) {
+      setStatus("failed");
+      setError(e.message || "Upload failed");
     }
-
-    const script = `Hi, I'm [Your Name], ${videoData.title}.
-
-${videoData.introduction}
-
-Here are my key strengths:
-${videoData.keyPoints.map((point, index) => `${index + 1}. ${point}`).join('\n')}
-
-I'm excited about the opportunity to contribute to your team and would love to discuss how my experience can benefit your organization.
-
-Thank you for your time, and I look forward to hearing from you.`;
-
-    navigator.clipboard.writeText(script);
-    toast({
-      title: "Script Generated!",
-      description: "Your video script has been copied to clipboard.",
-    });
   };
+
+  const busy = ["uploading", "queued", "downloading", "transcribing", "extracting"].includes(status);
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-24">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Video Resume Creator</h1>
-          <p className="text-xl text-muted-foreground">
-            Create compelling video resumes to stand out from the crowd
+      <main className="container mx-auto px-4 pt-32 md:pt-40 pb-16">
+        <div className="max-w-3xl mx-auto text-center mb-10">
+          <Badge variant="outline" className="mb-4"><Sparkles className="w-3 h-3 mr-1" /> AI-powered</Badge>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Video → Resume in 60 seconds</h1>
+          <p className="text-lg text-muted-foreground">
+            Record (or upload) a short intro about yourself. Our AI watches the video, transcribes what you say,
+            and turns it into an editable, ATS-friendly resume — instantly.
           </p>
         </div>
 
-        <div className="max-w-6xl mx-auto space-y-8">
-          <Tabs defaultValue="templates" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="templates">Templates</TabsTrigger>
-              <TabsTrigger value="script">Script Builder</TabsTrigger>
-              <TabsTrigger value="record">Record</TabsTrigger>
-              <TabsTrigger value="preview">Preview & Share</TabsTrigger>
-            </TabsList>
+        <div className="max-w-3xl mx-auto grid gap-6">
+          {/* How it works */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">How it works</CardTitle>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-3 gap-4 text-sm">
+              <div><span className="font-semibold">1. Record / upload</span><p className="text-muted-foreground mt-1">A 1–3 minute clip of you introducing your background, skills and achievements.</p></div>
+              <div><span className="font-semibold">2. AI extracts</span><p className="text-muted-foreground mt-1">Gemini transcribes speech and pulls structured experience, education and skills.</p></div>
+              <div><span className="font-semibold">3. Edit & export</span><p className="text-muted-foreground mt-1">Open the result in the Resume Builder, polish, then download.</p></div>
+            </CardContent>
+          </Card>
 
-            <TabsContent value="templates" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Choose a Template</CardTitle>
-                  <CardDescription>
-                    Select a video resume template that fits your industry and style
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {templates.map((template) => (
-                      <Card key={template.id} className="border-2 hover:border-primary cursor-pointer transition-colors">
-                        <CardContent className="p-4">
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                              <h3 className="font-semibold">{template.name}</h3>
-                              <Badge variant="outline">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {template.duration}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{template.description}</p>
-                            <div className="text-sm">
-                              <span className="font-medium">Structure: </span>
-                              <span className="text-muted-foreground">{template.script}</span>
-                            </div>
-                            <Button className="w-full">Use This Template</Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+          {/* Recorder / uploader */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Your video</CardTitle>
+              <CardDescription>Max 50MB · mp4, webm, mov · 1–3 minutes recommended</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                {file ? (
+                  <video src={previewUrl ?? undefined} controls className="w-full h-full object-cover" />
+                ) : recording ? (
+                  <video ref={videoElRef} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    <Video className="w-12 h-12 mx-auto mb-2" />
+                    <p className="text-sm">Record now or upload a file below</p>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                )}
+              </div>
 
-            <TabsContent value="script" className="space-y-6">
-              <div className="grid lg:grid-cols-2 gap-8">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Build Your Script</CardTitle>
-                    <CardDescription>
-                      Create a compelling script for your video resume
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Professional Title</label>
-                      <Input
-                        placeholder="e.g., Marketing Manager with 5 years experience"
-                        value={videoData.title}
-                        onChange={(e) => setVideoData(prev => ({ ...prev, title: e.target.value }))}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Introduction</label>
-                      <Textarea
-                        placeholder="Brief introduction about yourself and your passion..."
-                        value={videoData.introduction}
-                        onChange={(e) => setVideoData(prev => ({ ...prev, introduction: e.target.value }))}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Key Points</label>
-                      <div className="flex gap-2 mb-2">
-                        <Input
-                          placeholder="Add a key achievement or skill"
-                          value={videoData.newPoint}
-                          onChange={(e) => setVideoData(prev => ({ ...prev, newPoint: e.target.value }))}
-                          onKeyPress={(e) => e.key === 'Enter' && addKeyPoint()}
-                        />
-                        <Button onClick={addKeyPoint} variant="outline">Add</Button>
-                      </div>
-                      <div className="space-y-2">
-                        {videoData.keyPoints.map((point, index) => (
-                          <div key={index} className="flex items-center justify-between bg-muted p-2 rounded">
-                            <span className="text-sm">{point}</span>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => removeKeyPoint(point)}
-                            >
-                              ✕
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Target Duration</label>
-                      <Input
-                        type="number"
-                        placeholder="60"
-                        value={videoData.duration}
-                        onChange={(e) => setVideoData(prev => ({ ...prev, duration: e.target.value }))}
-                        className="w-24"
-                      />
-                      <span className="text-sm text-muted-foreground ml-2">seconds</span>
-                    </div>
-                    
-                    <Button onClick={generateScript} className="w-full">
-                      Generate Script
+              <div className="flex flex-wrap gap-2 justify-center">
+                {!recording ? (
+                  <Button onClick={startRecording} variant="outline" disabled={busy}>
+                    <Mic className="w-4 h-4 mr-2" /> Record from camera
+                  </Button>
+                ) : (
+                  <Button onClick={stopRecording} variant="destructive">
+                    <StopCircle className="w-4 h-4 mr-2" /> Stop recording
+                  </Button>
+                )}
+                <label>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    className="hidden"
+                    onChange={(e) => onPick(e.target.files?.[0] ?? null)}
+                    disabled={busy || recording}
+                  />
+                  <span>
+                    <Button asChild variant="outline" disabled={busy || recording}>
+                      <span><Upload className="w-4 h-4 mr-2" /> Upload file</span>
                     </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Tips for Success</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4 text-sm">
-                      <div>
-                        <h4 className="font-medium mb-2">📹 Recording Tips</h4>
-                        <ul className="space-y-1 text-muted-foreground">
-                          <li>• Use good lighting (face a window or use a ring light)</li>
-                          <li>• Ensure clear audio (use an external microphone if possible)</li>
-                          <li>• Maintain eye contact with the camera</li>
-                          <li>• Keep a professional background</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-medium mb-2">🎯 Content Tips</h4>
-                        <ul className="space-y-1 text-muted-foreground">
-                          <li>• Keep it concise (30-90 seconds ideal)</li>
-                          <li>• Start with a strong hook</li>
-                          <li>• Focus on achievements, not just responsibilities</li>
-                          <li>• End with a clear call to action</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-medium mb-2">💼 Professional Tips</h4>
-                        <ul className="space-y-1 text-muted-foreground">
-                          <li>• Dress appropriately for your industry</li>
-                          <li>• Practice your script beforehand</li>
-                          <li>• Speak clearly and at a moderate pace</li>
-                          <li>• Show enthusiasm and personality</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </span>
+                </label>
+                {file && (
+                  <Button onClick={() => { setFile(null); setStatus("idle"); setJobId(null); setError(null); }} variant="ghost" disabled={busy}>
+                    Clear
+                  </Button>
+                )}
               </div>
-            </TabsContent>
 
-            <TabsContent value="record" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Record Your Video Resume</CardTitle>
-                  <CardDescription>
-                    Use your device's camera to record your video resume
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                      {!isRecording && !hasRecording && (
-                        <div className="text-center">
-                          <Video className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                          <p className="text-muted-foreground">Click "Start Recording" to begin</p>
-                        </div>
-                      )}
-                      {isRecording && (
-                        <div className="text-center">
-                          <div className="w-4 h-4 bg-red-500 rounded-full mx-auto mb-4 animate-pulse"></div>
-                          <p className="text-red-500 font-medium">Recording in progress...</p>
-                        </div>
-                      )}
-                      {hasRecording && !isRecording && (
-                        <div className="text-center">
-                          <Play className="h-16 w-16 mx-auto mb-4 text-primary cursor-pointer" />
-                          <p className="text-muted-foreground">Click to preview your recording</p>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex justify-center gap-4">
-                      {!isRecording ? (
-                        <Button onClick={startRecording} size="lg">
-                          <Video className="h-5 w-5 mr-2" />
-                          Start Recording
-                        </Button>
-                      ) : (
-                        <Button onClick={stopRecording} variant="destructive" size="lg">
-                          <Pause className="h-5 w-5 mr-2" />
-                          Stop Recording
-                        </Button>
-                      )}
-                      
-                      {hasRecording && (
-                        <>
-                          <Button variant="outline" size="lg">
-                            <Upload className="h-5 w-5 mr-2" />
-                            Upload File
-                          </Button>
-                          <Button variant="outline" size="lg">
-                            Re-record
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+              {file && (
+                <p className="text-xs text-muted-foreground text-center">
+                  {file.name} · {(file.size / 1024 / 1024).toFixed(1)}MB
+                </p>
+              )}
 
-            <TabsContent value="preview" className="space-y-6">
-              <div className="grid lg:grid-cols-2 gap-8">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Video Preview</CardTitle>
-                    <CardDescription>
-                      Review your video resume before sharing
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                        {hasRecording ? (
-                          <div className="text-center">
-                            <Play className="h-16 w-16 mx-auto mb-4 text-primary cursor-pointer" />
-                            <p className="text-muted-foreground">Your Video Resume</p>
-                            <Badge variant="outline" className="mt-2">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {videoData.duration}s
-                            </Badge>
-                          </div>
-                        ) : (
-                          <div className="text-center">
-                            <Video className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                            <p className="text-muted-foreground">No video recorded yet</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              {busy && (
+                <div className="space-y-2">
+                  <Progress value={progress} />
+                  <p className="text-sm text-center text-muted-foreground">{STATUS_LABEL[status]}</p>
+                </div>
+              )}
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Share & Export</CardTitle>
-                    <CardDescription>
-                      Download or share your video resume
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <Button className="w-full" disabled={!hasRecording}>
-                          <Download className="h-4 w-4 mr-2" />
-                          Download MP4
-                        </Button>
-                        <Button variant="outline" className="w-full" disabled={!hasRecording}>
-                          <Share2 className="h-4 w-4 mr-2" />
-                          Share Link
-                        </Button>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Video Analytics</h4>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Views</span>
-                          <span className="flex items-center">
-                            <Eye className="h-3 w-3 mr-1" />
-                            0
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Duration</span>
-                          <span>{videoData.duration}s</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Format</span>
-                          <span>MP4</span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Sharing Options</h4>
-                        <div className="grid grid-cols-3 gap-2">
-                          <Button variant="outline" size="sm" className="w-full">
-                            LinkedIn
-                          </Button>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Email
-                          </Button>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Embed
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+              {error && (
+                <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 rounded-md p-3">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {status === "completed" && (
+                <div className="flex items-center gap-2 text-sm text-emerald-600 bg-emerald-500/10 rounded-md p-3">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Resume drafted. Redirecting to the builder…
+                </div>
+              )}
+
+              <Button
+                onClick={generate}
+                disabled={!file || busy || recording}
+                className="w-full h-12 text-base"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                {busy ? "Working…" : "Generate resume from video"}
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };
