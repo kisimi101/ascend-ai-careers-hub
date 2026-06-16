@@ -7,7 +7,7 @@ export const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative pt-32 md:pt-36 pb-16 md:pb-24 bg-background overflow-hidden">
+    <section className="relative pt-44 sm:pt-52 md:pt-56 lg:pt-60 pb-16 md:pb-24 bg-background overflow-hidden">
       <div className="container mx-auto container-padding relative min-h-[760px] lg:min-h-[820px]">
         {/* Floating: Resume Score */}
         <motion.div
