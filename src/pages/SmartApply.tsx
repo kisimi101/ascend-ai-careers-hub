@@ -374,7 +374,7 @@ const SmartApply = () => {
       if (!isAuthenticated) guestApply.recordUse();
     } catch (err: any) {
       console.error("Smart apply error:", err);
-      toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
+      toast({ title: "Smart Apply failed", description: await describeFnError(err), variant: "destructive" });
       setStep("upload");
     } finally {
       setIsProcessing(false);
@@ -451,7 +451,7 @@ const SmartApply = () => {
       if (!isAuthenticated) guestApply.recordUse();
     } catch (err: any) {
       console.error("Smart apply error:", err);
-      toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
+      toast({ title: "Smart Apply failed", description: await describeFnError(err), variant: "destructive" });
       setStep("upload");
     } finally {
       setIsProcessing(false);
