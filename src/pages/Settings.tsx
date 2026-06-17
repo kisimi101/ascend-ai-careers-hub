@@ -438,7 +438,6 @@ const Settings = () => {
           </Card>
 
 
-          <div className="flex justify-end">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
