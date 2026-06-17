@@ -22,6 +22,16 @@ serve(async (req) => {
       );
     }
 
+    // Server-side size guard (base64 → bytes). Cap 50MB.
+    const MAX_BYTES = 50 * 1024 * 1024;
+    const approxBytes = Math.floor((fileContent.length * 3) / 4);
+    if (approxBytes > MAX_BYTES) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: `File too large (${(approxBytes / 1024 / 1024).toFixed(1)}MB). Max 50MB. Please compress and try again.`,
+      }), { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -50,7 +60,25 @@ serve(async (req) => {
       }), { status: 415, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const bytes = Uint8Array.from(atob(fileContent), (c) => c.charCodeAt(0));
+    let bytes: Uint8Array;
+    try {
+      bytes = Uint8Array.from(atob(fileContent), (c) => c.charCodeAt(0));
+    } catch {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "File appears corrupted or not properly encoded. Please re-upload.",
+      }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Magic-byte sniffing to catch mislabeled / corrupted files
+    const head = Array.from(bytes.slice(0, 4)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    if (isPdf && !head.startsWith("25504446")) {
+      return new Response(JSON.stringify({ success: false, error: "Invalid PDF file. The file header is corrupted or not a real PDF." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (isDocx && !head.startsWith("504b")) {
+      return new Response(JSON.stringify({ success: false, error: "Invalid DOCX file. Expected a Word document; the file appears corrupted." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     let textContent = "";
 
     if (isTxt) {
@@ -71,7 +99,19 @@ serve(async (req) => {
         textContent = value || "";
       } catch (err) {
         console.error("docx parse error", err);
+        return new Response(JSON.stringify({
+          success: false,
+          error: "Could not parse this DOCX. The file may be corrupted or password-protected. Try re-saving in Word.",
+        }), { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
+    }
+
+    // Content-parsing validation: refuse near-empty extractions for text formats
+    if ((isTxt || isRtf || isDocx) && textContent.trim().length < 30) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "We couldn't extract enough text from this file. Please check it contains resume content and re-upload.",
+      }), { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const prompt = `You are a resume parser. Extract structured information from the following resume content.
