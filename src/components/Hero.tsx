@@ -92,7 +92,7 @@ export const Hero = () => {
             <Button
               size="lg"
               onClick={() => navigate("/get-started")}
-              className="h-14 px-9 text-lg font-bold rounded-2xl bg-foreground text-background hover:bg-foreground/90"
+              className="h-14 px-9 text-lg font-bold rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
             >
               Get started for free 🚀
             </Button>
