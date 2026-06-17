@@ -439,6 +439,38 @@ const Settings = () => {
 
 
           <div className="flex justify-end">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                End-to-end pipeline test
+              </CardTitle>
+              <CardDescription>
+                Runs Resume → Job Match → Smart Apply against the live backend and reports any step that fails.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button onClick={runPipelineTest} disabled={diagRunning}>
+                {diagRunning ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Running…</>) : "Run test"}
+              </Button>
+              {diagResult && (
+                <ul className="space-y-1 text-sm">
+                  {diagResult.steps.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      {s.ok
+                        ? <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                        : <XCircle className="h-4 w-4 text-destructive mt-0.5" />}
+                      <span className="font-mono">{s.name}</span>
+                      <span className="text-muted-foreground">({s.ms}ms)</span>
+                      {s.error && <span className="text-destructive">— {s.error}</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end">
             <Button
               onClick={saveSettings}
               disabled={isSaving}
