@@ -1,104 +1,83 @@
-# Plan: 7 Improvements
 
-## 1. Apify & Firecrawl via Lovable Connectors (with your keys as fallback)
+# Scope (6 areas)
 
-**Answer to your question:** Yes — Lovable has a built-in **Firecrawl connector** (gateway-managed, auto-refreshing). Apify does **not** currently have a Lovable connector, so it stays as your own `APIFY_API_KEY` secret.
+## 1. Welcome & Onboarding Email Sequence (Resend)
+Create `supabase/functions/_shared/onboarding-emails.ts` with 10 branded HTML templates and a dispatcher `send-onboarding-email` edge function that takes `{userId, type}` and sends via Resend (using existing `RESEND_API_KEY` + `RESEND_FROM`).
 
-Proposal:
-- **Firecrawl**: link the Lovable connector as **primary**. Edge functions try the gateway first, fall back to your `FIRECRAWL_API_KEY` if the gateway returns an error. (Both keys are server-side; your secret stays as backup.)
-- **Apify**: keep your `APIFY_API_KEY` (no connector exists).
+Triggers:
+| # | Email | Trigger | Send time |
+|---|---|---|---|
+| 1 | Welcome | DB trigger on `auth.users` insert (calls edge fn via pg_net) | Immediate |
+| 2 | Complete your profile | pg_cron daily: profile incomplete & signup > 24h | T+1d |
+| 3 | Upload your first resume | pg_cron: no resume_drafts & signup > 2d | T+2d |
+| 4 | Optimize your resume | After first resume saved, score < 80 | Event |
+| 5 | Job match recommendations | pg_cron weekly: has resume, matches found | Weekly Tue 9am |
+| 6 | Try Smart Apply | pg_cron: has resume, 0 applications, T+5d | T+5d |
+| 7 | Interview prep tips | After first `job_applications.status='interview'` | Event |
+| 8 | Premium features | T+7d, still on free tier | T+7d |
+| 9 | Re-engagement | pg_cron: no login in 14d | T+14d idle |
+| 10 | Application follow-up | pg_cron daily: application age 7d still `applied` | T+7d per app |
 
-Files: small helper `supabase/functions/_shared/firecrawl.ts` used by `scrape-linkedin`, `scrape-company`, `search-contacts`.
+Subject/preview/body per email written in templates file. Add new pg_cron job `onboarding-email-dispatcher` running daily that iterates eligible users and calls the dispatcher. Track sends in new `email_log` table (`user_id`, `email_type`, `sent_at` unique) to prevent duplicates.
 
-## 2. Resend wired up + tested
+## 2. Smart Apply Edge Function fix
+Audit `supabase/functions/smart-match/index.ts` + `src/pages/SmartApply.tsx`. Known issues:
+- `action === "generate-cover-letters"` calls `await req.json()` a **second time** — body already consumed at top → throws → non-2xx. Fix: read jobs from initial `body.jobs`.
+- Surface server error JSON in the UI instead of generic "non-2xx". Wrap `supabase.functions.invoke` and read `error.context.body` / response JSON.
+- Add explicit 4xx for missing `resumeData`.
+- Verify `optimize-resume` and `parse-resume` paths still return 2xx for the 50MB storage flow.
 
-You've added `RESEND_API_KEY` and verified a domain. I'll:
-- Create `supabase/functions/_shared/email.ts` — single `sendEmail({to, subject, html})` helper hitting Resend.
-- Switch `send-job-alerts`, `send-interview-reminders`, `send-notification-email`, `send-weekly-digest` to use it (they currently log only or are stubs).
-- Use sender `CareerNow <alerts@<yourdomain>>` — I'll ask which verified domain to use after the plan.
-- Test by calling `send-notification-email` with a sample payload and showing the Resend response.
+## 3. Multi-format resume parsing
+Update `supabase/functions/parse-resume/index.ts` to accept `.pdf .docx .doc .txt .rtf`:
+- PDF: existing path
+- DOCX: `npm:mammoth` extractRawText
+- DOC: best-effort — return friendly error asking user to save as .docx (legacy binary parsing isn't viable in Deno)
+- TXT: direct UTF-8 decode
+- RTF: strip RTF control words with regex
+Add MIME/extension validation on client (`ResumeChecker`, `SmartApply`, `ResumeEnhancer`, `LinkedInImport`). Show clear toast when unsupported.
 
-**How this helps users:** they get actual email for: new job-alert matches (#3), interview reminders 24h before, weekly progress digest (Sunday), and follow-up reminders. Without Resend wired, those were silent.
+## 4. Skills-section detection
+Fix false "Missing skills section" in `src/pages/ResumeBuilder.tsx` / `src/components/resume-builder/ATSScoreCard.tsx` (or wherever the checklist lives). Treat any of these as a skills section:
+`skills | key competencies | core competencies | technical competencies | technical skills | professional skills | expertise | proficiencies | technologies | tech stack`
+Match against `resumeData.skills.length > 0` OR any synonymous heading in rendered text. Same fix applied to `optimize-resume` AI prompt and `scan-keywords` edge function.
 
-## 3. Stricter recency: past 3 days
+## 5. Resume → Job Matching → Smart Apply wiring
+- After resume save in `ResumeBuilder`, persist latest skills to `profiles.latest_resume_skills` (new column).
+- `JobSearch` auto-prefills keywords from latest resume skills.
+- `SmartApply` reads latest `resume_drafts` row for signed-in users instead of localStorage-only.
+- "Find Jobs & Apply" CTA on optimize step → `/job-search?fromResume=1` then `/smart-apply` with selected jobs in sessionStorage.
 
-- `supabase/functions/search-jobs/index.ts`: change `tbs=qdr:w` → `tbs=qdr:3` (Google's "past 3 days" range).
-- `supabase/functions/check-job-alerts/index.ts`: same change so notification matches are <=3 days old.
-- Add `postedWithinDays: 3` default visible in `JobAlertManager` UI.
+## 6. Audit report
+Markdown report at `docs/AUDIT_2026-06-17.md` covering auth, resume tools, AI, DB, edge funcs, frontend, performance. List issues found, fixes applied this turn, remaining risks, and a pre-prod testing checklist. No code refactors beyond items 1–5.
 
-## 4. Company Watchlist
+# Files
 
-New feature — track companies, get notified when fresh roles appear.
+**Create**
+- `supabase/functions/_shared/onboarding-emails.ts`
+- `supabase/functions/send-onboarding-email/index.ts`
+- `supabase/migrations/<ts>_email_log_and_onboarding.sql` (email_log table + GRANTs/RLS, profiles.latest_resume_skills column, pg_cron job, auth.users trigger via pg_net for welcome email)
+- `docs/AUDIT_2026-06-17.md`
 
-DB migration:
-```sql
-CREATE TABLE public.company_watchlist (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  company_name text NOT NULL,
-  keywords text,           -- optional role filter
-  location text,
-  last_checked_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(user_id, company_name)
-);
--- GRANTs + RLS (auth.uid() = user_id)
-```
+**Edit**
+- `supabase/functions/smart-match/index.ts` (double json bug)
+- `supabase/functions/parse-resume/index.ts` (multi-format)
+- `supabase/functions/optimize-resume/index.ts` & `scan-keywords/index.ts` (skills synonyms)
+- `src/pages/SmartApply.tsx` (better error surfacing, file types, use latest resume_drafts)
+- `src/pages/ResumeChecker.tsx`, `src/pages/ResumeEnhancer.tsx`, `src/pages/LinkedInImport.tsx` (accept .doc/.txt/.rtf, validate)
+- `src/pages/ResumeBuilder.tsx` (persist skills to profile, skills-section synonym check)
+- `src/components/resume-builder/ATSScoreCard.tsx` (synonym check)
+- `src/pages/JobSearch.tsx` (prefill from resume skills)
 
-UI: new page `/company-watchlist` + card on Dashboard. Add/remove companies, see last-checked timestamp.
+# Out of scope
+- Visual redesign, mobile-responsive rework, bundle-size refactor (covered in audit report as recommendations only).
+- Migrating off Apify/Google search recency.
+- Per-user OAuth.
 
-Reuse existing `check-job-alerts` cron — extend it to also query each watched company via Apify with `site:linkedin.com/jobs "{company}"`.
+# Verification
+- Curl `send-onboarding-email` with `type=welcome` to a test inbox.
+- SmartApply pipeline end-to-end as guest then signed-in.
+- Upload `.docx .txt .rtf` to Resume Checker, confirm text extraction.
+- Build a resume using Executive template → confirm "Missing skills section" no longer fires when Key Competencies present.
+- Optimize resume → click Find Jobs & Apply → confirm prefilled keywords and Smart Apply runs.
 
-## 5. Job snapshot in Tracker
-
-`job_applications` already stores `company`, `position`, `job_url`. Add:
-```sql
-ALTER TABLE public.job_applications
-  ADD COLUMN job_snapshot jsonb,           -- {title, company, url, description, posted_date, source}
-  ADD COLUMN snapshot_taken_at timestamptz;
-```
-
-When user clicks "Track this job" in JobSearch results or SmartApply, store the full snapshot. JobTracker UI shows snapshot data instead of re-fetching, with a "View original (may be expired)" link.
-
-## 6. Per-tool upload limits in UI
-
-Single source of truth: new `src/lib/uploadLimits.ts`:
-```ts
-export const UPLOAD_LIMITS = {
-  resumeChecker: 50,
-  resumeEnhancer: 50,
-  smartApply: 50,
-  coverLetter: 10,
-  linkedinImport: 10,
-  videoResume: 50,
-  resumeComparison: 10,
-} as const;
-```
-Each upload component shows `Max {limit}MB · PDF, DOCX` under the dropzone and blocks oversized files with a clear toast.
-
-## 7. Manual "Refresh alerts" + auto schedule
-
-- Add **Refresh** button in `JobAlertManager` → invokes `check-job-alerts` for the current user only (new `userId` param).
-- Cron: schedule `check-job-alerts` every 6 hours via pg_cron (currently not scheduled).
-
-## Files touched (≈22)
-
-**Create:** `supabase/functions/_shared/email.ts`, `supabase/functions/_shared/firecrawl.ts`, `src/lib/uploadLimits.ts`, `src/pages/CompanyWatchlist.tsx`, `src/components/company-watchlist/WatchlistManager.tsx`, 2 migrations.
-
-**Edit:** `search-jobs`, `check-job-alerts`, `send-job-alerts`, `send-interview-reminders`, `send-notification-email`, `send-weekly-digest`, `scrape-linkedin`, `scrape-company`, `JobAlertManager.tsx`, `JobSearchResults.tsx`, `JobTracker.tsx`, `ResumeChecker.tsx`, `SmartApply.tsx`, `CoverLetterGenerator.tsx`, `LinkedInImport.tsx`, `VideoResume.tsx`, `App.tsx` (route).
-
-## Out of scope
-- Migrating to non-Google Apify actors (LinkedIn/Indeed direct) — would change pricing; ask if you want this.
-- Per-user OAuth for Apify (no such product).
-
-## Verification
-- Resend: trigger one test email, screenshot inbox path / function logs.
-- Recency: search "react developer" → confirm dates ≤3 days.
-- Watchlist: add "Stripe", run refresh, confirm rows.
-- Snapshot: track a job, delete the source URL, confirm tracker still renders.
-- Upload limits: try 60MB PDF on Resume Checker → blocked with message.
-
-## I need from you before building
-1. Which verified Resend domain/from-address? (e.g. `alerts@careernow.xyz`)
-2. Confirm Firecrawl connector should be linked as primary (or keep your key only)?
-3. OK to add the 2 migrations above?
+Confirm and I'll build.
