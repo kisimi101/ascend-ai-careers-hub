@@ -50,6 +50,39 @@ export type Database = {
         }
         Relationships: []
       }
+      company_watchlist: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          keywords: string | null
+          last_checked_at: string | null
+          location: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          last_checked_at?: string | null
+          location?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          keywords?: string | null
+          last_checked_at?: string | null
+          location?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       favorite_companies: {
         Row: {
           benefits: string[] | null
@@ -240,11 +273,13 @@ export type Database = {
           created_at: string
           id: string
           interview_date: string | null
+          job_snapshot: Json | null
           job_url: string | null
           location: string | null
           notes: string | null
           position: string
           salary: string | null
+          snapshot_taken_at: string | null
           status: string
           updated_at: string
           user_id: string
@@ -255,11 +290,13 @@ export type Database = {
           created_at?: string
           id?: string
           interview_date?: string | null
+          job_snapshot?: Json | null
           job_url?: string | null
           location?: string | null
           notes?: string | null
           position: string
           salary?: string | null
+          snapshot_taken_at?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -270,11 +307,13 @@ export type Database = {
           created_at?: string
           id?: string
           interview_date?: string | null
+          job_snapshot?: Json | null
           job_url?: string | null
           location?: string | null
           notes?: string | null
           position?: string
           salary?: string | null
+          snapshot_taken_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string
