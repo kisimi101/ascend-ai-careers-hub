@@ -3,8 +3,11 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Bookmark, ExternalLink, Building, Search, Loader2 } from "lucide-react";
+import { MapPin, Clock, Bookmark, ExternalLink, Building, Search, Loader2, Clipboard } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface Job {
   id: string;
@@ -29,6 +32,8 @@ interface JobSearchResultsProps {
 export const JobSearchResults = ({ searchQuery, location, filters, jobs, isLoading, hasSearched }: JobSearchResultsProps) => {
   const [sortBy, setSortBy] = useState("relevance");
   const [savedJobs, setSavedJobs] = useState<string[]>([]);
+  const [tracking, setTracking] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const toggleSaveJob = (jobId: string) => {
     setSavedJobs(prev => 
@@ -36,6 +41,43 @@ export const JobSearchResults = ({ searchQuery, location, filters, jobs, isLoadi
         ? prev.filter(id => id !== jobId)
         : [...prev, jobId]
     );
+  };
+
+  const trackJob = async (job: Job) => {
+    if (!user) {
+      toast.error("Sign in to track jobs");
+      return;
+    }
+    setTracking(job.id);
+    try {
+      const snapshot = {
+        title: job.title,
+        company: job.company,
+        location: job.location,
+        url: job.url,
+        description: job.description,
+        source: job.source,
+        postedDate: job.postedDate,
+        capturedAt: new Date().toISOString(),
+      };
+      const { error } = await (supabase as any).from("job_applications").insert({
+        user_id: user.id,
+        company: job.company,
+        position: job.title,
+        location: job.location,
+        status: "applied",
+        applied_date: new Date().toISOString().split("T")[0],
+        job_url: job.url || null,
+        job_snapshot: snapshot,
+        snapshot_taken_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      toast.success("Added to Job Tracker with snapshot");
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to track job");
+    } finally {
+      setTracking(null);
+    }
   };
 
   if (isLoading) {
@@ -146,6 +188,15 @@ export const JobSearchResults = ({ searchQuery, location, filters, jobs, isLoadi
                         </a>
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      onClick={() => trackJob(job)}
+                      disabled={tracking === job.id}
+                      className="flex items-center gap-2"
+                    >
+                      {tracking === job.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Clipboard className="w-4 h-4" />}
+                      Track this job
+                    </Button>
                   </div>
                 </div>
               </div>

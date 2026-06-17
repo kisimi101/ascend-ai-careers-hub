@@ -44,6 +44,7 @@ const MORE_GROUPS: { heading: string; items: PrimaryItem[] }[] = [
     items: [
       { label: "Cover Letter", path: "/cover-letter-generator", icon: Mail },
       { label: "Job Tracker", path: "/job-tracker", icon: Briefcase },
+      { label: "Company Watchlist", path: "/company-watchlist", icon: Building2 },
       { label: "Salary Estimator", path: "/salary-estimator", icon: BarChart3 },
       { label: "Company Research", path: "/company-research", icon: Building2 },
     ],

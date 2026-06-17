@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, Plus, Trash2, X, BellRing } from "lucide-react";
+import { Bell, Plus, Trash2, X, BellRing, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -33,6 +33,7 @@ export const JobAlertManager = ({ defaultTitle = "", defaultLocation = "" }: Job
   const [alerts, setAlerts] = useState<JobAlert[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [form, setForm] = useState({
     job_title: defaultTitle,
     location: defaultLocation,
@@ -99,6 +100,22 @@ export const JobAlertManager = ({ defaultTitle = "", defaultLocation = "" }: Job
     toast.success("Alert deleted");
   };
 
+  const refreshAlerts = async () => {
+    if (!user) return;
+    setRefreshing(true);
+    try {
+      const { error } = await supabase.functions.invoke("check-job-alerts", {
+        body: { userId: user.id },
+      });
+      if (error) throw error;
+      toast.success("Alerts refreshed — check your notifications");
+    } catch (e: any) {
+      toast.error(e?.message || "Refresh failed");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   if (!user) {
     return (
       <Card>
@@ -117,9 +134,16 @@ export const JobAlertManager = ({ defaultTitle = "", defaultLocation = "" }: Job
           <Bell className="w-4 h-4" />
           Job Alerts
         </CardTitle>
-        <Button variant="outline" size="sm" onClick={() => setShowForm(!showForm)}>
-          {showForm ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-        </Button>
+        <div className="flex gap-1">
+          {alerts.length > 0 && (
+            <Button variant="outline" size="sm" onClick={refreshAlerts} disabled={refreshing} title="Refresh alerts now">
+              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setShowForm(!showForm)}>
+            {showForm ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {showForm && (

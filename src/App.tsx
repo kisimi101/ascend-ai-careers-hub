@@ -60,6 +60,7 @@ import AiResumeBuilderLanding from "./pages/AiResumeBuilderLanding";
 import FreeResumeTemplatesHub from "./pages/FreeResumeTemplatesHub";
 import TailoredResumeOnboarding from "./pages/TailoredResumeOnboarding";
 import SeoKeywordTracker from "./pages/SeoKeywordTracker";
+import CompanyWatchlist from "./pages/CompanyWatchlist";
 
 const queryClient = new QueryClient();
 
@@ -123,6 +124,7 @@ const App = () => (
                   <Route path="/job-analytics" element={<ProtectedRoute><JobAnalytics /></ProtectedRoute>} />
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   <Route path="/company-research" element={<CompanyResearch />} />
+                  <Route path="/company-watchlist" element={<ProtectedRoute><CompanyWatchlist /></ProtectedRoute>} />
                   <Route path="/resume-analytics" element={<ProtectedRoute><ResumeAnalytics /></ProtectedRoute>} />
                   {/* Smart Apply: 1 free guest application, then signup */}
                   <Route path="/smart-apply" element={<SmartApply />} />

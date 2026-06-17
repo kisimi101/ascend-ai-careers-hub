@@ -1,62 +1,104 @@
-Scope is large but deliberate. Five workstreams, executed in this order:
+# Plan: 7 Improvements
 
-## 1. Hero / navbar overlap (quick win)
-`src/components/Hero.tsx` — bump top padding so the 3-tier nav (~190px tall on desktop) no longer clips "Better resume.". Change `pt-32 md:pt-36` → `pt-44 md:pt-56 lg:pt-60`. Verify in preview.
+## 1. Apify & Firecrawl via Lovable Connectors (with your keys as fallback)
 
-## 2. Free-by-default access model
-**Rule:** all tools work anonymously. Sign-in required only for:
-- creating a 2nd+ resume
-- applying to >10 jobs/day
-- the heavy AI tools: Resume Checker, Resume Enhancer, Career Path Planner (per your "Same + paywall on AI tools" choice — sign-in required, free tier OK for first use)
+**Answer to your question:** Yes — Lovable has a built-in **Firecrawl connector** (gateway-managed, auto-refreshing). Apify does **not** currently have a Lovable connector, so it stays as your own `APIFY_API_KEY` secret.
 
-**Changes:**
-- `src/components/ProtectedRoute.tsx` → add `mode` prop: `"auth-required" | "soft"`. Default soft = render children, no redirect.
-- `src/App.tsx` → remove `<ProtectedRoute>` wrappers from: Resume Builder (first resume), Job Search, Smart Apply, Cover Letter Generator, Interview Practice, LinkedIn Import/Optimizer, Resume Summary/Bullet/Skills/Translator/Comparison/Keyword Scanner, Portfolio, Network, Company Research, Salary, Heatmap, Industry Insights, Video Resume, Get Started, Tools Dashboard.
-- Keep auth required for: Dashboard, Profile, Settings, Apply History, Resume Analytics, Job Tracker, Job Analytics, Reference Manager, Auto Follow-Up, Career Timeline, Referral Mapper, SEO Keyword Tracker (these need persisted user data).
-- `src/pages/ResumeBuilder.tsx` → check existing resume count in localStorage + DB; if user has ≥1 saved resume and is anonymous, show AuthDialog with "Sign in to save another resume".
-- `src/hooks/useTrialLimit.ts` / job-apply flow → anonymous users get 10 applies/day tracked by localStorage; on 11th, show AuthDialog → upgrade modal.
-- AI tools (`ResumeChecker`, `ResumeEnhancer`, `CareerPathPlanner`) — gate the **run** action behind sign-in (not the page view). Show inline prompt instead of redirect.
+Proposal:
+- **Firecrawl**: link the Lovable connector as **primary**. Edge functions try the gateway first, fall back to your `FIRECRAWL_API_KEY` if the gateway returns an error. (Both keys are server-side; your secret stays as backup.)
+- **Apify**: keep your `APIFY_API_KEY` (no connector exists).
 
-## 3. Pricing alignment (Free / Pro $12 / Enterprise $39)
-`src/components/PricingSection.tsx` — rewrite feature lists to match what actually exists:
-- **Free (no sign-in needed):** 1 saved resume, 10 job applies/day, all AI tools (Checker/Enhancer/Summary/Bullets/Career Planner), Smart Apply, Cover Letter Generator, Interview Practice, LinkedIn Import, all templates (preview only), CSV export.
-- **Pro $12/mo:** Unlimited saved resumes, unlimited job applies, PDF + DOCX exports, Resume Analytics + share links, Job Tracker + analytics, Auto Follow-Up, Career Timeline, Reference Manager, Video-to-Resume, priority AI model.
-- **Enterprise $39/mo:** Everything in Pro + team seats, Network/Referral Mapper, Job Market Heatmap, Industry Insights, SEO Keyword Tracker, dedicated support, SSO-ready.
-Remove crowns per Core memory.
+Files: small helper `supabase/functions/_shared/firecrawl.ts` used by `scrape-linkedin`, `scrape-company`, `search-contacts`.
 
-## 4. 50MB uploads via Storage streaming
-- Create private storage bucket `uploads` (50MB file size limit).
-- New edge function `upload-signed-url` → returns short-lived signed upload URL for `uploads/{userId or anon}/{uuid}.{ext}`.
-- Client helper `src/lib/uploadLarge.ts` → request signed URL, PUT file directly to Storage, return storage path.
-- Update Resume Checker / Enhancer / Parser / Video Resume to use the helper instead of base64 payloads.
-- Edge functions (`ai-resume-tools`, `parse-resume`, new `video-to-resume`) accept `{ storagePath }`, download via service-role client, process, then delete the object.
-- File-size guard: 50MB client + server.
+## 2. Resend wired up + tested
 
-## 5. Video-to-Resume (build from scratch)
-- New edge function `supabase/functions/video-to-resume/index.ts`:
-  1. Receive `{ storagePath }`.
-  2. Download video from `uploads` bucket (streaming).
-  3. Extract audio → send to Gemini 2.5 Flash via `/v1/chat/completions` with `input_audio` block (webm/m4a from MediaRecorder) **OR** for true video, send video as `image_url`-style data URI to a vision-capable Gemini model; use `google/gemini-2.5-pro` which accepts video input.
-  4. Prompt: "Transcribe + extract: name, contact, education, experience with dates+bullets, skills, summary. Return strict JSON matching ResumeData shape."
-  5. Use `EdgeRuntime.waitUntil` pattern for >30s processing; insert a `video_jobs` row, return `job_id`; client polls.
-- DB migration: `video_jobs (id, user_id nullable, status, progress, result jsonb, error, created_at)` + RLS.
-- Rewrite `src/pages/VideoResume.tsx`:
-  - Upload UI (drag-drop, 50MB cap, mp4/webm/mov).
-  - Record-in-browser option via MediaRecorder (existing if present).
-  - Upload via `uploadLarge`, invoke `video-to-resume`, poll `video_jobs` row, on completion populate `resume-data` localStorage and navigate to `/resume-builder`.
-- Add explainer panel: "How it works: record/upload a 1–3 min video introducing yourself → AI transcribes and extracts your experience → instant resume draft you can edit."
+You've added `RESEND_API_KEY` and verified a domain. I'll:
+- Create `supabase/functions/_shared/email.ts` — single `sendEmail({to, subject, html})` helper hitting Resend.
+- Switch `send-job-alerts`, `send-interview-reminders`, `send-notification-email`, `send-weekly-digest` to use it (they currently log only or are stubs).
+- Use sender `CareerNow <alerts@<yourdomain>>` — I'll ask which verified domain to use after the plan.
+- Test by calling `send-notification-email` with a sample payload and showing the Resend response.
 
-## Out of scope (will not touch)
-- LinkedIn OAuth (separate request, not natively supported on Cloud).
-- Existing P0 AI tool wiring (already shipped last turn).
-- Mobile nav structure (already shipped).
+**How this helps users:** they get actual email for: new job-alert matches (#3), interview reminders 24h before, weekly progress digest (Sunday), and follow-up reminders. Without Resend wired, those were silent.
+
+## 3. Stricter recency: past 3 days
+
+- `supabase/functions/search-jobs/index.ts`: change `tbs=qdr:w` → `tbs=qdr:3` (Google's "past 3 days" range).
+- `supabase/functions/check-job-alerts/index.ts`: same change so notification matches are <=3 days old.
+- Add `postedWithinDays: 3` default visible in `JobAlertManager` UI.
+
+## 4. Company Watchlist
+
+New feature — track companies, get notified when fresh roles appear.
+
+DB migration:
+```sql
+CREATE TABLE public.company_watchlist (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  company_name text NOT NULL,
+  keywords text,           -- optional role filter
+  location text,
+  last_checked_at timestamptz,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(user_id, company_name)
+);
+-- GRANTs + RLS (auth.uid() = user_id)
+```
+
+UI: new page `/company-watchlist` + card on Dashboard. Add/remove companies, see last-checked timestamp.
+
+Reuse existing `check-job-alerts` cron — extend it to also query each watched company via Apify with `site:linkedin.com/jobs "{company}"`.
+
+## 5. Job snapshot in Tracker
+
+`job_applications` already stores `company`, `position`, `job_url`. Add:
+```sql
+ALTER TABLE public.job_applications
+  ADD COLUMN job_snapshot jsonb,           -- {title, company, url, description, posted_date, source}
+  ADD COLUMN snapshot_taken_at timestamptz;
+```
+
+When user clicks "Track this job" in JobSearch results or SmartApply, store the full snapshot. JobTracker UI shows snapshot data instead of re-fetching, with a "View original (may be expired)" link.
+
+## 6. Per-tool upload limits in UI
+
+Single source of truth: new `src/lib/uploadLimits.ts`:
+```ts
+export const UPLOAD_LIMITS = {
+  resumeChecker: 50,
+  resumeEnhancer: 50,
+  smartApply: 50,
+  coverLetter: 10,
+  linkedinImport: 10,
+  videoResume: 50,
+  resumeComparison: 10,
+} as const;
+```
+Each upload component shows `Max {limit}MB · PDF, DOCX` under the dropzone and blocks oversized files with a clear toast.
+
+## 7. Manual "Refresh alerts" + auto schedule
+
+- Add **Refresh** button in `JobAlertManager` → invokes `check-job-alerts` for the current user only (new `userId` param).
+- Cron: schedule `check-job-alerts` every 6 hours via pg_cron (currently not scheduled).
+
+## Files touched (≈22)
+
+**Create:** `supabase/functions/_shared/email.ts`, `supabase/functions/_shared/firecrawl.ts`, `src/lib/uploadLimits.ts`, `src/pages/CompanyWatchlist.tsx`, `src/components/company-watchlist/WatchlistManager.tsx`, 2 migrations.
+
+**Edit:** `search-jobs`, `check-job-alerts`, `send-job-alerts`, `send-interview-reminders`, `send-notification-email`, `send-weekly-digest`, `scrape-linkedin`, `scrape-company`, `JobAlertManager.tsx`, `JobSearchResults.tsx`, `JobTracker.tsx`, `ResumeChecker.tsx`, `SmartApply.tsx`, `CoverLetterGenerator.tsx`, `LinkedInImport.tsx`, `VideoResume.tsx`, `App.tsx` (route).
+
+## Out of scope
+- Migrating to non-Google Apify actors (LinkedIn/Indeed direct) — would change pricing; ask if you want this.
+- Per-user OAuth for Apify (no such product).
 
 ## Verification
-After each workstream:
-- Hero: visual check via Playwright screenshot at 1280×800.
-- Gating: open incognito → land on Resume Builder, build resume, save → save works; try second resume → AuthDialog. Try Job Search → 10 quick-applies allowed → 11th prompts sign-in.
-- Pricing: visual diff vs current.
-- Uploads: upload 30MB pdf to Resume Checker → AI returns analysis.
-- Video: upload 60s webm → job completes → resume populated.
+- Resend: trigger one test email, screenshot inbox path / function logs.
+- Recency: search "react developer" → confirm dates ≤3 days.
+- Watchlist: add "Stripe", run refresh, confirm rows.
+- Snapshot: track a job, delete the source URL, confirm tracker still renders.
+- Upload limits: try 60MB PDF on Resume Checker → blocked with message.
 
-**Estimated edits:** ~18 files modified, 2 edge functions created, 1 migration, 1 storage bucket.
+## I need from you before building
+1. Which verified Resend domain/from-address? (e.g. `alerts@careernow.xyz`)
+2. Confirm Firecrawl connector should be linked as primary (or keep your key only)?
+3. OK to add the 2 migrations above?
