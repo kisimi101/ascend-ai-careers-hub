@@ -126,7 +126,7 @@ const handler = async (req: Request): Promise<Response> => {
             <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5;">
               <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
-                  <h1 style="margin: 0;">CareerHub</h1>
+                  <h1 style="margin: 0;">CareerNow</h1>
                   <p style="margin: 10px 0 0 0; opacity: 0.9;">Your ${frequency} job alert digest</p>
                 </div>
                 
@@ -138,12 +138,12 @@ const handler = async (req: Request): Promise<Response> => {
                   
                   <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e0e0e0;">
                     <p style="color: #666; font-size: 14px;">
-                      💡 <strong>Tip:</strong> Update your alerts anytime in your CareerHub profile to refine your job search.
+                      💡 <strong>Tip:</strong> Update your alerts anytime in your CareerNow profile to refine your job search.
                     </p>
                   </div>
                   
                   <div style="text-align: center; margin-top: 24px;">
-                    <a href="${Deno.env.get('SITE_URL') || 'https://careerhub.dev'}/profile" 
+                    <a href="${Deno.env.get('SITE_URL') || 'https://careernow.xyz'}/profile" 
                        style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
                       Manage Alerts
                     </a>
@@ -151,8 +151,8 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-                  <p>© ${new Date().getFullYear()} CareerHub. All rights reserved.</p>
-                  <p>You're receiving this because you set up job alerts on CareerHub.</p>
+                  <p>© ${new Date().getFullYear()} CareerNow. All rights reserved.</p>
+                  <p>You're receiving this because you set up job alerts on CareerNow.</p>
                 </div>
               </div>
             </body>
