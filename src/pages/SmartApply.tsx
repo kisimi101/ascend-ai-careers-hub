@@ -241,8 +241,8 @@ const SmartApply = () => {
       toast({ title: "Unsupported file", description: "Please upload PDF, DOCX, or TXT.", variant: "destructive" });
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Max 5MB.", variant: "destructive" });
+    if (file.size > 50 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 50MB.", variant: "destructive" });
       return;
     }
 
@@ -823,7 +823,7 @@ const SmartApply = () => {
               <CardContent className="p-8 text-center">
                 <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Upload Your Resume</h3>
-                <p className="text-sm text-muted-foreground mb-4">PDF, DOCX, or TXT • Max 5MB</p>
+                <p className="text-sm text-muted-foreground mb-4">PDF, DOCX, or TXT • Max 50MB</p>
                 <input ref={fileInputRef} type="file" accept=".pdf,.docx,.txt" className="hidden" onChange={handleFileUpload} />
                 <Button className="btn-gradient" size="lg" onClick={() => fileInputRef.current?.click()}>
                   <Upload className="h-4 w-4 mr-2" /> Choose File
