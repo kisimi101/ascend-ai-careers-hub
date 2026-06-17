@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: "CareerNow <onboarding@resend.dev>",
+          from: Deno.env.get("RESEND_FROM") || "CareerNow <noreply@support.careernow.xyz>",
           to: [profile.email],
           subject: `📅 Interview Reminder: ${app.company} - ${app.position} (Tomorrow!)`,
           html: `
