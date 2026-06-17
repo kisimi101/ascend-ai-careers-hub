@@ -801,7 +801,13 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      _dispatch_onboarding_email: {
+        Args: { p_extra?: Json; p_type: string; p_user_id: string }
+        Returns: undefined
+      }
+      run_application_followups: { Args: never; Returns: undefined }
+      run_onboarding_drip: { Args: never; Returns: undefined }
+      run_weekly_job_matches: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
