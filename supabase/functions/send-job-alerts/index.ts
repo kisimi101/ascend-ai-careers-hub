@@ -111,10 +111,11 @@ const handler = async (req: Request): Promise<Response> => {
         `).join('');
 
         // Send email
+        const fromAddr = Deno.env.get("RESEND_FROM") || "CareerNow <onboarding@resend.dev>";
         const emailResponse = await resend.emails.send({
-          from: "CareerHub <onboarding@resend.dev>",
+          from: fromAddr,
           to: [profile.email],
-          subject: `🔔 Your ${frequency} job alert digest - CareerHub`,
+          subject: `🔔 Your ${frequency} job alert digest - CareerNow`,
           html: `
             <!DOCTYPE html>
             <html>

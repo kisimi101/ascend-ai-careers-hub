@@ -281,9 +281,9 @@ serve(async (req) => {
       mobileResults: false,
       languageCode: "",
       maxConcurrency: 1,
-      // Limit Google results to the past week so listings are fresh
+      // Limit Google results to the past 3 days so listings are fresh
       customDataFunction: undefined,
-      customSearchParameters: "tbs=qdr:w",
+      customSearchParameters: "tbs=qdr:3",
     };
 
     const runResponse = await fetch(

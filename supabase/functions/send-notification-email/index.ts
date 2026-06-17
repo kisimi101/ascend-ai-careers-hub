@@ -88,8 +88,9 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Invalid notification type');
     }
 
+    const fromAddr = Deno.env.get("RESEND_FROM") || "CareerNow <onboarding@resend.dev>";
     const emailResponse = await resend.emails.send({
-      from: "CareerHub <onboarding@resend.dev>",
+      from: fromAddr,
       to: [data.user_email],
       subject: emailContent.subject,
       html: emailContent.html,
