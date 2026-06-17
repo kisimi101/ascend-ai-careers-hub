@@ -242,7 +242,7 @@ const SmartApply = () => {
       return;
     }
     if (file.size > 50 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Max 50MB.", variant: "destructive" });
+      toast({ title: "File too large", description: "Max 50MB. Please compress or trim and try again.", variant: "destructive" });
       return;
     }
 

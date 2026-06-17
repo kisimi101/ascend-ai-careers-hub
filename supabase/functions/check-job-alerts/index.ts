@@ -16,11 +16,17 @@ serve(async (req) => {
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Get all active job alerts
-    const { data: alerts, error: alertsError } = await supabase
-      .from('job_alerts')
-      .select('*')
-      .eq('is_active', true);
+    // Optional user filter for manual "Refresh" button
+    let targetUserId: string | null = null;
+    try {
+      const body = await req.json();
+      if (body?.userId) targetUserId = String(body.userId);
+    } catch { /* no body = full sweep */ }
+
+    // Get active job alerts (optionally scoped to one user)
+    let q = supabase.from('job_alerts').select('*').eq('is_active', true);
+    if (targetUserId) q = q.eq('user_id', targetUserId);
+    const { data: alerts, error: alertsError } = await q;
 
     if (alertsError) throw alertsError;
     if (!alerts || alerts.length === 0) {
@@ -30,12 +36,13 @@ serve(async (req) => {
     }
 
     let notificationsCreated = 0;
+    const force = !!targetUserId; // manual refresh skips the frequency throttle
 
     for (const alert of alerts) {
       // Check if we already sent a notification recently (within frequency)
       const frequencyHours = alert.email_frequency === 'daily' ? 24 : alert.email_frequency === 'weekly' ? 168 : 24;
       
-      if (alert.last_sent_at) {
+      if (!force && alert.last_sent_at) {
         const lastSent = new Date(alert.last_sent_at);
         const hoursSince = (Date.now() - lastSent.getTime()) / (1000 * 60 * 60);
         if (hoursSince < frequencyHours) continue;
@@ -46,18 +53,38 @@ serve(async (req) => {
       const { error: notifError } = await supabase.from('notifications').insert({
         user_id: alert.user_id,
         type: 'job_alert',
-        title: `New jobs matching "${alert.job_title}"`,
-        message: `We found new ${alert.job_title} positions${locationText}. Click to search and apply now!`,
+        title: `New ${alert.job_title} jobs (past 3 days)`,
+        message: `Fresh ${alert.job_title} positions${locationText}. Click to search and apply.`,
         link: `/job-search?q=${encodeURIComponent(alert.job_title)}&loc=${encodeURIComponent(alert.location || '')}`,
       });
 
       if (!notifError) {
         notificationsCreated++;
-        // Update last_sent_at
-        await supabase
+        if (!force) await supabase
           .from('job_alerts')
           .update({ last_sent_at: new Date().toISOString() })
           .eq('id', alert.id);
+      }
+    }
+
+    // === Company watchlist sweep ===
+    let watchQ = supabase.from('company_watchlist').select('*');
+    if (targetUserId) watchQ = watchQ.eq('user_id', targetUserId);
+    const { data: watched } = await watchQ;
+    if (watched) {
+      for (const w of watched) {
+        const sinceMs = w.last_checked_at ? Date.now() - new Date(w.last_checked_at).getTime() : Infinity;
+        if (!force && sinceMs < 6 * 60 * 60 * 1000) continue; // throttle 6h
+        const kw = w.keywords ? ` (${w.keywords})` : '';
+        await supabase.from('notifications').insert({
+          user_id: w.user_id,
+          type: 'job_alert',
+          title: `New roles at ${w.company_name}${kw}`,
+          message: `Fresh openings at ${w.company_name}${w.location ? ` in ${w.location}` : ''}. Click to search.`,
+          link: `/job-search?q=${encodeURIComponent((w.keywords || '') + ' ' + w.company_name)}&loc=${encodeURIComponent(w.location || '')}`,
+        });
+        notificationsCreated++;
+        await supabase.from('company_watchlist').update({ last_checked_at: new Date().toISOString() }).eq('id', w.id);
       }
     }
 
