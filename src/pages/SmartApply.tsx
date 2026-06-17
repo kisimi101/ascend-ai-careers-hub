@@ -236,9 +236,17 @@ const SmartApply = () => {
       return;
     }
 
-    const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
-    if (!allowedTypes.includes(file.type)) {
-      toast({ title: "Unsupported file", description: "Please upload PDF, DOCX, or TXT.", variant: "destructive" });
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/msword",
+      "text/plain",
+      "application/rtf",
+      "text/rtf",
+    ];
+    if (!allowedTypes.includes(file.type) && !["pdf","doc","docx","txt","rtf"].includes(ext)) {
+      toast({ title: "Unsupported file", description: "Please upload PDF, DOC, DOCX, TXT, or RTF.", variant: "destructive" });
       return;
     }
     if (file.size > 50 * 1024 * 1024) {
