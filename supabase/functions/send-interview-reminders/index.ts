@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: "CareerHub <onboarding@resend.dev>",
+          from: Deno.env.get("RESEND_FROM") || "CareerNow <noreply@support.careernow.xyz>",
           to: [profile.email],
           subject: `📅 Interview Reminder: ${app.company} - ${app.position} (Tomorrow!)`,
           html: `
@@ -137,10 +137,10 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
                   
                   <p style="margin-top: 24px;">You've got this! Good luck! 🍀</p>
-                  <p style="color: #666;">The CareerHub Team</p>
+                  <p style="color: #666;">The CareerNow Team</p>
                 </div>
                 <div class="footer">
-                  <p>You received this email because you have interview reminders enabled on CareerHub.</p>
+                  <p>You received this email because you have interview reminders enabled on CareerNow.</p>
                 </div>
               </div>
             </body>

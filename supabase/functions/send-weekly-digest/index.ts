@@ -148,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: "CareerHub <onboarding@resend.dev>",
+          from: Deno.env.get("RESEND_FROM") || "CareerNow <noreply@support.careernow.xyz>",
           to: [profile.email],
           subject: `📊 Your Weekly Job Search Summary - ${thisWeekApps.length} new applications`,
           html: `
@@ -227,10 +227,10 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
                   
                   <p style="margin-top: 24px;">Keep up the great work!</p>
-                  <p style="color: #666;">The CareerHub Team</p>
+                  <p style="color: #666;">The CareerNow Team</p>
                 </div>
                 <div class="footer">
-                  <p>You received this email because you have weekly digest enabled on CareerHub.</p>
+                  <p>You received this email because you have weekly digest enabled on CareerNow.</p>
                 </div>
               </div>
             </body>

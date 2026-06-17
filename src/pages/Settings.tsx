@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Settings as SettingsIcon, Bell, Mail, Calendar, ArrowLeft, Loader2, Smartphone, Crown, ExternalLink } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Mail, Calendar, ArrowLeft, Loader2, Smartphone, Crown, ExternalLink, Activity, CheckCircle2, XCircle } from "lucide-react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -43,6 +43,30 @@ const Settings = () => {
   const [portalLoading, setPortalLoading] = useState(false);
   const { isSupported, isEnabled, permission, requestPermission, disable } = usePushNotifications();
   const { isPro, isLoading: subLoading } = useSubscription();
+
+  const [diagRunning, setDiagRunning] = useState(false);
+  const [diagResult, setDiagResult] = useState<{ ok: boolean; steps: { name: string; ok: boolean; ms: number; error?: string }[] } | null>(null);
+
+  const runPipelineTest = async () => {
+    setDiagRunning(true);
+    setDiagResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("test-pipeline", { body: {} });
+      if (error) throw error;
+      setDiagResult(data);
+      toast({
+        title: data?.ok ? "End-to-end test passed" : "End-to-end test had failures",
+        description: data?.ok ? "Resume → Job match → Smart Apply all working." : "See the step list for details.",
+        variant: data?.ok ? "default" : "destructive",
+      });
+    } catch (e: any) {
+      const msg = e?.message || "Test failed to run";
+      setDiagResult({ ok: false, steps: [{ name: "invoke", ok: false, ms: 0, error: msg }] });
+      toast({ title: "Test failed", description: msg, variant: "destructive" });
+    } finally {
+      setDiagRunning(false);
+    }
+  };
 
   const openCustomerPortal = async () => {
     try {
@@ -413,6 +437,37 @@ const Settings = () => {
             </CardContent>
           </Card>
 
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                End-to-end pipeline test
+              </CardTitle>
+              <CardDescription>
+                Runs Resume → Job Match → Smart Apply against the live backend and reports any step that fails.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button onClick={runPipelineTest} disabled={diagRunning}>
+                {diagRunning ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Running…</>) : "Run test"}
+              </Button>
+              {diagResult && (
+                <ul className="space-y-1 text-sm">
+                  {diagResult.steps.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      {s.ok
+                        ? <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                        : <XCircle className="h-4 w-4 text-destructive mt-0.5" />}
+                      <span className="font-mono">{s.name}</span>
+                      <span className="text-muted-foreground">({s.ms}ms)</span>
+                      {s.error && <span className="text-destructive">— {s.error}</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
 
           <div className="flex justify-end">
             <Button

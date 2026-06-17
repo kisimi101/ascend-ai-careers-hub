@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) throw new Error("RESEND_API_KEY missing");
-    const from = Deno.env.get("RESEND_FROM") || "CareerNow <onboarding@resend.dev>";
+    const from = Deno.env.get("RESEND_FROM") || "CareerNow <noreply@support.careernow.xyz>";
 
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
