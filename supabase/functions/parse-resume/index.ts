@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import mammoth from "npm:mammoth@1.7.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,20 +27,56 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Decode base64 to get raw text (works for TXT; for PDF/DOCX we send base64 to AI)
+    // Detect format from MIME or extension and extract text where possible.
+    const ext = (fileName || "").toLowerCase().split(".").pop() || "";
+    const isPdf  = fileType === "application/pdf" || ext === "pdf";
+    const isDocx = fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || ext === "docx";
+    const isDoc  = fileType === "application/msword" || ext === "doc";
+    const isTxt  = fileType === "text/plain" || ext === "txt";
+    const isRtf  = fileType === "application/rtf" || fileType === "text/rtf" || ext === "rtf";
+
+    if (!isPdf && !isDocx && !isDoc && !isTxt && !isRtf) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: `Unsupported file type. Please upload PDF, DOCX, DOC, TXT, or RTF.`,
+      }), { status: 415, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    if (isDoc) {
+      // Legacy .doc binary parsing isn't viable in Deno — guide users to save as .docx
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Legacy .doc files aren't supported. Please re-save as .docx, PDF, or TXT and try again.",
+      }), { status: 415, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const bytes = Uint8Array.from(atob(fileContent), (c) => c.charCodeAt(0));
     let textContent = "";
-    
-    if (fileType === "text/plain") {
-      const bytes = Uint8Array.from(atob(fileContent), (c) => c.charCodeAt(0));
+
+    if (isTxt) {
       textContent = new TextDecoder().decode(bytes);
-    } else {
-      // For PDF and DOCX, we'll send the base64 content to Gemini which can process documents
-      textContent = `[This is a base64-encoded ${fileType} file named "${fileName}". Please extract the resume information from it.]`;
+    } else if (isRtf) {
+      // Strip RTF control words and groups, leave plain text
+      const raw = new TextDecoder().decode(bytes);
+      textContent = raw
+        .replace(/\\par[d]?/g, "\n")
+        .replace(/\\'[0-9a-fA-F]{2}/g, "")
+        .replace(/\\[a-zA-Z]+-?\d* ?/g, "")
+        .replace(/[{}]/g, "")
+        .replace(/\\\*/g, "")
+        .trim();
+    } else if (isDocx) {
+      try {
+        const { value } = await mammoth.extractRawText({ buffer: bytes });
+        textContent = value || "";
+      } catch (err) {
+        console.error("docx parse error", err);
+      }
     }
 
     const prompt = `You are a resume parser. Extract structured information from the following resume content.
 
-${fileType === "text/plain" ? `Resume text:\n${textContent}` : `This is a ${fileType} document. The content is base64 encoded. Extract what you can from the filename and any text patterns.`}
+${textContent ? `Resume text:\n${textContent}` : `This is a ${fileType} document. Extract resume information from the attached file.`}
 
 Return a JSON object with this exact structure (use empty strings for missing fields, empty arrays for missing lists):
 {
@@ -79,7 +116,7 @@ Return ONLY valid JSON, no markdown or explanation.`;
         messages: [
           {
             role: "user",
-            content: fileType !== "text/plain"
+            content: (isPdf && !textContent)
               ? [
                   { type: "text", text: prompt },
                   {

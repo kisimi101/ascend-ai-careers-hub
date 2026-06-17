@@ -45,9 +45,17 @@ const ResumeChecker = () => {
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const okType = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type);
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const okType = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain',
+      'application/rtf',
+      'text/rtf',
+    ].includes(file.type) || ['pdf','doc','docx','txt','rtf'].includes(ext);
     if (!okType) {
-      toast({ title: "Unsupported file", description: "Please upload a PDF or DOCX.", variant: "destructive" });
+      toast({ title: "Unsupported file", description: "Please upload PDF, DOC, DOCX, TXT, or RTF.", variant: "destructive" });
       return;
     }
     if (file.size > MAX_UPLOAD_BYTES) {
@@ -163,13 +171,13 @@ const ResumeChecker = () => {
                     <p className="text-sm text-gray-600 mb-2">
                       {uploadedFile ? uploadedFile.name : "Click to upload or drag and drop"}
                     </p>
-                    <p className="text-xs text-gray-400">PDF, DOC, DOCX up to 50MB</p>
+                    <p className="text-xs text-gray-400">PDF, DOC, DOCX, TXT, RTF up to 50MB</p>
                   </div>
                   
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".pdf,.doc,.docx"
+                    accept=".pdf,.doc,.docx,.txt,.rtf"
                     onChange={handleFileUpload}
                     className="hidden"
                   />

@@ -57,7 +57,7 @@ const ResumeBuilder = () => {
 
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const downloadTrial = useTrialLimit("resume-download", 1);
   const [authOpen, setAuthOpen] = useState(false);
   const [downloadUsage, setDownloadUsage] = useState<{ used: number; limit: number; remaining: number } | null>(null);
@@ -152,6 +152,21 @@ const ResumeBuilder = () => {
       );
     } catch {}
   }, [resumeData, selectedTemplate, accentColor, density]);
+
+  // Persist latest resume skills to the user profile so Job Search and Smart Apply
+  // can auto-prefill keywords from the most recent resume.
+  useEffect(() => {
+    if (!user?.id) return;
+    const skills = (resumeData.skills || []).filter(s => typeof s === "string" && s.trim());
+    if (skills.length === 0) return;
+    const t = setTimeout(() => {
+      supabase.from("profiles").update({
+        latest_resume_skills: skills,
+        latest_resume_updated_at: new Date().toISOString(),
+      }).eq("id", user.id).then(() => {}, () => {});
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [resumeData.skills, user?.id]);
 
   const requireDownloadAccess = (): boolean => {
     if (isAuthenticated) return true;

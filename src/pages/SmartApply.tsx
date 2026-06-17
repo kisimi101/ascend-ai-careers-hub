@@ -53,6 +53,22 @@ import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 import { useTrialLimit } from "@/hooks/useTrialLimit";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 
+// Surface real server error messages instead of "Edge Function returned a non-2xx status code".
+async function describeFnError(err: any): Promise<string> {
+  try {
+    const ctx = err?.context;
+    if (ctx && typeof ctx.json === "function") {
+      const j = await ctx.json();
+      if (j?.error) return typeof j.error === "string" ? j.error : JSON.stringify(j.error);
+    }
+    if (ctx && typeof ctx.text === "function") {
+      const t = await ctx.text();
+      if (t) return t.slice(0, 300);
+    }
+  } catch {}
+  return err?.message || "Something went wrong.";
+}
+
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
   experience: Array<{ company: string; position: string; duration: string; description: string }>;
@@ -236,9 +252,17 @@ const SmartApply = () => {
       return;
     }
 
-    const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
-    if (!allowedTypes.includes(file.type)) {
-      toast({ title: "Unsupported file", description: "Please upload PDF, DOCX, or TXT.", variant: "destructive" });
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/msword",
+      "text/plain",
+      "application/rtf",
+      "text/rtf",
+    ];
+    if (!allowedTypes.includes(file.type) && !["pdf","doc","docx","txt","rtf"].includes(ext)) {
+      toast({ title: "Unsupported file", description: "Please upload PDF, DOC, DOCX, TXT, or RTF.", variant: "destructive" });
       return;
     }
     if (file.size > 50 * 1024 * 1024) {
@@ -350,7 +374,7 @@ const SmartApply = () => {
       if (!isAuthenticated) guestApply.recordUse();
     } catch (err: any) {
       console.error("Smart apply error:", err);
-      toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
+      toast({ title: "Smart Apply failed", description: await describeFnError(err), variant: "destructive" });
       setStep("upload");
     } finally {
       setIsProcessing(false);
@@ -427,7 +451,7 @@ const SmartApply = () => {
       if (!isAuthenticated) guestApply.recordUse();
     } catch (err: any) {
       console.error("Smart apply error:", err);
-      toast({ title: "Error", description: err.message || "Something went wrong.", variant: "destructive" });
+      toast({ title: "Smart Apply failed", description: await describeFnError(err), variant: "destructive" });
       setStep("upload");
     } finally {
       setIsProcessing(false);

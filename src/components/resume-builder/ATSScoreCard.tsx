@@ -51,11 +51,20 @@ export const ATSScoreCard = ({ resumeData, selectedTemplate }: ATSScoreProps) =>
     }
 
     // Skills (15 points)
-    if (resumeData.skills.length >= 5 && resumeData.skills[0]) {
+    // Filter empty/whitespace entries so a stray "" doesn't fool the count.
+    // The Skills section may be rendered under synonyms like "Key Competencies",
+    // "Core Competencies", "Technical Skills" — they all map to resumeData.skills.
+    const validSkills = (resumeData.skills || []).filter(
+      (s: unknown) => typeof s === "string" && s.trim().length > 0
+    );
+    if (validSkills.length >= 5) {
       score += 15;
       checks.push({ type: "pass", text: "Relevant skills listed" });
-    } else if (resumeData.skills.length >= 3 && resumeData.skills[0]) {
+    } else if (validSkills.length >= 3) {
       score += 10;
+      checks.push({ type: "warning", text: "Add more relevant skills (5+ recommended)" });
+    } else if (validSkills.length >= 1) {
+      score += 7;
       checks.push({ type: "warning", text: "Add more relevant skills (5+ recommended)" });
     } else {
       checks.push({ type: "fail", text: "Missing skills section" });

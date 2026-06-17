@@ -83,6 +83,33 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: {
+          email_type: string
+          id: string
+          meta: Json | null
+          sent_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          email_type: string
+          id?: string
+          meta?: Json | null
+          sent_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          email_type?: string
+          id?: string
+          meta?: Json | null
+          sent_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       favorite_companies: {
         Row: {
           benefits: string[] | null
@@ -452,6 +479,8 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          latest_resume_skills: Json | null
+          latest_resume_updated_at: string | null
           preferred_language: string | null
           updated_at: string
         }
@@ -460,6 +489,8 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          latest_resume_skills?: Json | null
+          latest_resume_updated_at?: string | null
           preferred_language?: string | null
           updated_at?: string
         }
@@ -468,6 +499,8 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          latest_resume_skills?: Json | null
+          latest_resume_updated_at?: string | null
           preferred_language?: string | null
           updated_at?: string
         }

@@ -199,9 +199,9 @@ ${resumeContext}`,
     }
 
     if (action === "generate-cover-letters") {
-      const { jobs } = await req.json();
-      // This action receives resumeData + jobs array from initial request body
-      const jobsList = resumeData.jobs || [];
+      // Body was already consumed at the top of the handler.
+      // Read jobs from the already-parsed body (resumeData.jobs or body.jobs).
+      const jobsList = (resumeData && resumeData.jobs) || body.jobs || [];
       
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
