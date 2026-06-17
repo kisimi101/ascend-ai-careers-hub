@@ -53,6 +53,22 @@ import { SearchUsageBadge } from "@/components/job-search/SearchUsageBadge";
 import { useTrialLimit } from "@/hooks/useTrialLimit";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 
+// Surface real server error messages instead of "Edge Function returned a non-2xx status code".
+async function describeFnError(err: any): Promise<string> {
+  try {
+    const ctx = err?.context;
+    if (ctx && typeof ctx.json === "function") {
+      const j = await ctx.json();
+      if (j?.error) return typeof j.error === "string" ? j.error : JSON.stringify(j.error);
+    }
+    if (ctx && typeof ctx.text === "function") {
+      const t = await ctx.text();
+      if (t) return t.slice(0, 300);
+    }
+  } catch {}
+  return err?.message || "Something went wrong.";
+}
+
 interface ResumeData {
   personalInfo: { fullName: string; email: string; phone: string; location: string; summary: string };
   experience: Array<{ company: string; position: string; duration: string; description: string }>;
