@@ -61,6 +61,7 @@ import FreeResumeTemplatesHub from "./pages/FreeResumeTemplatesHub";
 import TailoredResumeOnboarding from "./pages/TailoredResumeOnboarding";
 import SeoKeywordTracker from "./pages/SeoKeywordTracker";
 import CompanyWatchlist from "./pages/CompanyWatchlist";
+import ChromeExtension from "./pages/ChromeExtension";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ const App = () => (
                   <Route path="/tailored-resume" element={<TailoredResumeOnboarding />} />
                   <Route path="/seo-keyword-tracker" element={<ProtectedRoute><SeoKeywordTracker /></ProtectedRoute>} />
                   <Route path="/get-started" element={<GetStarted />} />
+                  <Route path="/chrome-extension" element={<ChromeExtension />} />
 
                   {/* Free tools — open to all visitors */}
                   <Route path="/tools" element={<ToolsDashboard />} />
