@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Download, Chrome, Sparkles, Shield, Zap, CheckCircle2 } from "lucide-react";
