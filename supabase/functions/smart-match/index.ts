@@ -250,6 +250,65 @@ Return JSON: { "coverLetters": [{ "jobIndex": 0, "letter": "Dear Hiring Manager,
       });
     }
 
+    if (action === "readiness" || action === "single-cover-letter") {
+      const jobTitle = body.jobTitle || body.job?.title || "";
+      const jobCompany = body.jobCompany || body.job?.company || "";
+      const jobDescription = body.jobDescription || body.job?.description || "";
+      const resumeContext = `
+Name: ${resumeData?.personalInfo?.fullName || "N/A"}
+Summary: ${resumeData?.personalInfo?.summary || "N/A"}
+Experience: ${(resumeData?.experience || []).map((e: any) => `${e.position} at ${e.company} (${e.duration}) - ${e.description}`).join("\n")}
+Education: ${(resumeData?.education || []).map((e: any) => `${e.degree} from ${e.institution} (${e.year})`).join("\n")}
+Skills: ${(resumeData?.skills || []).join(", ")}
+      `.trim();
+
+      const prompt = action === "readiness"
+        ? `Score how well this candidate matches the job. Return ONLY JSON:
+{ "score": 0-100, "verdict": "Strong fit"|"Good fit"|"Partial fit"|"Weak fit",
+  "matchedSkills": ["..."], "missingSkills": ["..."], "tips": ["short tip", "..."] }
+
+Job: ${jobTitle} at ${jobCompany}
+Description: ${jobDescription}
+
+Resume:
+${resumeContext}`
+        : `Write a tailored 3-paragraph cover letter (≤220 words) for this job. Return ONLY JSON: { "letter": "Dear Hiring Manager,..." }
+
+Job: ${jobTitle} at ${jobCompany}
+Description: ${jobDescription}
+
+Resume:
+${resumeContext}`;
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: "You are an expert career coach. Return only valid JSON." },
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.3,
+        }),
+      });
+      if (!response.ok) {
+        const t = await response.text();
+        console.error("AI error", response.status, t);
+        if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limit, try again." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        if (response.status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        throw new Error(`AI API error: ${response.status}`);
+      }
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || "";
+      const m = content.match(/\{[\s\S]*\}/);
+      if (!m) throw new Error("Could not parse AI response");
+      const result = JSON.parse(m[0]);
+      return new Response(JSON.stringify({ success: true, ...result }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     return new Response(JSON.stringify({ error: "Invalid action" }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
