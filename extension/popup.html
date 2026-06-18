@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>CareerNow Autofill</title>
+    <style>
+      :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+      body { width: 360px; margin: 0; padding: 16px; background: #faf7f3; color: #1a1614; }
+      h1 { font-size: 16px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; }
+      p.sub { font-size: 12px; color: #6b5e54; margin: 0 0 14px; }
+      .row { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+      label { font-size: 11px; color:#6b5e54; text-transform:uppercase; letter-spacing:0.04em; }
+      input, textarea { padding:8px 10px; border:1px solid #e6dfd6; border-radius:8px; font-size:13px; background:#fff; font-family:inherit; }
+      textarea { resize: vertical; min-height: 60px; }
+      button { width:100%; padding:10px 12px; border:0; border-radius:10px; font-weight:600; font-size:13px; cursor:pointer; }
+      button:disabled { opacity:0.5; cursor:not-allowed; }
+      .primary { background:#c2410c; color:#fff; }
+      .primary:hover:not(:disabled) { background:#9a3412; }
+      .secondary { background:#fff; color:#c2410c; border:1px solid #e6dfd6; }
+      .ghost { background:transparent; color:#c2410c; padding:8px 0; }
+      .status { font-size:12px; color:#16a34a; margin-top:8px; min-height: 16px; }
+      .err { color:#dc2626; }
+      .divider { height:1px; background:#e6dfd6; margin:14px 0; }
+      .profile { background:#fff; border:1px solid #e6dfd6; border-radius:10px; padding:10px 12px; font-size:12px; }
+      .profile strong { display:block; font-size:13px; margin-bottom:2px; color:#1a1614; }
+      .muted { color:#6b5e54; }
+      .score-card { background:#fff; border:1px solid #e6dfd6; border-radius:10px; padding:12px; margin:10px 0; }
+      .score-row { display:flex; align-items:center; justify-content:space-between; }
+      .score-num { font-size:28px; font-weight:700; letter-spacing:-0.02em; }
+      .score-good { color:#16a34a; } .score-mid { color:#c2410c; } .score-low { color:#dc2626; }
+      .pill { font-size:10px; padding:2px 8px; border-radius:999px; background:#faf7f3; color:#6b5e54; text-transform:uppercase; letter-spacing:0.04em; }
+      .tips { font-size:11px; color:#6b5e54; margin-top:8px; line-height:1.4; }
+      .tips li { margin-bottom:2px; }
+      .btn-row { display:flex; gap:6px; }
+      .btn-row button { flex:1; padding:8px 10px; font-size:12px; }
+      details { font-size:12px; color:#6b5e54; margin-top:8px; }
+      summary { cursor:pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>CareerNow Autofill</h1>
+    <p class="sub">One-click apply on Workday, Greenhouse, Lever, Ashby + more.</p>
+
+    <div id="signed-out">
+      <div class="row"><label>Email</label><input id="email" type="email" placeholder="you@example.com" /></div>
+      <div class="row"><label>Password</label><input id="password" type="password" placeholder="••••••••" /></div>
+      <button class="primary" id="signin">Sign in</button>
+      <button class="ghost" id="open-app">Don't have an account? Open CareerNow</button>
+    </div>
+
+    <div id="signed-in" style="display:none;">
+      <div class="profile" id="profile-card">
+        <strong id="p-name">—</strong>
+        <span class="muted" id="p-email">—</span>
+        <div class="muted" id="p-resume" style="margin-top:4px;font-size:11px;"></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <label>Job description (paste, optional)</label>
+        <textarea id="jd" placeholder="Paste the job description to enable Readiness & Cover Letter"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="secondary" id="score">Apply Readiness</button>
+        <button class="secondary" id="letter">AI Cover Letter</button>
+      </div>
+
+      <div id="score-card" class="score-card" style="display:none;">
+        <div class="score-row">
+          <div><div class="pill">Readiness</div><div class="score-num" id="score-num">—</div></div>
+          <div class="muted" id="score-verdict" style="font-size:12px;text-align:right;max-width:160px;"></div>
+        </div>
+        <ul class="tips" id="score-tips"></ul>
+      </div>
+
+      <div style="height:8px"></div>
+      <button class="primary" id="fill">Autofill this page</button>
+      <div class="status" id="status"></div>
+
+      <details>
+        <summary>Advanced</summary>
+        <div style="margin-top:6px;">
+          <button class="ghost" id="reload-data" style="padding:4px 0;text-align:left;">↻ Refresh profile & resume</button><br/>
+          <button class="ghost" id="clear-cache" style="padding:4px 0;text-align:left;">🗑 Clear field map for this site</button>
+        </div>
+      </details>
+
+      <div class="divider"></div>
+      <button class="ghost" id="signout">Sign out</button>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
