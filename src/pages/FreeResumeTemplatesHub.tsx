@@ -73,7 +73,9 @@ export default function FreeResumeTemplatesHub() {
         </section>
 
         <section className="px-4 sm:px-6 py-12">
-          <div className="container mx-auto max-w-6xl grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="container mx-auto max-w-6xl">
+            <h2 className="sr-only">Browse free resume templates</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {TEMPLATES.map(({ id, name, desc, ats, accent, Comp, best }) => (
               <Card key={id} className="overflow-hidden group hover:shadow-xl transition-all">
                 <div className="h-72 relative overflow-hidden bg-white border-b">
@@ -101,6 +103,7 @@ export default function FreeResumeTemplatesHub() {
                 </CardContent>
               </Card>
             ))}
+            </div>
           </div>
         </section>
 

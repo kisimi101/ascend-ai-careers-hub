@@ -30,3 +30,28 @@ CareerNow is an all-in-one, AI-powered career platform that helps job seekers cr
 
 ## Contact
 Website: https://careernow.xyz
+
+## Pages
+- [Home](/): AI career platform overview and product entry point.
+- [AI Resume Builder](/ai-resume-builder): Free AI resume builder tailored to any role.
+- [Free Resume Templates](/free-resume-templates): Six ATS-friendly templates with live preview.
+- [Resume Builder](/resume-builder): Editor with 6 templates and live ATS scoring.
+- [Resume Checker](/resume-checker): Score an existing resume against ATS rules.
+- [Tailored Resume](/tailored-resume): Onboarding flow that tailors a resume to a job description.
+- [Job Search](/job-search): Search 14+ job boards including LinkedIn, Indeed, RemoteOK.
+- [Job Search Tools](/job-search-tools): Landing hub for AI job-search features.
+- [Smart Apply](/smart-apply): AI tailors resume + cover letter and opens the employer apply URL.
+- [Cover Letter Generator](/cover-letter-generator): AI-generated tailored cover letters.
+- [Interview Practice](/interview-practice): AI interview practice with feedback.
+- [Salary Estimator](/salary-estimator): Estimate salaries by role and location.
+- [LinkedIn Optimizer](/linkedin-optimizer): Optimize a LinkedIn profile for recruiters.
+- [Company Research](/company-research): Research target companies before applying.
+- [Resume Examples](/resume-examples): Gallery of recruiter-tested resume samples.
+- [Chrome Extension](/chrome-extension): One-click autofill across Workday, Greenhouse, Lever, Ashby.
+- [Get Started](/get-started): Guided onboarding for new users.
+
+## Optional
+- [Product overview](/product.md)
+- [Pricing](/pricing.md)
+- [FAQ](/faq.md)
+- [Static AI page](/llm.html)
