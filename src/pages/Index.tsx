@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { Helmet } from "react-helmet-async";
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { AnnotatedResumePreview } from "@/components/AnnotatedResumePreview";
@@ -26,6 +27,34 @@ const SectionFallback = () => (
 const Index = () => {
   return (
     <main className="min-h-screen bg-background">
+      <Helmet>
+        <title>CareerNow — AI Resume Builder & Job Search</title>
+        <meta name="description" content="ATS-friendly resume builder, 14+ job boards, smart apply, and interview practice — one connected AI workflow for job seekers." />
+        <link rel="canonical" href="https://careernow.xyz/" />
+        <meta property="og:title" content="CareerNow — AI Resume Builder & Job Search" />
+        <meta property="og:description" content="ATS-friendly resume builder, 14+ job boards, smart apply and interview practice — one connected AI workflow." />
+        <meta property="og:url" content="https://careernow.xyz/" />
+        <meta property="og:type" content="website" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "CareerNow",
+          url: "https://careernow.xyz",
+          logo: "https://careernow.xyz/favicon.ico",
+          sameAs: ["https://www.careernow.xyz"],
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "CareerNow",
+          url: "https://careernow.xyz",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://careernow.xyz/job-search?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        })}</script>
+      </Helmet>
       <Navigation />
       <FloatingCTA />
       <FloatingSideTools />
